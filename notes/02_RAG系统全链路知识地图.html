@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG 系统全链路知识地图</title>
+    <style>
+      :root {
+        --bg: #eef6ff;
+        --bg-soft: #f8fbff;
+        --panel: rgba(255, 255, 255, 0.78);
+        --panel-strong: rgba(255, 255, 255, 0.92);
+        --line: rgba(80, 146, 255, 0.18);
+        --line-strong: rgba(57, 126, 255, 0.34);
+        --text: #0d1b3d;
+        --muted: #54617f;
+        --blue: #1565ff;
+        --blue-2: #39a6ff;
+        --cyan: #74dbff;
+        --glow: 0 18px 80px rgba(34, 131, 255, 0.22);
+        --glow-strong: 0 24px 100px rgba(22, 125, 255, 0.28);
+        --radius-xl: 34px;
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --radius-sm: 14px;
+        --shadow-card: 0 18px 52px rgba(14, 58, 125, 0.1);
+        --shadow-button: 0 14px 34px rgba(22, 101, 255, 0.22);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 8% 12%, rgba(55, 171, 255, 0.22), transparent 24%),
+          radial-gradient(circle at 86% 16%, rgba(78, 125, 255, 0.22), transparent 28%),
+          radial-gradient(circle at 50% 100%, rgba(89, 224, 255, 0.18), transparent 32%),
+          linear-gradient(180deg, #f8fcff 0%, #eef6ff 48%, #edf4ff 100%);
+        overflow: hidden;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: auto;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::before {
+        top: -16vw;
+        right: -12vw;
+        width: 44vw;
+        height: 44vw;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(52, 182, 255, 0.28), transparent 68%);
+        filter: blur(10px);
+      }
+
+      body::after {
+        left: -18vw;
+        bottom: -22vw;
+        width: 54vw;
+        height: 54vw;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(31, 103, 255, 0.18), transparent 68%);
+        filter: blur(14px);
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 18px 26px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-badge {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.18) 38%, transparent 39%),
+          linear-gradient(145deg, #7ee7ff, #2970ff 46%, #0d1d61);
+        box-shadow: var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .brand-badge::after {
+        content: "";
+        position: absolute;
+        inset: 9px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.34);
+      }
+
+      .brand-text strong {
+        display: block;
+        font-size: 18px;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-text span {
+        display: block;
+        margin-top: 3px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .button,
+      .nav-chip,
+      .mini-button,
+      .tab-button,
+      .accordion-trigger {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          box-shadow 220ms ease,
+          background 220ms ease,
+          color 220ms ease,
+          border-color 220ms ease,
+          opacity 220ms ease;
+      }
+
+      .button:hover,
+      .nav-chip:hover,
+      .mini-button:hover,
+      .tab-button:hover,
+      .accordion-trigger:hover {
+        transform: translateY(-2px);
+      }
+
+      .button:active,
+      .nav-chip:active,
+      .mini-button:active,
+      .tab-button:active,
+      .accordion-trigger:active {
+        transform: translateY(1px) scale(0.985);
+      }
+
+      .button:focus-visible,
+      .nav-chip:focus-visible,
+      .mini-button:focus-visible,
+      .tab-button:focus-visible,
+      .accordion-trigger:focus-visible,
+      .interactive-surface:focus-visible {
+        outline: 2px solid rgba(24, 112, 255, 0.44);
+        outline-offset: 3px;
+      }
+
+      .button {
+        padding: 13px 18px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.5;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .button-primary {
+        color: white;
+        background: linear-gradient(135deg, #0d79ff, #2fd0ff);
+        box-shadow: var(--shadow-button);
+      }
+
+      .button-secondary {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(21, 101, 255, 0.18);
+        box-shadow: 0 10px 28px rgba(73, 122, 196, 0.12);
+      }
+
+      .viewport {
+        position: relative;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        overflow: visible;
+      }
+
+      .slides {
+        height: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(100%, 100%);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        gap: 20px;
+        padding: 18px 26px 20px;
+        padding-bottom: 6px;
+        border-radius: 44px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 251, 255, 0.92));
+        border: 1px solid rgba(124, 179, 255, 0.14);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.7),
+          0 18px 44px rgba(39, 99, 175, 0.08);
+        overflow: hidden;
+        scroll-padding-inline: 26px;
+      }
+
+      .slides::-webkit-scrollbar {
+        display: none;
+      }
+
+      .slide {
+        scroll-snap-align: start;
+        height: 100%;
+        border-radius: 38px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 251, 255, 0.84)),
+          linear-gradient(135deg, rgba(82, 158, 255, 0.1), rgba(102, 220, 255, 0.08));
+        border: 1px solid rgba(88, 150, 255, 0.2);
+        box-shadow: var(--glow), var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.68);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .slide::before {
+        content: "";
+        position: absolute;
+        right: -8%;
+        bottom: -18%;
+        width: 34%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(63, 163, 255, 0.18), transparent 70%);
+        filter: blur(18px);
+        pointer-events: none;
+      }
+
+      .slide-header {
+        padding: 30px 34px 18px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        border-bottom: 1px solid rgba(91, 142, 255, 0.12);
+      }
+
+      .slide-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(37, 110, 255, 0.08);
+        border: 1px solid rgba(42, 120, 255, 0.14);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .slide-kicker::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2fd0ff, #136dff);
+        box-shadow: 0 0 18px rgba(55, 184, 255, 0.7);
+      }
+
+      .slide-title {
+        margin: 14px 0 10px;
+        font-size: clamp(32px, 4.3vw, 64px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+      }
+
+      .slide-desc {
+        max-width: 720px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75;
+      }
+
+      .slide-meta {
+        min-width: 210px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .meta-card {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(84, 143, 255, 0.16);
+        border-radius: 22px;
+        padding: 16px;
+        box-shadow: 0 14px 30px rgba(53, 108, 178, 0.08);
+      }
+
+      .meta-card strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .meta-card span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .slide-body {
+        padding: 22px 34px 30px;
+        overflow: auto;
+      }
+
+      .hero-grid,
+      .card-grid,
+      .detail-grid,
+      .metrics-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1.2fr 0.9fr;
+        align-items: stretch;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .glass-card,
+      .stat-card,
+      .glow-panel {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(250, 253, 255, 0.8));
+        border: 1px solid rgba(81, 145, 255, 0.16);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 18px 40px rgba(49, 96, 167, 0.08);
+      }
+
+      .interactive-surface {
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          box-shadow 220ms ease,
+          border-color 220ms ease,
+          background 220ms ease,
+          color 220ms ease;
+      }
+
+      .interactive-surface:hover {
+        transform: translateY(-4px);
+        border-color: rgba(21, 101, 255, 0.26);
+        box-shadow:
+          0 18px 42px rgba(45, 102, 179, 0.14),
+          0 0 0 1px rgba(94, 191, 255, 0.18);
+      }
+
+      .interactive-surface.is-active {
+        transform: translateY(-2px);
+        border-color: rgba(22, 109, 255, 0.34);
+        box-shadow:
+          0 18px 40px rgba(34, 104, 189, 0.16),
+          0 0 0 1px rgba(74, 197, 255, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.88);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 249, 255, 0.9));
+      }
+
+      .glass-card {
+        padding: 22px;
+      }
+
+      .glow-panel {
+        padding: 26px;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .glow-panel::before {
+        content: "";
+        position: absolute;
+        inset: -10% auto auto 55%;
+        width: 34%;
+        height: 45%;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(43, 167, 255, 0.22), transparent 68%);
+        filter: blur(14px);
+        pointer-events: none;
+      }
+
+      .hero-visual {
+        min-height: 380px;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 50% 45%, rgba(83, 191, 255, 0.28), transparent 24%),
+          radial-gradient(circle at 50% 50%, rgba(18, 91, 255, 0.18), transparent 48%),
+          linear-gradient(180deg, rgba(255,255,255,0.76), rgba(240,248,255,0.82));
+        position: relative;
+        isolation: isolate;
+      }
+
+      .orbital-core {
+        width: min(38vw, 320px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 30% 28%, rgba(255,255,255,0.95), rgba(255,255,255,0.16) 26%, transparent 27%),
+          conic-gradient(from 12deg, #aef0ff, #4ccaff, #1d66ff, #96e6ff, #6e96ff, #aef0ff);
+        display: grid;
+        place-items: center;
+        box-shadow:
+          0 0 0 16px rgba(255, 255, 255, 0.12),
+          0 0 80px rgba(31, 135, 255, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        animation: float 7s ease-in-out infinite;
+      }
+
+      .orbital-core::before {
+        content: "";
+        width: 72%;
+        height: 72%;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle, rgba(14, 34, 121, 0.95), rgba(18, 41, 140, 0.86) 48%, rgba(45, 154, 255, 0.16) 100%);
+        box-shadow: inset 0 0 34px rgba(85, 190, 255, 0.32);
+      }
+
+      .orbital-ring {
+        position: absolute;
+        inset: 50%;
+        width: min(48vw, 410px);
+        height: min(48vw, 410px);
+        margin: calc(min(48vw, 410px) / -2);
+        border-radius: 50%;
+        border: 1px solid rgba(56, 143, 255, 0.2);
+        box-shadow: inset 0 0 28px rgba(64, 157, 255, 0.1);
+      }
+
+      .orbital-ring::before,
+      .orbital-ring::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fff, #6ae2ff 55%, #1565ff);
+        box-shadow: 0 0 20px rgba(56, 180, 255, 0.72);
+      }
+
+      .orbital-ring::before {
+        top: 9%;
+        left: 16%;
+      }
+
+      .orbital-ring::after {
+        right: 12%;
+        bottom: 15%;
+      }
+
+      .flowline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .flow-step {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(44, 120, 255, 0.18);
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 24px rgba(67, 117, 188, 0.08);
+        transition:
+          transform 180ms ease,
+          box-shadow 220ms ease,
+          background 220ms ease,
+          border-color 220ms ease,
+          color 220ms ease;
+      }
+
+      .flow-step:hover,
+      .flow-step.is-active {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, rgba(16, 109, 255, 0.14), rgba(53, 207, 255, 0.12));
+        border-color: rgba(20, 106, 255, 0.28);
+        color: #0d2f86;
+        box-shadow: 0 16px 34px rgba(45, 110, 194, 0.14);
+      }
+
+      .flow-arrow {
+        color: var(--blue);
+        font-weight: 700;
+      }
+
+      .section-note {
+        margin-top: 16px;
+        padding: 15px 16px;
+        border-radius: var(--radius-md);
+        background: rgba(20, 101, 255, 0.06);
+        border: 1px solid rgba(20, 101, 255, 0.12);
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 14px;
+      }
+
+      .card-title {
+        margin: 0 0 8px;
+        font-size: 21px;
+        letter-spacing: -0.03em;
+      }
+
+      .card-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(23, 106, 255, 0.08);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .card-copy,
+      .bullet-list li,
+      .accordion-content,
+      .timeline-copy {
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 14px;
+      }
+
+      .bullet-list {
+        margin: 10px 0 0;
+        padding-left: 18px;
+      }
+
+      .bullet-list li + li {
+        margin-top: 8px;
+      }
+
+      .stat-card {
+        padding: 18px;
+        min-height: 132px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -16% -26% auto;
+        width: 40%;
+        height: 60%;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(48, 171, 255, 0.2), transparent 70%);
+        filter: blur(12px);
+        pointer-events: none;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+      }
+
+      .stat-label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .nav-rail {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 0 26px 22px;
+        scrollbar-width: none;
+      }
+
+      .nav-rail::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-chip {
+        white-space: nowrap;
+        padding: 12px 16px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--muted);
+        border: 1px solid rgba(72, 130, 255, 0.16);
+        box-shadow: 0 10px 24px rgba(63, 108, 183, 0.08);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .nav-chip.active {
+        background: linear-gradient(135deg, #116bff, #43d6ff);
+        color: white;
+        border-color: transparent;
+        box-shadow: var(--shadow-button);
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+      }
+
+      .mini-button {
+        width: 46px;
+        height: 46px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.84);
+        color: var(--blue);
+        border: 1px solid rgba(67, 127, 255, 0.18);
+        box-shadow: 0 10px 24px rgba(64, 111, 185, 0.1);
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .timeline {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        padding-top: 22px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        top: 11px;
+        left: 4%;
+        right: 4%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(75, 174, 255, 0.16), rgba(21, 101, 255, 0.58), rgba(75, 174, 255, 0.16));
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-top: 20px;
+        padding-right: 8px;
+        padding-left: 8px;
+        padding-bottom: 12px;
+        border-radius: 20px;
+        transition:
+          transform 180ms ease,
+          box-shadow 220ms ease,
+          background 220ms ease,
+          border-color 220ms ease;
+      }
+
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 10px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fbfeff, #70daff 54%, #1565ff);
+        box-shadow: 0 0 18px rgba(32, 151, 255, 0.55);
+      }
+
+      .timeline-item:hover,
+      .timeline-item.is-active {
+        transform: translateY(-4px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(242, 248, 255, 0.84));
+        box-shadow: 0 18px 40px rgba(43, 100, 176, 0.12);
+      }
+
+      .timeline-year {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+      }
+
+      .timeline-topic {
+        display: block;
+        margin-top: 8px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .tabs {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(70, 126, 255, 0.12);
+      }
+
+      .tab-button {
+        padding: 11px 14px;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .tab-button.active {
+        background: linear-gradient(135deg, #106dff, #35cfff);
+        color: white;
+        box-shadow: 0 12px 26px rgba(21, 101, 255, 0.24);
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      .process-ribbon {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .process-pill {
+        padding: 10px 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.74);
+        border: 1px solid rgba(70, 128, 255, 0.12);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.03em;
+      }
+
+      .process-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+
+      .process-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .process-card {
+        min-height: 188px;
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 251, 255, 0.84));
+        border: 1px solid rgba(73, 134, 255, 0.14);
+        box-shadow: 0 14px 34px rgba(46, 96, 168, 0.08);
+      }
+
+      .process-index {
+        display: inline-grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0f73ff, #53dcff);
+        box-shadow: 0 12px 24px rgba(24, 112, 255, 0.22);
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .process-card h3 {
+        margin: 14px 0 8px;
+        font-size: 18px;
+        letter-spacing: -0.03em;
+      }
+
+      .process-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.72;
+      }
+
+      .process-detail {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition:
+          max-height 260ms ease,
+          opacity 220ms ease,
+          margin-top 220ms ease,
+          padding-top 220ms ease;
+      }
+
+      .process-card.is-active .process-detail {
+        max-height: 220px;
+        opacity: 1;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(79, 136, 255, 0.14);
+      }
+
+      .process-detail ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .process-detail li {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .process-detail li + li {
+        margin-top: 8px;
+      }
+
+      .focus-panel {
+        padding: 22px;
+        border-radius: 24px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(242, 249, 255, 0.88));
+        border: 1px solid rgba(74, 136, 255, 0.16);
+        box-shadow: 0 18px 38px rgba(43, 98, 172, 0.1);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .focus-panel::before {
+        content: "";
+        position: absolute;
+        right: -12%;
+        top: -16%;
+        width: 44%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(65, 180, 255, 0.2), transparent 68%);
+        filter: blur(14px);
+        pointer-events: none;
+      }
+
+      .focus-panel strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .focus-panel p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.78;
+      }
+
+      .focus-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .focus-item {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(77, 138, 255, 0.14);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .focus-item strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--text);
+        font-size: 13px;
+      }
+
+      .retrieval-board {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .retrieval-node {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(72, 132, 255, 0.14);
+        box-shadow: 0 14px 30px rgba(52, 104, 174, 0.08);
+      }
+
+      .retrieval-node strong {
+        display: block;
+        font-size: 17px;
+      }
+
+      .retrieval-node span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .issue-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .issue-card {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(75, 136, 255, 0.14);
+        box-shadow: 0 14px 30px rgba(47, 100, 170, 0.08);
+      }
+
+      .issue-card strong {
+        display: block;
+        font-size: 17px;
+      }
+
+      .issue-card p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.68;
+      }
+
+      .knowledge-dock {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .dock-panel {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(74, 135, 255, 0.14);
+        box-shadow: 0 14px 28px rgba(47, 97, 165, 0.08);
+      }
+
+      .dock-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .dock-title::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2fd0ff, #1565ff);
+        box-shadow: 0 0 14px rgba(62, 182, 255, 0.68);
+      }
+
+      .chip-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .link-chip {
+        appearance: none;
+        border: 1px solid rgba(68, 130, 255, 0.16);
+        background: rgba(255, 255, 255, 0.88);
+        color: var(--blue);
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          box-shadow 220ms ease,
+          background 220ms ease,
+          border-color 220ms ease,
+          color 220ms ease;
+      }
+
+      .link-chip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(32, 102, 187, 0.14);
+        border-color: rgba(20, 106, 255, 0.28);
+      }
+
+      .link-chip:active {
+        transform: translateY(1px) scale(0.985);
+      }
+
+      .link-chip.problem {
+        color: #0f2f84;
+        background: linear-gradient(135deg, rgba(204, 242, 255, 0.82), rgba(222, 234, 255, 0.9));
+      }
+
+      .relationship-note {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(20, 101, 255, 0.05);
+        border: 1px solid rgba(20, 101, 255, 0.1);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .accordion {
+        display: grid;
+        gap: 12px;
+      }
+
+      .accordion-item {
+        border-radius: 18px;
+        border: 1px solid rgba(72, 134, 255, 0.14);
+        background: rgba(255, 255, 255, 0.72);
+        overflow: hidden;
+      }
+
+      .accordion-trigger {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        padding: 18px 18px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--text);
+      }
+
+      .accordion-trigger strong {
+        font-size: 16px;
+      }
+
+      .accordion-trigger span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .accordion-trigger .plus {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: var(--blue);
+        background: rgba(21, 101, 255, 0.08);
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 18px;
+        transition: max-height 260ms ease, padding 260ms ease;
+      }
+
+      .accordion-item.open .accordion-content {
+        max-height: 300px;
+        padding: 0 18px 18px;
+      }
+
+      .accordion-item.open .plus {
+        background: linear-gradient(135deg, #106dff, #35d1ff);
+        color: white;
+      }
+
+      .split-layout {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 18px;
+      }
+
+      .progress-shell {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .progress-bar {
+        width: 200px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(78, 130, 211, 0.12);
+        overflow: hidden;
+      }
+
+      .progress-bar span {
+        display: block;
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #1f71ff, #50d9ff);
+        box-shadow: 0 0 18px rgba(44, 170, 255, 0.44);
+        transition: width 300ms ease;
+      }
+
+      .reading-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .reading-item {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(77, 138, 255, 0.14);
+      }
+
+      .reading-index {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        color: white;
+        background: linear-gradient(135deg, #0f73ff, #53dcff);
+        box-shadow: 0 12px 24px rgba(24, 112, 255, 0.24);
+        font-weight: 700;
+      }
+
+      .reading-item strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .reading-item span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .footer-note {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(85, 142, 255, 0.14);
+      }
+
+      .footer-note p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) scale(1);
+        }
+        50% {
+          transform: translateY(-12px) scale(1.02);
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .hero-grid,
+        .split-layout,
+        .process-layout,
+        .detail-grid,
+        .card-grid,
+        .metrics-grid,
+        .timeline,
+        .process-ribbon,
+        .process-grid,
+        .retrieval-board,
+        .issue-grid,
+        .knowledge-dock {
+          grid-template-columns: 1fr;
+        }
+
+        .slide-header {
+          grid-template-columns: 1fr;
+        }
+
+        .slide-header {
+          flex-direction: column;
+        }
+
+        .slide-meta {
+          width: 100%;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hero-visual {
+          min-height: 280px;
+        }
+
+        .orbital-core {
+          width: min(52vw, 260px);
+        }
+      }
+
+      @media (max-width: 760px) {
+        html,
+        body {
+          overflow: auto;
+        }
+
+        .shell {
+          height: auto;
+          min-height: 100vh;
+        }
+
+        .topbar,
+        .viewport,
+        .nav-rail {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+
+        .slides {
+          height: auto;
+          grid-auto-columns: minmax(100%, 100%);
+          padding-left: 14px;
+          padding-right: 14px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+
+        .slide {
+          min-height: calc(100vh - 142px);
+        }
+
+        .slide-header,
+        .slide-body {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .slide-title {
+          font-size: 34px;
+        }
+
+        .slide-meta {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-badge"></div>
+          <div class="brand-text">
+            <strong>RAG 系统全链路知识地图</strong>
+            <span>关联型知识地图 · 顺链路学 + 反向排障</span>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <div class="progress-shell">
+            <span id="slideCounter">01 / 10</span>
+            <div class="progress-bar"><span id="progressFill"></span></div>
+          </div>
+          <button class="button button-secondary" id="goBackTrack" disabled>返回上一步</button>
+          <button class="button button-secondary" id="jumpOverview">查看主链</button>
+          <button class="button button-primary" id="jumpReading">权威延展</button>
+        </div>
+      </header>
+
+      <main class="viewport">
+        <div class="slides" id="slides">
+          <section class="slide" data-title="总览" id="slide-0">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">RAG 主线总览</span>
+                <h1 class="slide-title">从大模型局限性<br />到可落地 RAG 系统</h1>
+                <p class="slide-desc">
+                  这是一张围绕 <strong>落地</strong> 与 <strong>排障</strong> 设计的 RAG 关联型知识地图。你可以按主链路顺着看，也可以从“召回差、幻觉高、Query 不清”这类问题反向定位相关环节。
+                </p>
+              </div>
+
+              <div class="slide-meta">
+                <div class="meta-card">
+                  <strong>视觉定调</strong>
+                  <span>亮底、蓝光、未来感、玻璃拟态、强层级标题、科技流线背景。</span>
+                </div>
+                <div class="meta-card">
+                  <strong>交互方式</strong>
+                  <span>横向翻页、滚动吸附、按钮跳转、卡片反馈、局部展开细节。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-body">
+              <div class="hero-grid">
+                <div class="glow-panel">
+                  <div class="card-kicker">学习主链</div>
+                  <h2 class="card-title">先理解为什么需要 RAG，再看它如何从离线到在线跑通。</h2>
+                  <div class="flowline" style="margin-top: 18px">
+                    <span class="flow-step" data-target="slide-1">为什么需要 RAG</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step" data-target="slide-2">整体架构</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step" data-target="slide-3">离线构建</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step" data-target="slide-5">在线检索</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step" data-target="slide-8">增强生成</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step" data-target="slide-9">评估落地</span>
+                  </div>
+
+                  <div class="section-note">
+                    在线总链路：
+                    <strong>`用户问题 -> Query 改写/分解 -> 路由 -> 检索 -> 召回 -> 重排 -> 增强 -> 生成 -> 后处理`</strong><br />
+                    离线前提链路：
+                    <strong>`原始数据采集 -> 文档解析 -> 数据清洗 -> 文本分割 -> 向量化 -> 索引/入库`</strong>
+                  </div>
+
+                  <div class="issue-grid">
+                    <div class="issue-card interactive-surface" data-target="slide-7">
+                      <strong>召回不准 / 召回太杂</strong>
+                      <p>先去看分块策略、搜索策略、最大召回数量、最小匹配度、重排与混合检索。</p>
+                    </div>
+                    <div class="issue-card interactive-surface" data-target="slide-8">
+                      <strong>答案幻觉高 / 依据弱</strong>
+                      <p>优先回看证据召回质量、Prompt 组装、引用依据和生成后处理。</p>
+                    </div>
+                    <div class="issue-card interactive-surface" data-target="slide-6">
+                      <strong>用户问题模糊 / 检索方向跑偏</strong>
+                      <p>先查 Query 改写、歧义消解、约束条件强化和领域术语适配。</p>
+                    </div>
+                    <div class="issue-card interactive-surface" data-target="slide-5">
+                      <strong>结构化命中差 / 路由错</strong>
+                      <p>回到在线链路，看 Text-to-SQL、查询路由、结构化优先和多路查询拆分。</p>
+                    </div>
+                  </div>
+
+                  <div class="relationship-note">
+                    使用方式建议：
+                    <strong>第一次按主链顺序通读，第二次从问题卡片反向排查。</strong>
+                    页面内提供“上游 / 下游 / 相关点 / 排障入口”导航，方便你从任一知识点继续顺着链路看下去。
+                  </div>
+                </div>
+
+                <div class="hero-visual glass-card">
+                  <div class="orbital-ring"></div>
+                  <div class="orbital-core"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="为什么需要 RAG" id="slide-1">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">01 / Need</span>
+                <h2 class="slide-title">为什么需要 RAG</h2>
+                <p class="slide-desc">
+                  大模型会说，不代表它能稳定回答业务问题。RAG 的出现，本质上是为了弥补纯参数化记忆在时效性、私有知识、专业精度和可追溯性上的天然短板。
+                </p>
+              </div>
+              <div class="slide-meta">
+                <div class="meta-card">
+                  <strong>核心结论</strong>
+                  <span>RAG 不是替代模型，而是给模型增加外部知识访问能力。</span>
+                </div>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="metrics-grid">
+                <div class="stat-card">
+                  <span class="stat-value">01</span>
+                  <span class="stat-label">时效性不足</span>
+                  <p class="card-copy">训练后世界会变化，模型参数不会自动同步最新知识。</p>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-value">02</span>
+                  <span class="stat-label">幻觉</span>
+                  <p class="card-copy">在证据不足时，模型仍可能生成看似合理但事实错误的内容。</p>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-value">03</span>
+                  <span class="stat-label">私有知识缺失</span>
+                  <p class="card-copy">企业制度、工单、说明书、业务表单等不会天然存在于模型参数中。</p>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-value">04</span>
+                  <span class="stat-label">来源不可追溯</span>
+                  <p class="card-copy">纯大模型问答常常无法告诉你答案依据到底来自哪里。</p>
+                </div>
+              </div>
+
+              <div class="split-layout" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">能力演进</div>
+                  <ul class="bullet-list">
+                    <li><strong>1.0</strong>：Prompt → Response，只有单轮能力。</li>
+                    <li><strong>2.0</strong>：加入上下文窗口，具备短期记忆和多轮对话。</li>
+                    <li><strong>3.0</strong>：加入 CoT，更会推理和总结。</li>
+                    <li><strong>4.0</strong>：接入外部知识库，也就是 RAG。</li>
+                  </ul>
+                </div>
+
+                <div class="glass-card">
+                  <div class="card-kicker">两类记忆</div>
+                  <ul class="bullet-list">
+                    <li><strong>参数化记忆</strong>：模型参数中学到的知识。</li>
+                    <li><strong>非参数化记忆</strong>：外部知识库、向量索引、文档存储中的显式知识。</li>
+                    <li><strong>RAG 本质</strong>：把模型记忆和外部检索记忆结合起来。</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-2">进入整体架构</button>
+                    <button class="link-chip" data-target="slide-3">看离线地基</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">相关知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-8">为什么要控幻觉</button>
+                    <button class="link-chip" data-target="slide-9">如何做评估</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">召回正确却答错</button>
+                    <button class="link-chip problem" data-target="slide-8">答案没依据</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">回到主链</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-0">总览导航</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="整体架构" id="slide-2">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">02 / Architecture</span>
+                <h2 class="slide-title">RAG 的整体架构</h2>
+                <p class="slide-desc">
+                  RAG 由离线和在线两大阶段组成。离线负责“把知识准备好”，在线负责“把知识正确地找出来并生成答案”。
+                </p>
+              </div>
+              <div class="controls">
+                <button class="mini-button" data-target="slide-1">←</button>
+                <button class="mini-button" data-target="slide-3">→</button>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="detail-grid">
+                <div class="glow-panel">
+                  <div class="card-kicker">离线链路</div>
+                  <h3 class="card-title">Knowledge Base Build</h3>
+                  <div class="flowline" style="margin-top: 14px">
+                    <span class="flow-step">采集</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">解析</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">清洗</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">分块</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">向量化</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">索引/入库</span>
+                  </div>
+                  <p class="card-copy" style="margin-top: 16px">
+                    目标是把原始资料转成可被系统高效检索的知识资产。离线质量越差，在线上限越低。
+                  </p>
+                </div>
+
+                <div class="glow-panel">
+                  <div class="card-kicker">在线链路</div>
+                  <h3 class="card-title">Query to Answer</h3>
+                  <div class="flowline" style="margin-top: 14px">
+                    <span class="flow-step">Query</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">改写</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">检索</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">召回</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">重排</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-step">生成</span>
+                  </div>
+                  <p class="card-copy" style="margin-top: 16px">
+                    目标不是“让模型猜”，而是“让模型基于证据作答”。真正成熟的系统还会在最后加上后处理和引用标注。
+                  </p>
+                </div>
+              </div>
+
+              <div class="glass-card" style="margin-top: 18px">
+                <div class="card-kicker">经典 RAG 范式</div>
+                <div class="card-grid">
+                  <div class="glass-card" style="padding: 18px">
+                    <h3 class="card-title">RAG-Sequence</h3>
+                    <p class="card-copy">整个答案生成过程中，共享同一组检索文档，更适合理解为“先搜一批，再整体作答”。</p>
+                  </div>
+                  <div class="glass-card" style="padding: 18px">
+                    <h3 class="card-title">RAG-Token</h3>
+                    <p class="card-copy">逐 token 生成时允许参考不同检索文档，灵活但更复杂。</p>
+                  </div>
+                  <div class="glass-card" style="padding: 18px">
+                    <h3 class="card-title">核心认知</h3>
+                    <p class="card-copy">RAG 不只是“先搜后答”的粗流程，它在生成阶段内部也可以有不同耦合方式。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-1">为什么需要 RAG</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-3">离线构建</button>
+                    <button class="link-chip" data-target="slide-5">在线链路</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-6">Query 改写</button>
+                    <button class="link-chip" data-target="slide-7">检索重排</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-5">结构化路由错</button>
+                    <button class="link-chip problem" data-target="slide-3">离线地基弱</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="离线构建" id="slide-3">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">03 / Offline</span>
+                <h2 class="slide-title">离线知识库构建</h2>
+                <p class="slide-desc">
+                  离线阶段是整套系统的地基。它不直接回答用户问题，但决定了后面检索与生成的上限。
+                </p>
+              </div>
+              <div class="tabs" id="offlineTabs">
+                <button class="tab-button active" data-tab="offline-a">6 步主链</button>
+                <button class="tab-button" data-tab="offline-b">数据源</button>
+                <button class="tab-button" data-tab="offline-c">产品职责</button>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="tab-pane active" data-pane="offline-a">
+                <div class="process-ribbon">
+                  <div class="process-pill">01 采集</div>
+                  <div class="process-pill">02 解析</div>
+                  <div class="process-pill">03 清洗</div>
+                  <div class="process-pill">04 分块</div>
+                  <div class="process-pill">05 向量化</div>
+                  <div class="process-pill">06 索引入库</div>
+                </div>
+
+                <div class="process-layout">
+                  <div class="process-grid">
+                    <article class="process-card interactive-surface is-active">
+                      <span class="process-index">01</span>
+                      <h3>原始数据采集</h3>
+                      <p>先定义知识边界，再收资料。目标是让进入知识库的数据和业务问题强相关，而不是“先全量堆进去”。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>先区分核心资料、辅助资料、噪声资料，避免知识源失焦。</li>
+                          <li>优先收集高频问答、制度文档、产品说明、工单记录这类直接影响命中率的材料。</li>
+                        </ul>
+                      </div>
+                    </article>
+
+                    <article class="process-card interactive-surface">
+                      <span class="process-index">02</span>
+                      <h3>文档解析</h3>
+                      <p>把 PDF、Word、PPT、图片、扫描件等资料转成机器可读的结构化文本，并尽量保留标题层级与表格关系。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>这一步的关键不是“能不能读出字”，而是“结构有没有被读对”。</li>
+                          <li>标题、段落、表格、页眉页脚一旦混乱，后面分块和检索都会一起失真。</li>
+                        </ul>
+                      </div>
+                    </article>
+
+                    <article class="process-card interactive-surface">
+                      <span class="process-index">03</span>
+                      <h3>数据清洗</h3>
+                      <p>把“可读文本”进一步变成“可检索文本”，包括去重、去噪、脱敏、纠错和无关信息剔除。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>清洗不是装饰动作，它决定检索时会不会把无效页脚、旧版本、错别字一并召回。</li>
+                          <li>对企业场景来说，脱敏和版本管理往往和准确率同样重要。</li>
+                        </ul>
+                      </div>
+                    </article>
+
+                    <article class="process-card interactive-surface">
+                      <span class="process-index">04</span>
+                      <h3>文本分块</h3>
+                      <p>把长文档切成适合检索的 Chunk，平衡语义完整性、命中精度、窗口长度和后续 Token 成本。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>Chunk 太小会丢背景，太大又会稀释主题，所以要跟文档类型和问题类型一起设计。</li>
+                          <li>制度、教程、说明书等结构化文档，通常更适合按标题和章节去切。</li>
+                        </ul>
+                      </div>
+                    </article>
+
+                    <article class="process-card interactive-surface">
+                      <span class="process-index">05</span>
+                      <h3>向量化</h3>
+                      <p>使用 Embedding 模型把文本映射到语义空间，让系统可以基于“意思相近”而不是只靠关键词匹配。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>Embedding 负责“找相似”，不是负责生成答案。</li>
+                          <li>模型是否适配中文、垂直领域术语和长文本，会直接影响召回效果。</li>
+                        </ul>
+                      </div>
+                    </article>
+
+                    <article class="process-card interactive-surface">
+                      <span class="process-index">06</span>
+                      <h3>索引与入库</h3>
+                      <p>把向量、原文、元数据和结构标签一起存入可搜索系统，形成后续在线检索依赖的知识资产底座。</p>
+                      <div class="process-detail">
+                        <ul>
+                          <li>真实工程里通常不只有向量索引，还会配合关键词索引、标签过滤和版本字段。</li>
+                          <li>这一步设计得越清楚，后面越容易做 Hybrid Search、召回控制和引用追溯。</li>
+                        </ul>
+                      </div>
+                    </article>
+                  </div>
+
+                  <aside class="focus-panel">
+                    <strong>这一页的阅读方式</strong>
+                    <p>这里不再用单线时间轴，而是改成六格流程板。原因很简单：离线构建不是“故事顺序”，而是一条前后依赖非常强的工程流水线。你可以先扫一遍 01 到 06 的大意，再点击任一模块展开更细的定义与风险点。</p>
+
+                    <div class="focus-list">
+                      <div class="focus-item">
+                        <strong>识别口诀</strong>
+                        先看这一步处理的是什么输入，再看产出的是什么结构，最后判断它会影响在线链路的哪一环。
+                      </div>
+                      <div class="focus-item">
+                        <strong>最常见误区</strong>
+                        很多人会把“解析、清洗、分块、向量化”混成一个动作，其实它们各自解决的是完全不同的问题。
+                      </div>
+                      <div class="focus-item">
+                        <strong>产品视角</strong>
+                        这一页适合用来讲清 RAG 的产品视角：“为什么 RAG 效果不好，根因常常不在模型，而在离线地基”。
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+
+              <div class="tab-pane" data-pane="offline-b">
+                <div class="card-grid">
+                  <div class="glass-card">
+                    <div class="card-kicker">企业内部</div>
+                    <ul class="bullet-list">
+                      <li>历史文档</li>
+                      <li>业务系统数据</li>
+                      <li>在线知识库</li>
+                      <li>FAQ、工单、客服记录</li>
+                      <li>邮件、会议纪要、IM 记录</li>
+                    </ul>
+                  </div>
+                  <div class="glass-card">
+                    <div class="card-kicker">外网公开</div>
+                    <ul class="bullet-list">
+                      <li>行业网站、百科、论坛、新闻</li>
+                      <li>政府公开数据</li>
+                      <li>天气、地图、法律、财经 API</li>
+                      <li>公共数据集</li>
+                    </ul>
+                  </div>
+                  <div class="glass-card">
+                    <div class="card-kicker">付费外采</div>
+                    <ul class="bullet-list">
+                      <li>行业报告</li>
+                      <li>专业数据库</li>
+                      <li>第三方知识服务</li>
+                      <li>用户问题样本</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane" data-pane="offline-c">
+                <div class="detail-grid">
+                  <div class="glass-card">
+                    <h3 class="card-title">产品经理要定义什么</h3>
+                    <ul class="bullet-list">
+                      <li>知识边界</li>
+                      <li>核心数据源优先级</li>
+                      <li>来源标注规范</li>
+                      <li>质量验证标准</li>
+                    </ul>
+                  </div>
+                  <div class="glass-card">
+                    <h3 class="card-title">为什么这一步值钱</h3>
+                    <p class="card-copy">
+                      如果离线阶段收错数据、解析失真、清洗不到位、分块不合理，后面再怎么调检索和 Prompt，效果都只能在低质量地基上打补丁。
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-2">整体架构</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-4">分块与向量</button>
+                    <button class="link-chip" data-target="slide-7">检索召回重排</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-5">在线链路</button>
+                    <button class="link-chip" data-target="slide-9">评估与落地</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">召回太杂</button>
+                    <button class="link-chip problem" data-target="slide-5">知识没走对路</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="分块与向量" id="slide-4">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">04 / Chunking &amp; Vector</span>
+                <h2 class="slide-title">文本分块、向量化与索引</h2>
+                <p class="slide-desc">
+                  这是实践中最容易“听懂概念、但实际最影响效果”的部分。真正决定线上命中的，往往不是模型名字，而是 Chunk 设计和检索结构是否合理。
+                </p>
+              </div>
+              <div class="slide-meta">
+                <div class="meta-card">
+                  <strong>关键结论</strong>
+                  <span>Chunk 不是越小越好，索引也不是越复杂越好，一切都要围绕业务检索目标。</span>
+                </div>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="accordion">
+                <div class="accordion-item open">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>6 类分块策略</strong>
+                      <span>固定长度、语义感知、文档结构、关键词/主题、多粒度、混合分块</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    固定长度简单但容易切断语义；语义感知更自然；文档结构适合制度和说明书；多粒度适合“小搜大”；混合分块最接近真实工程。
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>分块长度如何取</strong>
+                      <span>由文档类型、检索目标、Embedding 能力、生成 Token 预算共同决定</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    短块更精准但容易丢背景；长块背景更完整但噪声更大；重叠窗口能缓解边界损失，但会增加冗余和成本。
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>Contextual Retrieval / Late Chunking</strong>
+                      <span>值得补充的进阶知识</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    Contextual Retrieval 解决的是 Chunk 脱离语境后检索失败的问题；Late Chunking 则尝试先用更长上下文编码，再在后部切分出 Chunk 表示，以保留更多上下文信息。
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">向量化</div>
+                  <h3 class="card-title">Embedding 不是生成</h3>
+                  <p class="card-copy">Embedding 模型负责把文本映射到向量空间，用于相似度匹配，不负责自然语言答案生成。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">Dense Retrieval</div>
+                  <h3 class="card-title">从关键词走向语义</h3>
+                  <p class="card-copy">以 DPR 为代表的 Dense Retrieval，让 Query 和 Passage 映射到同一语义空间，是现代语义检索的核心范式之一。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">索引</div>
+                  <h3 class="card-title">HNSW / kNN / 元数据过滤</h3>
+                  <p class="card-copy">真实检索往往不是只有“最近邻”，而是向量相似度、元数据过滤和排序策略的组合。</p>
+                </div>
+              </div>
+
+              <div class="detail-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">进阶补充</div>
+                  <h3 class="card-title">为什么不能全量召回</h3>
+                  <p class="card-copy">
+                    原因不是“不能搜到”，而是 <strong>上下文放不下、成本太高、噪声太多</strong>。所以离线分块的意义，就是把大文档提前拆成可按需调用的片段，问题问到哪一块，就优先召回哪一块。
+                  </p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">大小切片</div>
+                  <h3 class="card-title">父子 Chunk / 小搜大</h3>
+                  <p class="card-copy">
+                    说明书、手册这类复杂文档往往不是只切一层，而是 <strong>大切片保留背景，小切片负责精准命中</strong>。先用小切片找方向，再回捞对应的大切片，是典型的提准思路。
+                  </p>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-3">离线构建</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-7">召回与重排</button>
+                    <button class="link-chip" data-target="slide-8">增强与生成</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-5">在线链路</button>
+                    <button class="link-chip" data-target="slide-9">调优评估</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">召回不准</button>
+                    <button class="link-chip problem" data-target="slide-7">Top-K 太大太小</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="在线链路" id="slide-5">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">05 / Online</span>
+                <h2 class="slide-title">在线链路：从 Query 到 Answer</h2>
+                <p class="slide-desc">
+                  在线阶段是真正被用户感知到的部分。它不是“一问一答”，而是一条由改写、路由、检索、召回、重排、增强和生成组成的复合链路。
+                </p>
+              </div>
+              <div class="controls">
+                <button class="mini-button" data-target="slide-4">←</button>
+                <button class="mini-button" data-target="slide-6">→</button>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="glow-panel">
+                <div class="card-kicker">主链路</div>
+                <div class="flowline" style="margin-top: 8px">
+                  <span class="flow-step">用户 Query</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">改写 / 分解</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">查询路由</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">查询构建</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">检索</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">召回</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">重排</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">增强</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="flow-step">生成</span>
+                </div>
+              </div>
+
+              <div class="detail-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">路由</div>
+                  <p class="card-copy">
+                    当一个 Query 被改写或拆解后，系统要决定每个子问题走哪条路径：查结构化数据库、查向量数据库，还是走多路查询。
+                  </p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">查询构建</div>
+                  <p class="card-copy">
+                    典型路径包括 <strong>Text-to-SQL</strong> 与 <strong>Text-to-Embedding</strong>。前者面向明确字段和精确条件，后者面向语义相似和模糊表达。
+                  </p>
+                </div>
+              </div>
+
+              <div class="section-note">
+                关键原则：
+                <strong>能走结构化检索的，优先走结构化检索。</strong>
+                原因是准确率更高、成本更低、稳定性更强。不是所有问题都应该直接扔给向量检索或大模型。
+              </div>
+
+              <div class="detail-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">路由例子</div>
+                  <h3 class="card-title">复杂问题先拆，再分路执行</h3>
+                  <p class="card-copy">
+                    举个例子：“气候变化的影响”这种问题。它不是一个单路查询，而是可以拆成“对天气的影响”“对经济的影响”等多路子问题，再把结果合并后交给模型生成最终答案。
+                  </p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">产品重点</div>
+                  <h3 class="card-title">规则决定系统如何理解“最近”“更高”“更多”</h3>
+                  <p class="card-copy">
+                    这类词不是算法自己知道的，而是产品要定义业务规则。比如“最近”到底指 7 天、30 天还是当前季度，这会直接影响改写、路由和最终答案。
+                  </p>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-2">整体架构</button>
+                    <button class="link-chip" data-target="slide-6">Query 改写</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-7">检索召回重排</button>
+                    <button class="link-chip" data-target="slide-8">增强生成</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-3">离线地基</button>
+                    <button class="link-chip" data-target="slide-9">效果评估</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">结构化命中差</button>
+                    <button class="link-chip problem" data-target="slide-6">用户问题模糊</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="Query 增强" id="slide-6">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">06 / Query</span>
+                <h2 class="slide-title">Query 改写与增强</h2>
+                <p class="slide-desc">
+                  这是产品最容易介入、也最容易直接提升准确率的地方。用户的表达往往模糊、缺信息、多意图，必须先改写，后检索。
+                </p>
+              </div>
+              <div class="tabs" id="queryTabs">
+                <button class="tab-button active" data-tab="query-a">6 种方法</button>
+                <button class="tab-button" data-tab="query-b">高级扩展</button>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="tab-pane active" data-pane="query-a">
+                <div class="card-grid">
+                  <div class="glass-card"><h3 class="card-title">语义强化</h3><p class="card-copy">通过同义词扩展、语义改写、实体链接等方式，丰富 Query 的表达。</p></div>
+                  <div class="glass-card"><h3 class="card-title">歧义消除</h3><p class="card-copy">识别多义词、指代不明、语境缺失问题，避免搜错方向。</p></div>
+                  <div class="glass-card"><h3 class="card-title">上下文补全</h3><p class="card-copy">补回被用户省略、但检索系统必须依赖的关键信息。</p></div>
+                  <div class="glass-card"><h3 class="card-title">意图拆解</h3><p class="card-copy">把一个复杂问题拆成多个子问题，分别搜，再合并结果。</p></div>
+                  <div class="glass-card"><h3 class="card-title">领域术语适配</h3><p class="card-copy">把通俗表达转成更适合业务知识库理解的专业术语。</p></div>
+                  <div class="glass-card"><h3 class="card-title">约束条件强化</h3><p class="card-copy">补全时间、地点、范围、评分、格式等限制条件。</p></div>
+                </div>
+              </div>
+
+              <div class="tab-pane" data-pane="query-b">
+                <div class="detail-grid">
+                  <div class="glow-panel">
+                    <div class="card-kicker">HyDE</div>
+                    <h3 class="card-title">让“假想文档”帮你检索</h3>
+                    <p class="card-copy">
+                      HyDE 的思路不是直接拿 Query 去检索，而是先让大模型生成一段“假想答案文档”，再对这段文档做 embedding，用它去找真实文档。适合 Query 很短、很抽象、缺乏相关标注时的零样本检索。
+                    </p>
+                  </div>
+                  <div class="glass-card">
+                    <div class="card-kicker">规则归属</div>
+                    <p class="card-copy">
+                      Query 改写不是“算法自己决定”，而是：
+                      <strong>产品规则 + 数据标注 + 模型能力</strong> 的结合。产品经理负责定义目标、规则与业务边界，技术团队负责把规则真正做进系统。
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="relationship-note">
+                补充说明：
+                <strong>Query 改写不是让模型“随便换个说法”，而是围绕业务规则补信息、去歧义、拆意图。</strong>
+                尤其像“最近”“哪个好”“流程是什么”这类问题，产品要先定义清楚业务边界，系统才能稳定回答。
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-5">在线链路</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-7">检索召回重排</button>
+                    <button class="link-chip" data-target="slide-8">生成与增强</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-3">业务规则与数据</button>
+                    <button class="link-chip" data-target="slide-9">效果验证</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-5">问题没走对路</button>
+                    <button class="link-chip problem" data-target="slide-7">搜出来不相关</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="检索召回重排" id="slide-7">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">07 / Retrieval</span>
+                <h2 class="slide-title">检索、召回、重排</h2>
+                <p class="slide-desc">
+                  真正成熟的 RAG 检索系统，不是只做一次向量搜索，而是把稀疏检索、稠密检索、召回、精排、结果融合组合起来，服务最终答案质量。
+                </p>
+              </div>
+              <div class="slide-meta">
+                <div class="meta-card">
+                  <strong>核心公式化理解</strong>
+                  <span>Sparse + Dense + Rerank + Fusion</span>
+                </div>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="retrieval-board">
+                <div class="retrieval-node interactive-surface">
+                  <strong>Sparse</strong>
+                  <span>用 BM25、倒排索引抓住术语、编号、关键词这类精确命中。</span>
+                </div>
+                <div class="retrieval-node interactive-surface">
+                  <strong>Dense</strong>
+                  <span>用 Embedding 抓语义近邻，覆盖自然语言表达和模糊描述。</span>
+                </div>
+                <div class="retrieval-node interactive-surface">
+                  <strong>Fusion</strong>
+                  <span>把多路召回结果拼起来，常见做法是 Hybrid Search 和 RRF 融合。</span>
+                </div>
+                <div class="retrieval-node interactive-surface">
+                  <strong>Rerank</strong>
+                  <span>在候选集合上重排优先级，把“看起来像”变成“真正最相关”。</span>
+                </div>
+              </div>
+
+              <div class="card-grid">
+                <div class="glass-card">
+                  <div class="card-kicker">Sparse Retrieval</div>
+                  <h3 class="card-title">BM25 / 倒排索引</h3>
+                  <p class="card-copy">依赖词项匹配，对专有名词、型号、术语编号尤其有效。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">Dense Retrieval</div>
+                  <h3 class="card-title">Embedding 检索</h3>
+                  <p class="card-copy">依赖语义相似，适合自然语言问题、模糊表达和语义近义匹配。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">Hybrid Search</div>
+                  <h3 class="card-title">混合检索</h3>
+                  <p class="card-copy">最常见的真实含义之一，就是 Sparse + Dense 一起用。</p>
+                </div>
+              </div>
+
+              <div class="detail-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <h3 class="card-title">召回与 Top-K</h3>
+                  <ul class="bullet-list">
+                    <li>召回是先把可能相关的候选片段捞回来。</li>
+                    <li><strong>Top-K</strong> 不是越大越好，它在平衡召回率、噪声和 Token 成本。</li>
+                    <li><strong>Score 阈值</strong> 用于过滤低相关结果，但不同平台分值不可直接横比。</li>
+                  </ul>
+                </div>
+                <div class="glass-card">
+                  <h3 class="card-title">Rerank 与 RRF</h3>
+                  <ul class="bullet-list">
+                    <li>Rerank 在候选集合上重新打分排序。</li>
+                    <li>Embedding 负责“找相似”，Rerank 负责“重排优先级”。</li>
+                    <li>混合检索结果合并常用 <strong>RRF</strong>，它基于排名融合而不是简单平均分。</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="card-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">调用方式</div>
+                  <h3 class="card-title">自动召回 vs 按需召回</h3>
+                  <p class="card-copy">实践中有“每轮自动召回”与“按需从特定知识库召回”两种方式。前者省操作，后者更可控，适合多知识库和高成本场景。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">搜索策略</div>
+                  <h3 class="card-title">混合语义 vs 全文关键词</h3>
+                  <p class="card-copy">语义适合模糊表达，全文适合术语、编号、关键词精确命中。真实产品里通常不是二选一，而是看场景组合使用。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">最大召回数量</div>
+                  <h3 class="card-title">Top-K 是召回上限，不是越大越好</h3>
+                  <p class="card-copy">通过 3、5 这样的数量演示召回条数变化。数量越大，覆盖面更广，但噪声、成本和后续重排负担也会升高。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">最小匹配度</div>
+                  <h3 class="card-title">Score 阈值决定放行线</h3>
+                  <p class="card-copy">你真正要管的是“门槛设多少”，不是分数如何计算。算法负责打分，产品负责结合场景确定放行阈值。</p>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-4">分块与向量</button>
+                    <button class="link-chip" data-target="slide-6">Query 改写</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-8">增强生成</button>
+                    <button class="link-chip" data-target="slide-9">评估调优</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-5">结构化优先</button>
+                    <button class="link-chip" data-target="slide-3">离线质量</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-4">切片不合理</button>
+                    <button class="link-chip problem" data-target="slide-8">有证据但答偏</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="生成与优化" id="slide-8">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">08 / Generation</span>
+                <h2 class="slide-title">增强、生成与系统优化</h2>
+                <p class="slide-desc">
+                  检索完并不代表系统已经成功。真正的关键在于：如何把证据组织进 Prompt，并让模型输出结构清楚、依据明确、尽量不编造的答案。
+                </p>
+              </div>
+              <div class="slide-meta">
+                <div class="meta-card">
+                  <strong>一句话</strong>
+                  <span>检索好只是开始，Prompt 组装和生成控制是最后一公里。</span>
+                </div>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="accordion">
+                <div class="accordion-item open">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>生成输入通常包含什么</strong>
+                      <span>原始 Query、改写 Query、Top-K 片段、任务定义、约束条件、输出格式</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    RAG 的生成阶段不是把片段机械拼起来，而是基于任务定义和约束，让模型围绕证据作答。
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>生成后的后处理</strong>
+                      <span>内容验证、格式调整、引用标注、语言润色、结构化输出</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    如果后处理缺失，系统很容易出现“内容对但表达乱”“引用缺失”“格式不统一”等问题，影响实际可用性。
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-trigger">
+                    <div>
+                      <strong>多轮对话为什么会影响 RAG</strong>
+                      <span>历史状态、追问逻辑、上下文压缩、用户画像</span>
+                    </div>
+                    <div class="plus">+</div>
+                  </button>
+                  <div class="accordion-content">
+                    多轮对话不是 RAG 本身，但会显著影响 Query 理解、检索方向和最终答案一致性，因此企业级应用通常会把对话状态跟踪与 RAG 一起设计。
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">优化策略</div>
+                  <h3 class="card-title">小切片 / 大切片</h3>
+                  <p class="card-copy">小块负责精准命中，大块负责补充背景，是“小搜大”“父子 Chunk”类策略的核心。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">多路查询</div>
+                  <h3 class="card-title">复杂问题先拆再搜</h3>
+                  <p class="card-copy">适合对比型、多条件、多跳问题，能提升复杂问题的检索质量。</p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">可追溯</div>
+                  <h3 class="card-title">引用与依据</h3>
+                  <p class="card-copy">成熟的 RAG 系统不只要答对，还要告诉用户：依据来自哪里、是否可回查。</p>
+                </div>
+              </div>
+
+              <div class="detail-grid" style="margin-top: 18px">
+                <div class="glass-card">
+                  <div class="card-kicker">补充</div>
+                  <h3 class="card-title">增强不只发生在生成前一刻</h3>
+                  <p class="card-copy">
+                    强调一点：“增强在各个环节都有”。除了 Prompt 组装，还包括 Query 增强、跨域增强、功能态增强等。它本质上是在不同节点把系统往“更容易答对”方向推。
+                  </p>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">生成控制</div>
+                  <h3 class="card-title">先保证 grounded，再追求文采</h3>
+                  <p class="card-copy">
+                    对工作场景来说，答案首先要基于证据、结构稳定、能回查来源；表达润色和可读性，是在此基础上的第二层要求。
+                  </p>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-5">在线链路</button>
+                    <button class="link-chip" data-target="slide-7">检索召回重排</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">下游去向</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-9">评估调优</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">横向关联</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-1">幻觉与边界</button>
+                    <button class="link-chip" data-target="slide-6">提示词与改写</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">排障入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">有召回但答错</button>
+                    <button class="link-chip problem" data-target="slide-9">需要判定 groundedness</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="slide" data-title="评估与落地" id="slide-9">
+            <div class="slide-header">
+              <div>
+                <span class="slide-kicker">09 / Evaluation</span>
+                <h2 class="slide-title">评估、调优与延展阅读</h2>
+                <p class="slide-desc">
+                  一个 RAG 系统要真正可用，不只是“看起来能答”，而是要能评估、能定位问题、能持续优化。
+                </p>
+              </div>
+              <div class="controls">
+                <button class="mini-button" data-target="slide-0">↑</button>
+              </div>
+            </div>
+            <div class="slide-body">
+              <div class="detail-grid">
+                <div class="glass-card">
+                  <div class="card-kicker">评估指标</div>
+                  <ul class="bullet-list">
+                    <li><strong>检索侧</strong>：Recall@K、Precision@K、MRR、nDCG</li>
+                    <li><strong>生成侧</strong>：Groundedness、Relevance、Completeness、幻觉率</li>
+                    <li><strong>工程侧</strong>：时延、Token 消耗、成本、稳定性</li>
+                  </ul>
+                </div>
+                <div class="glass-card">
+                  <div class="card-kicker">调优闭环</div>
+                  <ul class="bullet-list">
+                    <li>先选一个明确场景</li>
+                    <li>做代表性问题集</li>
+                    <li>先看检索是否命中正确证据</li>
+                    <li>再看答案是否 grounded</li>
+                    <li>一次只改一个变量再复测</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="glow-panel" style="margin-top: 18px" id="readingSection">
+                <div class="card-kicker">权威延展阅读</div>
+                <h3 class="card-title">从知识地图走向个人知识体系</h3>
+                <div class="reading-list" style="margin-top: 16px">
+                  <div class="reading-item">
+                    <div class="reading-index">01</div>
+                    <div>
+                      <strong>Lewis et al. — Retrieval-Augmented Generation</strong>
+                      <span>理解参数化记忆 / 非参数化记忆、RAG-Sequence、RAG-Token。</span>
+                    </div>
+                  </div>
+                  <div class="reading-item">
+                    <div class="reading-index">02</div>
+                    <div>
+                      <strong>Karpukhin et al. — Dense Passage Retrieval</strong>
+                      <span>理解现代 Dense Retrieval 的基本范式。</span>
+                    </div>
+                  </div>
+                  <div class="reading-item">
+                    <div class="reading-index">03</div>
+                    <div>
+                      <strong>ColBERT / HyDE / Contextual Retrieval / Late Chunking</strong>
+                      <span>继续补齐精排、Query 扩展、Chunk 语境保持这几条重要进阶线。</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="footer-note">
+                  <p>这一页系统梳理了 RAG 从离线构建到在线检索、增强生成与评估落地的完整链路，可作为项目复盘与实战应用时的产品视角参考。</p>
+                  <button class="button button-primary" id="backToStart">返回第一页</button>
+                </div>
+              </div>
+
+              <div class="knowledge-dock">
+                <div class="dock-panel">
+                  <div class="dock-title">上游知识</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-7">看召回质量</button>
+                    <button class="link-chip" data-target="slide-8">看生成质量</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">问题入口</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip problem" data-target="slide-7">召回差怎么查</button>
+                    <button class="link-chip problem" data-target="slide-6">Query 规则怎么补</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">回到主链</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-0">总览</button>
+                    <button class="link-chip" data-target="slide-2">整体架构</button>
+                  </div>
+                </div>
+                <div class="dock-panel">
+                  <div class="dock-title">继续延展</div>
+                  <div class="chip-cloud">
+                    <button class="link-chip" data-target="slide-3">回看离线</button>
+                    <button class="link-chip" data-target="slide-5">回看在线</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <nav class="nav-rail" id="navRail"></nav>
+    </div>
+
+    <script>
+      const slides = document.getElementById("slides");
+      const slideNodes = [...document.querySelectorAll(".slide")];
+      const navRail = document.getElementById("navRail");
+      const slideCounter = document.getElementById("slideCounter");
+      const progressFill = document.getElementById("progressFill");
+      const goBackTrack = document.getElementById("goBackTrack");
+      const jumpOverview = document.getElementById("jumpOverview");
+      const jumpReading = document.getElementById("jumpReading");
+      const backToStart = document.getElementById("backToStart");
+      const navigationHistory = [];
+      let activeSlideIndex = 0;
+
+      function pad(num) {
+        return String(num).padStart(2, "0");
+      }
+
+      function goToSlide(index) {
+        const node = slideNodes[index];
+        if (!node) return;
+        node.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+      }
+
+      function syncBackButton() {
+        goBackTrack.disabled = navigationHistory.length === 0;
+      }
+
+      function navigateToIndex(index, options = {}) {
+        const { track = false } = options;
+        if (index == null || index < 0 || index >= slideNodes.length) return;
+        if (track && index !== activeSlideIndex) {
+          navigationHistory.push(activeSlideIndex);
+          syncBackButton();
+        }
+        goToSlide(index);
+      }
+
+      slideNodes.forEach((slide, index) => {
+        const chip = document.createElement("button");
+        chip.className = "nav-chip";
+        chip.textContent = `${pad(index + 1)} · ${slide.dataset.title}`;
+        chip.addEventListener("click", () => navigateToIndex(index, { track: true }));
+        navRail.appendChild(chip);
+      });
+
+      function updateActiveState() {
+        const containerRect = slides.getBoundingClientRect();
+        let activeIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        slideNodes.forEach((slide, index) => {
+          const rect = slide.getBoundingClientRect();
+          const distance = Math.abs(rect.left - containerRect.left);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            activeIndex = index;
+          }
+        });
+
+        [...navRail.children].forEach((chip, index) => {
+          chip.classList.toggle("active", index === activeIndex);
+        });
+
+        activeSlideIndex = activeIndex;
+        slideCounter.textContent = `${pad(activeIndex + 1)} / ${pad(slideNodes.length)}`;
+        progressFill.style.width = `${((activeIndex + 1) / slideNodes.length) * 100}%`;
+      }
+
+      slides.addEventListener("scroll", updateActiveState, { passive: true });
+      window.addEventListener("resize", updateActiveState);
+      updateActiveState();
+
+      document.querySelectorAll("[data-target]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = document.getElementById(button.dataset.target);
+          if (target) {
+            const index = slideNodes.indexOf(target);
+            navigateToIndex(index, { track: true });
+          }
+        });
+      });
+
+      goBackTrack.addEventListener("click", () => {
+        const previous = navigationHistory.pop();
+        syncBackButton();
+        if (previous != null) {
+          goToSlide(previous);
+        }
+      });
+
+      jumpOverview.addEventListener("click", () => navigateToIndex(0, { track: true }));
+      jumpReading.addEventListener("click", () => navigateToIndex(slideNodes.length - 1, { track: true }));
+      backToStart.addEventListener("click", () => navigateToIndex(0, { track: true }));
+
+      document.querySelectorAll(".tabs").forEach((tabGroup) => {
+        tabGroup.addEventListener("click", (event) => {
+          const button = event.target.closest(".tab-button");
+          if (!button) return;
+
+          tabGroup.querySelectorAll(".tab-button").forEach((btn) => btn.classList.remove("active"));
+          button.classList.add("active");
+
+          const slide = tabGroup.closest(".slide");
+          const key = button.dataset.tab;
+          slide.querySelectorAll(".tab-pane").forEach((pane) => {
+            pane.classList.toggle("active", pane.dataset.pane === key);
+          });
+        });
+      });
+
+      document.querySelectorAll(".accordion-trigger").forEach((button) => {
+        button.addEventListener("click", () => {
+          const item = button.closest(".accordion-item");
+          item.classList.toggle("open");
+        });
+      });
+
+      const interactiveSelector = [
+        ".meta-card",
+        ".stat-card",
+        ".timeline-item",
+        ".reading-item",
+        ".issue-card",
+        ".flow-step",
+        ".process-card",
+        ".retrieval-node",
+        ".card-grid > .glass-card",
+        ".detail-grid > .glass-card",
+        ".detail-grid > .glow-panel",
+        ".split-layout > .glass-card"
+      ].join(", ");
+
+      function activateSurface(node) {
+        if (node.classList.contains("process-card")) {
+          const group = node.closest(".process-grid");
+          group?.querySelectorAll(".process-card").forEach((card) => {
+            card.classList.toggle("is-active", card === node);
+          });
+          return;
+        }
+
+        if (node.classList.contains("flow-step")) {
+          const line = node.closest(".flowline");
+          line?.querySelectorAll(".flow-step").forEach((step) => {
+            step.classList.toggle("is-active", step === node);
+          });
+          return;
+        }
+
+        node.classList.toggle("is-active");
+      }
+
+      document.querySelectorAll(interactiveSelector).forEach((node) => {
+        node.classList.add("interactive-surface");
+
+        if (node.tagName !== "BUTTON") {
+          node.tabIndex = 0;
+          node.setAttribute("role", "button");
+        }
+
+        node.addEventListener("click", (event) => {
+          event.stopPropagation();
+          activateSurface(node);
+        });
+
+        node.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            activateSurface(node);
+          }
+        });
+      });
+
+      document.querySelectorAll(".flowline").forEach((line) => {
+        const firstStep = line.querySelector(".flow-step");
+        firstStep?.classList.add("is-active");
+      });
+
+      syncBackButton();
+
+      slides.addEventListener(
+        "wheel",
+        (event) => {
+          if (window.innerWidth <= 760) return;
+          if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+            event.preventDefault();
+            slides.scrollBy({ left: event.deltaY * 0.95, behavior: "auto" });
+          }
+        },
+        { passive: false }
+      );
+    </script>
+  </body>
+</html>

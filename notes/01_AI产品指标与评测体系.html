@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 产品指标与评测体系 · 方法论手册</title>
+<style>
+/* ============================================
+   Linear Design System — Knowledge Notes Visualization
+   Palette, typography, components strictly from DESIGN.md
+   ============================================ */
+
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+  /* Backgrounds */
+  --bg-marketing: #08090a;
+  --bg-panel: #0f1011;
+  --bg-surface: #191a1b;
+  --bg-surface-hover: #28282c;
+  --bg-tint-02: rgba(255,255,255,0.02);
+  --bg-tint-04: rgba(255,255,255,0.04);
+  --bg-tint-05: rgba(255,255,255,0.05);
+  --bg-tint-08: rgba(255,255,255,0.08);
+
+  /* Text */
+  --text-primary: #f7f8f8;
+  --text-secondary: #d0d6e0;
+  --text-tertiary: #8a8f98;
+  --text-quaternary: #62666d;
+
+  /* Brand */
+  --brand-indigo: #5e6ad2;
+  --accent-violet: #7170ff;
+  --accent-hover: #828fff;
+  --security-lavender: #7a7fad;
+
+  /* Status */
+  --success-green: #27a644;
+  --success-emerald: #10b981;
+
+  /* Borders */
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-standard: rgba(255,255,255,0.08);
+  --border-solid-1: #23252a;
+  --border-solid-2: #34343a;
+  --line-tint: #141516;
+
+  /* Shadows */
+  --shadow-subtle: rgba(0,0,0,0.03) 0px 1.2px 0px 0px;
+  --shadow-ring: rgba(0,0,0,0.2) 0px 0px 0px 1px;
+  --shadow-elevated: rgba(0,0,0,0.4) 0px 2px 4px;
+  --shadow-dialog: rgba(0,0,0,0) 0px 8px 2px, rgba(0,0,0,0.01) 0px 5px 2px, rgba(0,0,0,0.04) 0px 3px 2px, rgba(0,0,0,0.07) 0px 1px 1px, rgba(0,0,0,0.08) 0px 0px 1px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter Variable', 'Inter', 'SF Pro Display', -apple-system, system-ui, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-feature-settings: "cv01", "ss03";
+  background: var(--bg-marketing);
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--brand-indigo);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   Layout: sidebar + main
+   ============================================ */
+.app {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 32px 20px 32px 32px;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 16px;
+}
+.sidebar-brand-mark {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--accent-violet) 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-weight: 590;
+  font-size: 14px;
+  letter-spacing: -0.24px;
+}
+.sidebar-brand-text {
+  font-size: 13px;
+  font-weight: 510;
+  color: var(--text-secondary);
+  letter-spacing: -0.13px;
+}
+.sidebar-brand-sub {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  font-weight: 510;
+  letter-spacing: normal;
+  text-transform: uppercase;
+}
+
+.nav-heading {
+  font-size: 10px;
+  font-weight: 510;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 10px 8px;
+}
+
+.nav-group {
+  margin-bottom: 4px;
+}
+
+.nav-h2 {
+  display: block;
+  padding: 7px 10px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 510;
+  border-radius: 6px;
+  letter-spacing: -0.13px;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-h2:hover {
+  background: var(--bg-tint-04);
+  color: var(--text-primary);
+}
+.nav-h2.active {
+  background: var(--bg-tint-05);
+  color: var(--text-primary);
+  box-shadow: inset 2px 0 0 var(--accent-violet);
+}
+
+.nav-h3-list {
+  list-style: none;
+  padding: 4px 0 4px 14px;
+  margin: 0;
+  border-left: 1px solid var(--border-subtle);
+  margin-left: 14px;
+}
+.nav-h3-list li { margin: 0; }
+.nav-h3 {
+  display: block;
+  padding: 5px 10px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 4px;
+  letter-spacing: -0.13px;
+  transition: color 0.15s;
+}
+.nav-h3:hover {
+  color: var(--text-primary);
+}
+.nav-h3.active {
+  color: var(--accent-violet);
+  font-weight: 510;
+}
+
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-standard);
+  border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--border-solid-2); }
+
+/* ============================================
+   Main content
+   ============================================ */
+.main {
+  padding: 48px 56px 120px;
+  min-width: 0;
+}
+
+/* ============================================
+   Hero — Linear Display XL style
+   ============================================ */
+.hero {
+  padding: 56px 0 64px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 48px;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1px solid var(--border-solid-1);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 510;
+  letter-spacing: normal;
+}
+.pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-violet);
+}
+.pill-indigo {
+  background: rgba(94,106,210,0.12);
+  border-color: rgba(94,106,210,0.3);
+  color: var(--accent-hover);
+}
+.pill-indigo .pill-dot { background: var(--accent-hover); }
+.pill-emerald {
+  background: rgba(16,185,129,0.1);
+  border-color: rgba(16,185,129,0.25);
+  color: var(--success-emerald);
+}
+.pill-emerald .pill-dot { background: var(--success-emerald); }
+
+.hero-title {
+  font-size: 64px;
+  font-weight: 510;
+  line-height: 1.0;
+  letter-spacing: -1.408px;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+  font-feature-settings: "cv01", "ss03";
+}
+.hero-title .accent {
+  color: var(--accent-violet);
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.2px;
+  color: var(--text-tertiary);
+  max-width: 780px;
+  margin: 0 0 32px;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+.hero-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hero-meta-label {
+  font-size: 11px;
+  font-weight: 510;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hero-meta-value {
+  font-size: 14px;
+  font-weight: 510;
+  color: var(--text-secondary);
+  letter-spacing: -0.182px;
+}
+.hero-meta-value.mono {
+  font-family: 'Berkeley Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ============================================
+   Section: Knowledge Architecture Overview
+   ============================================ */
+.overview {
+  margin: 0 0 64px;
+  padding: 40px;
+  background: var(--bg-tint-02);
+  border: 1px solid var(--border-standard);
+  border-radius: 12px;
+  box-shadow: var(--shadow-ring);
+}
+
+.overview-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 510;
+  color: var(--accent-violet);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  background: rgba(113,112,255,0.1);
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+
+.overview-title {
+  font-size: 32px;
+  font-weight: 510;
+  line-height: 1.13;
+  letter-spacing: -0.704px;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.overview-desc {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  letter-spacing: -0.165px;
+  margin: 0 0 32px;
+}
+
+.loop-diagram {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.loop-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 10px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.loop-card-day {
+  font-family: 'Berkeley Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 510;
+  color: var(--text-quaternary);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.loop-card-title {
+  font-size: 17px;
+  font-weight: 590;
+  color: var(--text-primary);
+  letter-spacing: -0.24px;
+  margin: 0 0 6px;
+}
+.loop-card-subtitle {
+  font-size: 12px;
+  font-weight: 510;
+  color: var(--accent-violet);
+  letter-spacing: normal;
+  margin-bottom: 16px;
+}
+.loop-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.loop-card-list li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: -0.13px;
+  padding: 4px 0 4px 16px;
+  position: relative;
+  line-height: 1.5;
+}
+.loop-card-list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 11px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--text-quaternary);
+}
+
+.loop-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.loop-arrow-label {
+  font-family: 'Berkeley Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--text-quaternary);
+  margin-bottom: 8px;
+  writing-mode: horizontal-tb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.loop-arrow svg {
+  width: 40px;
+  height: 24px;
+}
+
+.loop-feedback {
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: var(--bg-tint-02);
+  border: 1px dashed var(--border-standard);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  letter-spacing: -0.13px;
+}
+.loop-feedback svg {
+  flex-shrink: 0;
+  color: var(--accent-violet);
+}
+
+/* ============================================
+   Markdown body — Linear-style typography
+   ============================================ */
+.content {
+  max-width: 920px;
+}
+
+.content h1 {
+  font-size: 48px;
+  font-weight: 510;
+  line-height: 1.0;
+  letter-spacing: -1.056px;
+  color: var(--text-primary);
+  margin: 72px 0 24px;
+  scroll-margin-top: 32px;
+}
+
+.content h2 {
+  font-size: 32px;
+  font-weight: 510;
+  line-height: 1.13;
+  letter-spacing: -0.704px;
+  color: var(--text-primary);
+  margin: 80px 0 24px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-subtle);
+  scroll-margin-top: 24px;
+  position: relative;
+}
+.content h2::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: 0;
+  width: 40px;
+  height: 1px;
+  background: var(--accent-violet);
+}
+
+.content h3 {
+  font-size: 24px;
+  font-weight: 510;
+  line-height: 1.33;
+  letter-spacing: -0.288px;
+  color: var(--text-primary);
+  margin: 48px 0 16px;
+  scroll-margin-top: 24px;
+}
+
+.content h4 {
+  font-size: 20px;
+  font-weight: 590;
+  line-height: 1.33;
+  letter-spacing: -0.24px;
+  color: var(--text-primary);
+  margin: 32px 0 12px;
+}
+
+.content p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.content ul, .content ol {
+  margin: 0 0 20px;
+  padding-left: 24px;
+  color: var(--text-secondary);
+}
+.content li {
+  margin: 6px 0;
+  line-height: 1.7;
+  font-size: 16px;
+}
+.content ul li::marker { color: var(--text-quaternary); }
+.content ol li::marker { color: var(--text-quaternary); font-weight: 510; }
+
+.content strong {
+  font-weight: 590;
+  color: var(--text-primary);
+}
+
+.content em {
+  font-style: normal;
+  color: var(--accent-violet);
+  font-weight: 510;
+}
+
+.content a {
+  color: var(--accent-violet);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(113,112,255,0.3);
+  transition: border-color 0.15s, color 0.15s;
+}
+.content a:hover {
+  color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Inline code — Berkeley Mono */
+.content code {
+  font-family: 'Berkeley Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  padding: 2px 6px;
+  background: var(--bg-tint-05);
+  border: 1px solid var(--border-standard);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+/* Code blocks */
+.content pre {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 8px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin: 24px 0;
+  box-shadow: var(--shadow-ring);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   Blockquote — Linear callout
+   ============================================ */
+.content blockquote {
+  margin: 24px 0;
+  padding: 18px 24px;
+  background: var(--bg-tint-02);
+  border: 1px solid var(--border-standard);
+  border-left: 3px solid var(--text-quaternary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+.content blockquote p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.content blockquote p:first-child { margin-top: 0; }
+.content blockquote p:last-child { margin-bottom: 0; }
+.content blockquote ul, .content blockquote ol {
+  margin: 8px 0 8px 0;
+}
+
+/* Insight callout — indigo border, slight accent bg */
+.content blockquote.callout-insight {
+  background: linear-gradient(90deg, rgba(94,106,210,0.06) 0%, rgba(94,106,210,0) 100%);
+  border-left-color: var(--brand-indigo);
+  border-left-width: 3px;
+  position: relative;
+  padding-left: 52px;
+}
+.content blockquote.callout-insight::before {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  width: 16px; height: 16px;
+  background: var(--brand-indigo);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(94,106,210,0.15);
+}
+.content blockquote.callout-insight::after {
+  content: "!";
+  position: absolute;
+  left: 27px;
+  top: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 590;
+  line-height: 1;
+}
+.content blockquote.callout-insight strong:first-child {
+  color: var(--accent-violet);
+}
+
+/* ============================================
+   Tables — Linear style, low-noise
+   ============================================ */
+.content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 24px 0;
+  font-size: 14px;
+  background: var(--bg-tint-02);
+  border: 1px solid var(--border-standard);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.content thead {
+  background: var(--bg-tint-04);
+}
+.content th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 510;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-standard);
+}
+.content td {
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  letter-spacing: -0.13px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+.content tbody tr:last-child td { border-bottom: none; }
+.content tbody tr:hover { background: var(--bg-tint-02); }
+.content td strong {
+  color: var(--text-primary);
+  font-weight: 590;
+}
+.content td code { font-size: 12px; }
+
+/* 分隔线 */
+.content hr {
+  border: none;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 56px 0;
+  position: relative;
+}
+.content hr::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 1px;
+  background: var(--accent-violet);
+}
+
+/* Checkbox lists */
+.content input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--accent-violet);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 1024px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+  .main { padding: 32px 24px 80px; }
+  .hero-title { font-size: 48px; letter-spacing: -1.056px; }
+  .hero-subtitle { font-size: 17px; }
+  .loop-diagram { grid-template-columns: 1fr; }
+  .loop-arrow { transform: rotate(90deg); padding: 8px 0; }
+}
+
+@media (max-width: 640px) {
+  .main { padding: 24px 16px 60px; }
+  .hero { padding: 24px 0 32px; }
+  .hero-title { font-size: 36px; letter-spacing: -0.704px; }
+  .overview { padding: 24px; }
+  .content h2 { font-size: 24px; letter-spacing: -0.288px; }
+  .content table { font-size: 13px; }
+  .content th, .content td { padding: 10px 12px; }
+}
+
+/* Print */
+@media print {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  body { background: white; color: black; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">AI</div>
+      <div>
+        <div class="sidebar-brand-text">赫庭 · 知识沉淀</div>
+      </div>
+    </div>
+    <div class="nav-heading">Contents</div>
+    <nav>
+      <div class="nav-group"><a href="#前言-为什么-ai-产品经理必须掌握这套体系" class="nav-h2">前言：为什么 AI 产品经理必须掌握这套体系</a><ul class="nav-h3-list"><li><a href="#一个典型的反面案例" class="nav-h3">一个典型的反面案例</a></li><li><a href="#ai-产品经理的三大困境-不懂指标与评测会陷入" class="nav-h3">AI 产品经理的三大困境（不懂指标与评测会陷入）</a></li><li><a href="#指标与评测对产品经理的核心价值" class="nav-h3">指标与评测对产品经理的核心价值</a></li></ul></div><div class="nav-group"><a href="#第一篇-数据指标体系" class="nav-h2">第一篇：数据指标体系</a><ul class="nav-h3-list"><li><a href="#一-数据与指标的本质区别" class="nav-h3">一、数据与指标的本质区别</a></li><li><a href="#二-从数据到决策的五步流转" class="nav-h3">二、从数据到决策的五步流转</a></li><li><a href="#三-指标的有效性判断" class="nav-h3">三、指标的有效性判断</a></li><li><a href="#四-指标体系的五层常见指标" class="nav-h3">四、指标体系的五层常见指标</a></li><li><a href="#五-指标分类的三种视角" class="nav-h3">五、指标分类的三种视角</a></li><li><a href="#六-指标拆解的六大方法" class="nav-h3">六、指标拆解的六大方法</a></li><li><a href="#七-指标分析的四大框架" class="nav-h3">七、指标分析的四大框架</a></li><li><a href="#八-指标体系的本质" class="nav-h3">八、指标体系的本质</a></li><li><a href="#九-公司本质与指标选择" class="nav-h3">九、公司本质与指标选择</a></li></ul></div><div class="nav-group"><a href="#第二篇-ai-产品评测体系" class="nav-h2">第二篇：AI 产品评测体系</a><ul class="nav-h3-list"><li><a href="#一-传统产品-vs-ai-产品-评测的根本差异" class="nav-h3">一、传统产品 vs AI 产品：评测的根本差异</a></li><li><a href="#二-传统-pm-ai-pm-的三大转变" class="nav-h3">二、传统 PM → AI PM 的三大转变</a></li><li><a href="#三-ai-产品的四层架构与产品经理职责" class="nav-h3">三、AI 产品的四层架构与产品经理职责</a></li><li><a href="#四-评测五步法-核心框架" class="nav-h3">四、评测五步法（核心框架）</a></li><li><a href="#第一步-定指标-what-is-good" class="nav-h3">第一步：定指标（What is Good?）</a></li><li><a href="#第二步-选方法-who-evaluates-how" class="nav-h3">第二步：选方法（Who evaluates &amp; How?）</a></li><li><a href="#第三步-造评测集-what-questions-to-ask" class="nav-h3">第三步：造评测集（What questions to ask?）</a></li><li><a href="#第四步-执行评测" class="nav-h3">第四步：执行评测</a></li><li><a href="#第五步-bad-case-归因分析-四层排查法" class="nav-h3">第五步：Bad Case 归因分析（四层排查法）</a></li><li><a href="#五-agent-能力评测专项" class="nav-h3">五、Agent 能力评测专项</a></li><li><a href="#六-rag-系统评测与调优" class="nav-h3">六、RAG 系统评测与调优</a></li></ul></div><div class="nav-group"><a href="#第三篇-贯通指标与评测的知识闭环" class="nav-h2">第三篇：贯通指标与评测的知识闭环</a><ul class="nav-h3-list"><li><a href="#闭环关系图" class="nav-h3">闭环关系图</a></li><li><a href="#两套体系的共同底层" class="nav-h3">两套体系的共同底层</a></li></ul></div><div class="nav-group"><a href="#第四篇-实战建议与行业参考" class="nav-h2">第四篇：实战建议与行业参考</a><ul class="nav-h3-list"><li><a href="#一-产品经理实战表达升级" class="nav-h3">一、产品经理实战表达升级</a></li><li><a href="#二-高加分的-产品观-表达-金句公式" class="nav-h3">二、高加分的"产品观"表达（金句公式）</a></li><li><a href="#三-推荐学习的产品案例" class="nav-h3">三、推荐学习的产品案例</a></li><li><a href="#四-构建评测体系的关键心法" class="nav-h3">四、构建评测体系的关键心法</a></li></ul></div><div class="nav-group"><a href="#第五篇-术语表" class="nav-h2">第五篇：术语表</a><ul class="nav-h3-list"><li><a href="#指标类" class="nav-h3">指标类</a></li><li><a href="#ai-与评测类" class="nav-h3">AI 与评测类</a></li></ul></div><div class="nav-group"><a href="#第六篇-延伸实践建议" class="nav-h2">第六篇：延伸实践建议</a><ul class="nav-h3-list"><li><a href="#实践方向" class="nav-h3">实践方向</a></li></ul></div><div class="nav-group"><a href="#第七篇-个人思考与复习要点" class="nav-h2">第七篇：个人思考与复习要点</a><ul class="nav-h3-list"><li><a href="#知识串联线索" class="nav-h3">知识串联线索</a></li><li><a href="#最关键的-5-个概念-必须滚瓜烂熟" class="nav-h3">最关键的 5 个概念（必须滚瓜烂熟）</a></li><li><a href="#最值得深入探索的方向" class="nav-h3">最值得深入探索的方向</a></li><li><a href="#关于学习方法的元认知" class="nav-h3">关于学习方法的元认知</a></li></ul></div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badges">
+        <span class="pill pill-indigo"><span class="pill-dot"></span>AI Product Management</span>
+        <span class="pill"><span class="pill-dot"></span>指标体系</span>
+        <span class="pill"><span class="pill-dot"></span>评测体系</span>
+      </div>
+      <h1 class="hero-title">AI 产品指标与<br>评测体系<span class="accent">.</span></h1>
+      <p class="hero-subtitle">
+        从「怎么定义 AI 产品的好坏」到「怎么系统地验证和优化」——
+        一套按知识主线重构的系统化方法论。
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <div class="hero-meta-label">Structure</div>
+          <div class="hero-meta-value">7 篇 · 知识体系优先</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="hero-meta-label">Design System</div>
+          <div class="hero-meta-value mono">Linear</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Architecture Overview -->
+    <section class="overview">
+      <div class="overview-kicker">Knowledge Architecture</div>
+      <h2 class="overview-title">指标与评测的闭环结构</h2>
+      <p class="overview-desc">
+        指标体系解决「衡量问题」——把抽象的"好"拆成可计算的标尺。
+        评测体系解决「验证问题」——用科学方法测、归因、优化。
+        两者在"定指标"这一步天然咬合。
+      </p>
+
+      <div class="loop-diagram">
+        <div class="loop-card">
+          <div class="loop-card-day">PART · 01</div>
+          <h3 class="loop-card-title">指标体系</h3>
+          <div class="loop-card-subtitle">定义"什么是好"</div>
+          <ul class="loop-card-list">
+            <li>数据 vs 指标本质</li>
+            <li>五层指标（流量/用户/行为/转化/体验）</li>
+            <li>三种分类（业务/结构/时效）</li>
+            <li>六法拆解（要素/二分/公式/漏斗/矩阵/树）</li>
+            <li>四大分析框架（AARRR/UJM/OSM/杜邦）</li>
+          </ul>
+        </div>
+
+        <div class="loop-arrow">
+          <span class="loop-arrow-label">Input</span>
+          <svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="2" y1="12" x2="34" y2="12" stroke="#7170ff" stroke-dasharray="2 3"/>
+            <path d="M30 6 L38 12 L30 18" stroke="#7170ff" fill="none"/>
+          </svg>
+        </div>
+
+        <div class="loop-card">
+          <div class="loop-card-day">PART · 02</div>
+          <h3 class="loop-card-title">评测体系</h3>
+          <div class="loop-card-subtitle">验证"好不好"</div>
+          <ul class="loop-card-list">
+            <li>① 定指标（继承指标体系）</li>
+            <li>② 选方法（脚本/LLM/人工）</li>
+            <li>③ 造评测集（四大来源）</li>
+            <li>④ 执行评测</li>
+            <li>⑤ Bad Case 四层归因</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="loop-feedback">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8a7.96 7.96 0 0 0-1.04-3.93l-1.1 1.1A6.5 6.5 0 0 1 14.5 8c0 3.59-2.91 6.5-6.5 6.5S1.5 11.59 1.5 8 4.41 1.5 8 1.5c1.46 0 2.81.48 3.89 1.3L8 6.7V0Z"/>
+        </svg>
+        <span><strong style="color: var(--text-secondary); font-weight: 590;">产品迭代飞轮</strong> · 指标 → 评测 → 归因 → 新指标，持续闭环</span>
+      </div>
+    </section>
+
+    <!-- Body Content -->
+    <article class="content">
+      <h2 id="前言-为什么-ai-产品经理必须掌握这套体系">前言：为什么 AI 产品经理必须掌握这套体系</h2>
+<h3 id="一个典型的反面案例">一个典型的反面案例</h3>
+<blockquote class="callout callout-insight">
+<p>客户听说 DeepSeek-R1 在榜单上得分最高，要求替换原模型。替换后发现：<br />
+- R1 是长思考模型，<strong>反应速度慢</strong>；<br />
+- 长思考模型在未重写提示词的情况下<strong>极易产生幻觉</strong>；<br />
+- 最终效果不佳，被迫回退，人力物力双重浪费。</p>
+<p><strong>核心教训</strong>：没有评测体系 → 选型没有依据 → 出了问题没人背锅 → 产品经理沦为"传话筒"。</p>
+</blockquote>
+<h3 id="ai-产品经理的三大困境-不懂指标与评测会陷入">AI 产品经理的三大困境（不懂指标与评测会陷入）</h3>
+<table>
+<thead>
+<tr>
+<th>困境</th>
+<th>表现</th>
+<th>根因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术话语权缺失</td>
+<td>算法说什么就是什么，无法质疑选型方案</td>
+<td>没有可量化的评判依据</td>
+</tr>
+<tr>
+<td>被动响应式迭代</td>
+<td>用户说"太生硬"→改；又说"太啰嗦"→改；陷入死循环</td>
+<td>没有指标定位问题本质</td>
+</tr>
+<tr>
+<td>问题归因模糊</td>
+<td>投诉率从 1% 涨到 8%，不知是产品、Agent 还是宣传的锅</td>
+<td>没有分层指标体系</td>
+</tr>
+</tbody>
+</table>
+<h3 id="指标与评测对产品经理的核心价值">指标与评测对产品经理的核心价值</h3>
+<ul>
+<li><strong>让抽象的"好"变得可量化</strong>："我做的产品特别成功" ≠ "我把 DAU 从 1000 做到 1 万"</li>
+<li><strong>统一团队语言</strong>：不说"我觉得还行"，只说"留存率 25%"</li>
+<li><strong>驱动科学决策</strong>：指标指向的是下一步行动，而不是情绪</li>
+<li><strong>团队协作核心能力</strong>：评测体系怎么构建，是衡量 AI 产品经理专业度的关键；头部公司甚至设专职评测产品经理岗</li>
+</ul>
+<hr />
+<h2 id="第一篇-数据指标体系">第一篇：数据指标体系</h2>
+<blockquote>
+<p>这一篇解决的是 <strong>"什么是好"</strong> 的问题——在开始评测之前，先把"好"拆成可计算的标尺。</p>
+</blockquote>
+<h3 id="一-数据与指标的本质区别">一、数据与指标的本质区别</h3>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>数据（Data）</th>
+<th>指标（Metric）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本质</td>
+<td>原始的、未经处理的记录或事实</td>
+<td>经过计算、聚合或定义的度量</td>
+</tr>
+<tr>
+<td>用途</td>
+<td>存储事实</td>
+<td>衡量业务/运营效果</td>
+</tr>
+<tr>
+<td>示例</td>
+<td>QQ 空间访问记录、付款流水、签到次数</td>
+<td>留存率、转化率、客单价</td>
+</tr>
+<tr>
+<td>类比</td>
+<td>小孩每门考试的分数</td>
+<td>学校大屏上公示的排名</td>
+</tr>
+<tr>
+<td>形式</td>
+<td>一张麦当劳小票</td>
+<td>麦当劳后台的汇总看板</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键洞察：指标 ∈ 数据</strong>——指标是数据的一种，但必须经过度量加工。</p>
+<h3 id="二-从数据到决策的五步流转">二、从数据到决策的五步流转</h3>
+<pre><code>① 原始采集 → ② 清洗标准化 → ③ 计算聚合 → ④ 确定业务指标 → ⑤ 做决策并行动
+</code></pre>
+<p><strong>奶茶店类比（贯穿全篇）</strong>：<br />
+- ① 店员在便签上记录订单（潦草、格式乱、易遗漏）<br />
+- ② 贴一张标准化表格让店员按列填写（解决格式统一）<br />
+- ③ 一天结束算总账（聚合计算）<br />
+- ④ 日订单量、客单价、爆款占比、利润四个核心指标<br />
+- ⑤ 珍珠奶茶占 53% → 多备货；果茶仅 32 杯 → 搞优惠；2-4 点密集 → 增兼职</p>
+<h3 id="三-指标的有效性判断">三、指标的有效性判断</h3>
+<blockquote>
+<p><strong>虚荣指标（Vanity Metric）</strong>：看起来漂亮但对决策没价值的指标。<br />
+- 快递场景举例：「特殊密码数」「有彩色带彩的签收数」→ 虚荣<br />
+- 真正有用：平均送达时间、签收率、损坏率</p>
+</blockquote>
+<p><strong>判断标准</strong>：这个指标能驱动下一步行动吗？不能 → 虚荣。</p>
+<h3 id="四-指标体系的五层常见指标">四、指标体系的五层常见指标</h3>
+<p>AI 产品经理必须能把业务拆到这五层，每一层都有典型指标。</p>
+<h4 id="4-1-流量层-用户从哪里来">4.1 流量层（用户从哪里来）</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>定义</th>
+<th>坑点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PV</strong>（Page View）</td>
+<td>页面被加载的次数，刷新算一次</td>
+<td>可以通过刷新刷数据，不精准</td>
+</tr>
+<tr>
+<td><strong>UV</strong>（Unique Visitor）</td>
+<td>一段时间内的独立访客数，按账号 ID / IP / 本地缓存去重</td>
+<td>游客模式要靠 IP 兜底</td>
+</tr>
+<tr>
+<td><strong>IP 数</strong></td>
+<td>独立 IP 地址数，同一路由器下的多台设备算一个</td>
+<td>宿舍同一路由器下 = 1 个 IP</td>
+</tr>
+<tr>
+<td><strong>跳出率</strong></td>
+<td>用户进入页面后很快离开的比例</td>
+<td>跳出率高 = 产品差 or 推广人群错配</td>
+</tr>
+<tr>
+<td>新老访客比</td>
+<td>新用户占总访客的比例</td>
+<td>7UV 以上算老用户（参考口径）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-2-用户层-用户是谁-用多少">4.2 用户层（用户是谁、用多少）</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>英文</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DAU</td>
+<td>Daily Active Users</td>
+<td>当日登录或使用产品的去重用户数</td>
+</tr>
+<tr>
+<td>WAU</td>
+<td>Weekly Active Users</td>
+<td>7 日内访问产品的去重用户数</td>
+</tr>
+<tr>
+<td>MAU</td>
+<td>Monthly Active Users</td>
+<td>30 日内访问产品的去重用户数</td>
+</tr>
+<tr>
+<td>留存率</td>
+<td>Retention</td>
+<td>新增用户经过 N 天后仍使用的比例</td>
+</tr>
+<tr>
+<td>用户粘性</td>
+<td>Stickiness</td>
+<td>DAU ÷ MAU</td>
+</tr>
+</tbody>
+</table>
+<p><strong>深度分析：活跃的"浅/中/深"三层</strong></p>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>浅度（打开）</th>
+<th>中度（核心功能）</th>
+<th>深度（变现行为）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>微信</td>
+<td>启动 APP</td>
+<td>发消息</td>
+<td>转账、朋友圈点赞、公众号阅读</td>
+</tr>
+<tr>
+<td>高德</td>
+<td>启动 APP</td>
+<td>查看路线</td>
+<td>打车</td>
+</tr>
+<tr>
+<td>游戏</td>
+<td>启动游戏</td>
+<td>匹配/开一把</td>
+<td>排位赛、充值买皮肤</td>
+</tr>
+<tr>
+<td>电商</td>
+<td>启动 APP</td>
+<td>搜索、比价</td>
+<td>下单、评论</td>
+</tr>
+</tbody>
+</table>
+<p><strong>用户粘性的行业基准</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>产品类型</th>
+<th>健康粘性（DAU/MAU）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>强社交（微信、抖音）</td>
+<td>&gt; 50%</td>
+</tr>
+<tr>
+<td>电商/平台（淘宝、美团）</td>
+<td>20% - 50%</td>
+</tr>
+<tr>
+<td>工具（12306、银行 APP）</td>
+<td>&lt; 20% 是正常的</td>
+</tr>
+</tbody>
+</table>
+<p><strong>留存率的类型与应用</strong>：<br />
+- <strong>次日留存</strong>：验证"新用户是否 get 到产品核心价值"。低 → 要加引导页、小红点、onboarding。<br />
+- <strong>7 日留存</strong>：验证用户是否养成使用习惯（签到、支付宝收能量的底层逻辑）。<br />
+- <strong>30 日留存</strong>：验证"用户是否离不开你"——所有社交类产品都盯这个（苹果不支持微信，用户选谁？）。</p>
+<p><strong>留存率计算陷阱</strong>：<br />
+- 分子：第一天新增用户中，第二天还来的人数<br />
+- 分母：第一天新增的用户数（不含老用户、不含第二天的新用户）<br />
+- 举例：第一天发鸡蛋吸引 1000 老头注册，第二天只剩 100 老头回来 → 次日留存 = 10%</p>
+<h4 id="4-3-行为层-用户怎么用">4.3 行为层（用户怎么用）</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>计算 / 定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问深度</td>
+<td>PV ÷ UV</td>
+</tr>
+<tr>
+<td>使用时长</td>
+<td>单次/日均</td>
+</tr>
+<tr>
+<td>核心行为次数</td>
+<td>如生图次数、对话轮次</td>
+</tr>
+<tr>
+<td>功能渗透率</td>
+<td>使用某功能的用户 ÷ 总活跃用户</td>
+</tr>
+<tr>
+<td>行为路径（用户旅程 UJM）</td>
+<td>第一步→第二步→...→第 N 步</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-4-转化层-用户掏不掏钱">4.4 转化层（用户掏不掏钱）</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>漏斗转化率</td>
+<td>每一步到下一步的转化比例</td>
+</tr>
+<tr>
+<td>付费率</td>
+<td>付费用户数 ÷ 总用户数</td>
+</tr>
+<tr>
+<td>ARPU</td>
+<td>人均收入（Average Revenue Per User）</td>
+</tr>
+<tr>
+<td>复购率</td>
+<td>再次购买的用户比例</td>
+</tr>
+<tr>
+<td>GMV</td>
+<td>Gross Merchandise Volume，商品交易总额（不管亏赚都算）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-5-体验层-用户爽不爽">4.5 体验层（用户爽不爽）</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>响应时间</td>
+<td>P90 / P99 延迟，保证大多数用户流畅</td>
+</tr>
+<tr>
+<td>首屏时间</td>
+<td>首页跳转时长（很多 APP 用假首屏动画制造"秒开"错觉）</td>
+</tr>
+<tr>
+<td>下载错误率</td>
+<td>请求失败的比例</td>
+</tr>
+<tr>
+<td>CSAT</td>
+<td>用户满意度打分（1-5 分）</td>
+</tr>
+<tr>
+<td>NPS</td>
+<td>净推荐值（Net Promoter Score）——"你愿意推荐给朋友的意愿"（≠ 满意度）</td>
+</tr>
+<tr>
+<td><strong>AI 专属</strong>：意图识别准确率</td>
+<td>AI 能否理解用户真正想做什么</td>
+</tr>
+<tr>
+<td><strong>AI 专属</strong>：回答相关性</td>
+<td>答非所问的占比</td>
+</tr>
+<tr>
+<td><strong>AI 专属</strong>：转人工率</td>
+<td>AI 兜不住要转给人工的比例</td>
+</tr>
+<tr>
+<td><strong>AI 专属</strong>：多轮对话完成率</td>
+<td>对话进行到底不中断的比例</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：NPS 和满意度是两件事。满意度看"做得好不好"，NPS 看"愿不愿意推荐给朋友"——推荐需要更高的信任。</p>
+</blockquote>
+<h3 id="五-指标分类的三种视角">五、指标分类的三种视角</h3>
+<h4 id="5-1-按业务逻辑分类">5.1 按业务逻辑分类</h4>
+<pre><code>不可控因素：监管、政策、汇率、市场（不用管）
+可控因素：
+├── 北极星指标：全公司/全项目的唯一最核心指标（最终目标）
+├── 结果指标：业务最终结果（如 GMV、付费转化率）
+├── 过程指标：业务过程中的关键节点（如转化率、完成率）
+└── 运营指标：日常管理的操作性指标
+</code></pre>
+<blockquote>
+<p><strong>关于北极星指标的常见辨析</strong>：<br />
+- 实际工作中，"你们公司的北极星指标是什么"是最容易被追问、也最该想清楚的问题<br />
+- 北极星 vs 结果指标区别：北极星偏<strong>长期/方向性</strong>衡量，结果指标偏<strong>阶段性</strong>衡量<br />
+- 北极星指标≈业务目标；<strong>不能自己拍脑袋定</strong>，必须找业务方对齐</p>
+</blockquote>
+<h4 id="5-2-按结构成分分类">5.2 按结构成分分类</h4>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>定义</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原子指标</td>
+<td>维度 + 度量 + 汇总方式，不可再拆</td>
+<td>DAU = 账号 ID + 个数 + 求和</td>
+</tr>
+<tr>
+<td>派生指标</td>
+<td>原子指标 + 修饰词 + 新组合方式</td>
+<td>7 日留存率 = 日活 + 7 日周期 + 比率</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5-3-按先见后见性分类">5.3 按先见后见性分类</h4>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>先见性指标</strong></td>
+<td>当下就能观测并决策</td>
+<td>抬头率（50 人有 40 人抬头，80%）</td>
+</tr>
+<tr>
+<td><strong>后见性指标</strong></td>
+<td>必须事后才有结果</td>
+<td>用户最终转化率（周期结束才能算出来）</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>实战经验</strong>：后见性指标无法直接操盘。办法是<strong>找到先见性与后见性之间的因果关系</strong>——内容吸引度 → 使用时长 → 任务完成度 → 复访率 → 最终转化率。先优化先见性指标来逼近后见性结果。</p>
+</blockquote>
+<p><strong>指标间的关系模式</strong>：<br />
+- <strong>包含关系</strong>：流失率 ∈ 非活跃率<br />
+- <strong>互补关系</strong>：留存率 + 流失率 ≈ 1<br />
+- <strong>因果关系</strong>：投诉率 → 退货率；满意度 → 复购率</p>
+<h3 id="六-指标拆解的六大方法">六、指标拆解的六大方法</h3>
+<blockquote>
+<p>这是体系构建的方法论武器库，六法对应不同场景。</p>
+</blockquote>
+<h4 id="6-1-要素法">6.1 要素法</h4>
+<p>列举一个目标/事物的组成要素。例：雷锋精神 = 拾金不昧 + 乐于助人 + 无私奉献 + ...</p>
+<h4 id="6-2-二分法">6.2 二分法</h4>
+<p>从"要/不要"两端分析。例：减肥 = 要运动/早睡/规律 + 不要碳水/零食/熬夜。对应核心金句："管住嘴，迈开腿"。</p>
+<blockquote class="callout callout-insight">
+<p><strong>关键提醒</strong>：做任何优化策略都可以套二分法——要让用户满意的事 vs 不要让用户痛苦的事。</p>
+</blockquote>
+<h4 id="6-3-公式法-最常用">6.3 公式法（最常用）</h4>
+<p>用数学公式表达关键因素之间的关系。</p>
+<pre><code>GMV = 用户数 × 成交率 × 平均客单价
+    = UV × 浏览转化率 × 加购转化率 × 支付转化率 × 平均客单价
+
+总收入 = 新客收入 + 老客收入
+      = 新客UV × 新客ARPU + 老客UV × 老客ARPU
+
+3 秒完播率 = 钩子强度 × 标题匹配度 × 开场节奏
+</code></pre>
+<p><strong>李诞"有效粉丝"公式案例</strong>：</p>
+<pre><code>有效粉丝 = 总粉丝 - 未付费用户
+</code></pre>
+<p>李诞在直播间说"没付费的都是垃圾"——本质是公式法思维在商业判断上的应用。</p>
+<h4 id="6-4-漏斗法-转化分析必备">6.4 漏斗法（转化分析必备）</h4>
+<p>按业务流程一层一层往下漏，看每层转化率。</p>
+<pre><code>曝光 → 点击 → 下载 → 注册 → 登录 → 激活 → 购买 → 复购
+</code></pre>
+<p>每一层之间的转化率都是可优化的杠杆点。</p>
+<h4 id="6-5-矩阵法">6.5 矩阵法</h4>
+<p>罗列所有组合进行对比。例：新老用户 × 多渠道；APP/小程序/H5 × 各业务模块。</p>
+<p><strong>H5 科普</strong>：H5 = HTML5，指在微信/飞书点击链接打开的网页，区别于"小程序"（依赖微信/支付宝官方平台的应用）。</p>
+<h4 id="6-6-树状图法-层级下钻">6.6 树状图法（层级下钻）</h4>
+<p>北极星指标 → 一级指标 → 二级指标 → ...</p>
+<p>实操以 <strong>GMV 提升</strong> 为例：</p>
+<pre><code>北极星：本月 GMV 提升 X%
+├── 付费用户数（一级）
+│   ├── 新用户数（二级）
+│   │   ├── 注册 UV（三级）→ 投放广告、地推送鸡蛋、线上优惠券
+│   │   ├── 登录率 → 注册即自动登录、短信提醒
+│   │   └── 曝光 UV → 个性推荐、首页 Banner、限时秒杀
+│   └── 老用户数 → 复购优惠券、会员体系、过期提醒
+└── 客单价（一级）→ 组合套餐、满减策略、高端货曝光
+</code></pre>
+<h3 id="七-指标分析的四大框架">七、指标分析的四大框架</h3>
+<h4 id="7-1-aarrr-模型-海盗模型-增长黑客-用户增长">7.1 AARRR 模型（海盗模型 / 增长黑客 / 用户增长）</h4>
+<pre><code>① Acquisition 获客 → ② Activation 激活 → ③ Retention 留存 → ④ Revenue 变现 → ⑤ Referral 推荐
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>典型策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>获客</td>
+<td>线上打广告、线下地推（扫街/扫楼/电梯广告）、送鸡蛋送行李箱、扫码送酸奶</td>
+</tr>
+<tr>
+<td>激活</td>
+<td>注册即登录、注册即送优惠券、首日引导页、小红点闪烁</td>
+</tr>
+<tr>
+<td>留存</td>
+<td>每日签到、蚂蚁庄园收能量、连续登录奖励、优惠券到期提醒</td>
+</tr>
+<tr>
+<td>变现</td>
+<td>缩短路径（拼多多无购物车）、冲动消费触发、限时倒计时、大额优惠券到期</td>
+</tr>
+<tr>
+<td>推荐</td>
+<td>拼团砍一刀、分享得奖励、"好友都在用"的社交背书</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：变现的底层是"冲动消费 + 信任感"。路径越短，转化率越高。9.9 元垃圾袋不会纠结，9 千元大件才会反复对比。</p>
+</blockquote>
+<h4 id="7-2-ujm-用户旅程图-user-journey-map">7.2 UJM（用户旅程图 / User Journey Map）</h4>
+<p>梳理用户使用产品的每一步操作。以 AI 叫车场景为例：</p>
+<pre><code>打开首页 → 点击 AI 叫车 → 勾选乘车选项 → 点击呼叫 → 【分支】
+    ├── 叫车成功
+    ├── 长时间未确认 → 需要超时机制
+    └── 过程中修改 → 需要修改入口
+</code></pre>
+<p><strong>每个节点都是优化点</strong>：入口找不到 → 加小红点引导；流程太长 → 合并步骤；完成率低 → 简化表单。</p>
+<h4 id="7-3-osm-模型-日常管理">7.3 OSM 模型（日常管理）</h4>
+<pre><code>O (Objective) 目标 → S (Strategy) 策略 → M (Measurement) 度量
+</code></pre>
+<p>实操例：<br />
+- O：提升用户量<br />
+- S：线下送鸡蛋 + 线上送优惠券 + 拉多少人抽奖 + 拼团优惠<br />
+- M：新增注册数、次日留存率、拉新 ARPU</p>
+<h4 id="7-4-杜邦分析-财务分析">7.4 杜邦分析（财务分析）</h4>
+<p>从净利率、资产周转率、权益乘数拆解 ROE，主要用于财务方向，其他岗位了解即可。</p>
+<h3 id="八-指标体系的本质">八、指标体系的本质</h3>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：指标体系不是一堆指标的堆砌，而是一套<strong>有组织的评价标准</strong>。</p>
+</blockquote>
+<h4 id="8-1-指标体系的三个作用">8.1 指标体系的三个作用</h4>
+<ol>
+<li><strong>量化目标</strong>：把"做得好"变成"DAU 从 1000 到 1 万"</li>
+<li><strong>统一语言</strong>：不说"还行"，只说"留存率 25%"</li>
+<li><strong>驱动决策</strong>：指标指向下一步行动</li>
+</ol>
+<h4 id="8-2-指标体系构建的三要素">8.2 指标体系构建的三要素</h4>
+<pre><code>北极星指标（定方向）→ 一级指标（拆业务关键节点）→ 二级指标（拆过程指标）
+</code></pre>
+<h4 id="8-3-构建方法论">8.3 构建方法论</h4>
+<p>不要求每个人都能独立构建完整体系（通常是总监级工作），但必须掌握其中的零碎知识点——拆解方法、分析框架、层级术语。<strong>实际落地中能叫得上名字、解释得清原理，就是专业度的体现。</strong></p>
+<h4 id="8-4-构建的要素标准-判断一个指标是否合格">8.4 构建的要素标准（判断一个指标是否合格）</h4>
+<ul>
+<li>直接与商业/业务相关</li>
+<li>能反映客户认可度</li>
+<li>能影响用户行为</li>
+<li>简单、直接、直观</li>
+<li>容易获得且可衡量</li>
+</ul>
+<h3 id="九-公司本质与指标选择">九、公司本质与指标选择</h3>
+<table>
+<thead>
+<tr>
+<th>公司类型</th>
+<th>本质</th>
+<th>核心指标方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>To B / SaaS</strong></td>
+<td><strong>降本增效</strong></td>
+<td>节省人力成本、提升效率、服务时长、处理量</td>
+</tr>
+<tr>
+<td><strong>To C</strong></td>
+<td><strong>盈利</strong></td>
+<td>用户增长、用户体验、GMV、付费转化</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>行业观察</strong>：<br />
+- 中国独有"运营"岗位是因为运营需求量大。国外没有独立运营岗。<br />
+- 美国擅长科研（砸钱搞 GDP、融资文化），中国擅长运营落地（无现金支付就是明证）。<br />
+- AI 时代运营需求增加——不仅要运营用户，还要运营产品（因为 AI 永远是概率事件，需要持续评测拉高准确率）。</p>
+</blockquote>
+<hr />
+<h2 id="第二篇-ai-产品评测体系">第二篇：AI 产品评测体系</h2>
+<blockquote>
+<p>这一篇解决的是 <strong>"怎么验证好"</strong> 的问题——在有了指标之后，用科学方法测、归因、优化。</p>
+</blockquote>
+<h3 id="一-传统产品-vs-ai-产品-评测的根本差异">一、传统产品 vs AI 产品：评测的根本差异</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>传统产品（如美图秀秀）</th>
+<th>AI 产品（如即梦修图）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户路径</td>
+<td>可控、固定、可预测</td>
+<td>不可控、多轮对话、开放式</td>
+</tr>
+<tr>
+<td>评测重点</td>
+<td>功能是否正常触发（点击→出图）</td>
+<td>综合效果（采纳率、对话轮次、修改次数、保存率、响应时间）</td>
+</tr>
+<tr>
+<td>模板依赖</td>
+<td>强</td>
+<td>弱（每次生成都不同）</td>
+</tr>
+<tr>
+<td>沟通成本</td>
+<td>低</td>
+<td>高（需反复调整）</td>
+</tr>
+<tr>
+<td>标准答案</td>
+<td>有</td>
+<td>通常没有</td>
+</tr>
+</tbody>
+</table>
+<h3 id="二-传统-pm-ai-pm-的三大转变">二、传统 PM → AI PM 的三大转变</h3>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>传统 PM</th>
+<th>AI PM（新增部分）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>需求分析</td>
+<td>用户调研 + 竞品分析</td>
+<td><strong>+ AI 能力边界评估</strong></td>
+</tr>
+<tr>
+<td>产品设计</td>
+<td>功能流程 + 交互设计</td>
+<td><strong>+ Prompt 工程 + Agent 流程设计</strong></td>
+</tr>
+<tr>
+<td>效果验证</td>
+<td>AB 测试 + 用户反馈</td>
+<td><strong>+ 评测集 + 指标体系</strong></td>
+</tr>
+<tr>
+<td>迭代决策</td>
+<td>数据分析 + 定性反馈</td>
+<td><strong>+ Bad Case 归因</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="三-ai-产品的四层架构与产品经理职责">三、AI 产品的四层架构与产品经理职责</h3>
+<pre><code>┌─────────────────────────────────────────┐
+│ 用户层 │ 体验好不好（用户满意度、留存率、转化率、采纳率）
+├─────────────────────────────────────────┤
+│ 技术层 │ Agent / RAG / Prompt 的效果（意图准确率、知识召回率、任务完成率）
+├─────────────────────────────────────────┤
+│ 模型层 │ 模型本身的 benchmark 得分（SuperCLUE、MMLU、C-Eval）
+├─────────────────────────────────────────┤
+│ 基础层 │ 成本 / 算力 / 合规 / 数据资产
+└─────────────────────────────────────────┘
+</code></pre>
+<p><strong>各层产品经理的关注点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>产品经理要做什么</th>
+<th>典型指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户层</td>
+<td>界面交互形式、AI 输出展示策略、构建用户反馈闭环（点赞点踩）、设计透明度与可控性（人在环路 Human-in-the-loop）</td>
+<td>满意度、留存率、转化率、NPS</td>
+</tr>
+<tr>
+<td>技术层</td>
+<td>知识库结构设计、检索生成策略、Agent 工作流拆解、评测体系构建、Bad Case 归因</td>
+<td>意图识别准确率、关键知识召回率、任务完成率</td>
+</tr>
+<tr>
+<td>模型层</td>
+<td>模型选型（仅 0→1 阶段重要）、模型路由设计（简单任务用小模型，复杂任务用大模型）</td>
+<td>benchmark 得分、幻觉率、指令遵循度</td>
+</tr>
+<tr>
+<td>基础层</td>
+<td><strong>只管数据资产质量 + 数据飞轮闭环</strong>；成本/算力/合规交给算法团队</td>
+<td>数据准确率、标注一致性</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>关键提醒</strong>：模型选型只在 0→1 阶段重要。产品稳定运行后，模型会被不断替换更优的版本，产品经理更多精力应放在 <strong>Prompt + Agent 流程优化</strong> 上。</p>
+</blockquote>
+<p><strong>主流评测平台</strong>：<br />
+- <strong>Langsmith</strong>、<strong>Langfuse</strong>：主流 Agent 评测追踪平台<br />
+- <strong>PromptPilot</strong>（字节）：提示词评测与批量测试平台<br />
+- 通用 Benchmark：<strong>SuperCLUE</strong>、<strong>MMLU</strong>、<strong>C-Eval</strong>、<strong>AlignBench</strong></p>
+<h3 id="四-评测五步法-核心框架">四、评测五步法（核心框架）</h3>
+<pre><code>① 定指标 → ② 选方法 → ③ 造评测集 → ④ 执行评测 → ⑤ 归因分析
+</code></pre>
+<p>这套五步法是贯通指标体系与评测体系的桥梁——<strong>第一步"定指标"就是第一篇讲的全部内容</strong>。</p>
+<h3 id="第一步-定指标-what-is-good">第一步：定指标（What is Good?）</h3>
+<h4 id="4-1-构建思路-自顶向下">4.1 构建思路（自顶向下）</h4>
+<pre><code>业务指标（北极星）→ 拆解核心场景 → 明确定性指标 + 定量指标 → 制定打分方法
+</code></pre>
+<h4 id="4-2-业务指标示例">4.2 业务指标示例</h4>
+<table>
+<thead>
+<tr>
+<th>产品类型</th>
+<th>核心业务指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生图产品</td>
+<td>采纳率（客户不采纳就不用了）</td>
+</tr>
+<tr>
+<td>智能写作</td>
+<td>一次修改率、报告结构合理性</td>
+</tr>
+<tr>
+<td>AI 客服</td>
+<td>任务完成率、转人工率</td>
+</tr>
+<tr>
+<td>Agent 根因分析</td>
+<td>问题准确定位率、行动建议可落地率</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-3-定性-vs-定量指标的区别-重中之重">4.3 定性 vs 定量指标的区别（重中之重）</h4>
+<table>
+<thead>
+<tr>
+<th>对比</th>
+<th>定量指标</th>
+<th>定性指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>特征</td>
+<td>有标准答案、可计算</td>
+<td>主观判断、难以标准化</td>
+</tr>
+<tr>
+<td>评测方式</td>
+<td><strong>自动化脚本</strong></td>
+<td><strong>大模型评测 or 人工评测</strong></td>
+</tr>
+<tr>
+<td>示例</td>
+<td>准确率、召回率、响应时间 P90/P99、工具调用正确率、参数提取准确率</td>
+<td>回答的情感丰富度、口语化程度、审美、有没有"人味"、回答相关性、逻辑性</td>
+</tr>
+<tr>
+<td>谁把关</td>
+<td>算法团队自测</td>
+<td><strong>产品经理重点把控</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：<strong>定性指标是拉开产品差距的 Benchmark</strong>。如果大家都有标准答案（定量），所有模型表现都差不多；真正拉开差距的是"品味"——把抽象审美转化为可评测标准的能力。</p>
+</blockquote>
+<h4 id="4-4-定性指标如何设计-以-有人味-为例">4.4 定性指标如何设计？（以"有人味"为例）</h4>
+<p>不能说"有人味"就完事，必须拆成可评判维度：<br />
+- <strong>情感丰富度</strong>：情感词汇数量 × 匹配度<br />
+- <strong>口语化程度</strong>：是否贴近日常对话<br />
+- <strong>个性化细节</strong>：是否加入场景化描述</p>
+<p>然后定义评分标准（比如 1-5 分制），每个分数都给出正反案例。</p>
+<h4 id="4-5-定量指标的关键参考标准">4.5 定量指标的关键参考标准</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>响应时间 P90</td>
+<td>90% 请求的延迟上限，保证大多数用户体验流畅</td>
+</tr>
+<tr>
+<td>响应时间 P99</td>
+<td>99% 请求的延迟上限，用于极端情况保障</td>
+</tr>
+<tr>
+<td>并发能力</td>
+<td>按预估峰值的 2 倍准备资源</td>
+</tr>
+<tr>
+<td>召回率</td>
+<td>知识库检索的完整性（关键知识是否被召回）</td>
+</tr>
+<tr>
+<td>RPM / TPM</td>
+<td>Requests Per Minute / Tokens Per Minute，系统并发处理能力</td>
+</tr>
+</tbody>
+</table>
+<h3 id="第二步-选方法-who-evaluates-how">第二步：选方法（Who evaluates &amp; How?）</h3>
+<p>三大评测方法对比：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>适用指标</th>
+<th>成本</th>
+<th>效率</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>自动化脚本</strong></td>
+<td>定量指标</td>
+<td>低</td>
+<td>高</td>
+<td>CI/CD 回归测试、成功率、响应时间、工具调用正确率</td>
+</tr>
+<tr>
+<td><strong>大模型评测（LLM-as-Judge）</strong></td>
+<td>定性指标</td>
+<td>中</td>
+<td>中</td>
+<td>回答质量、相关性、逻辑性</td>
+</tr>
+<tr>
+<td><strong>人工评测</strong></td>
+<td>复杂主观任务</td>
+<td>高</td>
+<td>低</td>
+<td>多轮对话连贯性、创意生成、业务专业判断</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5-1-自动化脚本">5.1 自动化脚本</h4>
+<p>定义好入参/出参后，开发自测。例如查天气工具：<br />
+- 入参：时间、地点<br />
+- 出参：目标时间的温度、天气描述<br />
+- 脚本批量跑 100 条查询，检查准确率</p>
+<h4 id="5-2-大模型评测-llm-as-judge-核心机制">5.2 大模型评测（LLM-as-Judge）核心机制</h4>
+<p>用 <strong>高质量模型（如 Claude 4.6 / GPT-4）作为"教师模型"</strong>，通过提示词让它给另一个模型的回答打分。本质是<strong>模型蒸馏</strong>的变体。</p>
+<p><strong>评分提示词必含的四要素</strong>：</p>
+<pre><code>1. 角色设定：你是一个资深评测专家
+2. 评分原则：评分范围（0-4 或 1-5）、评分权重、每档分数的定义
+3. 评分步骤：第一步阅读评测集，第二步对照规则，第三步输出结果
+4. 输出格式：JSON（强烈推荐，可直接转表格；MD 格式不结构化）
+</code></pre>
+<p><strong>JSON 输出示例结构</strong>：</p>
+<pre><code class="language-json">{
+  &quot;综合评分&quot;: 3,
+  &quot;评分原因&quot;: &quot;...&quot;,
+  &quot;维度1&quot;: {&quot;分数&quot;: 4, &quot;原因&quot;: &quot;...&quot;},
+  &quot;维度2&quot;: {&quot;分数&quot;: 2, &quot;原因&quot;: &quot;...&quot;}
+}
+</code></pre>
+<p><strong>打分方法</strong>：<br />
+- <strong>绝对打分</strong>：1-5 分制，有完整评分标准<br />
+- <strong>GSB（Good/Same/Bad）</strong>：两个模型对比，A 优于 B / 相同 / B 优于 A<br />
+- <strong>HPS</strong>：更细粒度的对比（5 档：明显好/稍好/相同/稍差/明显差）</p>
+<blockquote class="callout callout-insight">
+<p><strong>选型建议</strong>：字节的 <strong>PromptPilot</strong>——支持提示词生成、调试、批量评测、智能评分。流程：写 Prompt → 上传评测集 → 跑两个模型 → 智能评分比较 GSB → 找到最优 Prompt。</p>
+</blockquote>
+<h4 id="5-3-人工评测的完整-sop">5.3 人工评测的完整 SOP</h4>
+<pre><code>① 任务发起（产品经理定义指标/规则/评测集）
+  → ② 项目理解（标注师学习背景）
+  → ③ 标准培训
+  → ④ 试标（~10 条）+ 准确率核验
+  → ⑤ 正式标注
+  → ⑥ 质检（抽查标注质量）
+  → ⑦ 复检（防止质检出错）
+  → ⑧ 验收
+</code></pre>
+<p><strong>角色分工</strong>：<br />
+- <strong>AI 训练师 / 标注师</strong>：执行标注<br />
+- <strong>AI 产品经理</strong>：定义评测指标 + 评测集 + 评分规则 + 决定由谁标<br />
+- <strong>业务专家</strong>：没有标注师时，由最终用户/业务方直接标注</p>
+<h3 id="第三步-造评测集-what-questions-to-ask">第三步：造评测集（What questions to ask?）</h3>
+<h4 id="6-1-评测集的四大来源与配比">6.1 评测集的四大来源与配比</h4>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>配比</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>真实用户日志</strong></td>
+<td>占主要部分</td>
+<td>最具代表性；优先选多轮追问的 case，最能暴露短板</td>
+</tr>
+<tr>
+<td><strong>历史 Bad Case</strong></td>
+<td>~20%</td>
+<td>用户点踩、投诉的 case；验证新版本是否修复了老问题</td>
+</tr>
+<tr>
+<td><strong>边界 Case（人工构造）</strong></td>
+<td>~20%</td>
+<td>极端/非常规输入，测试鲁棒性。例：图文生成产品被要求写文案，看它能否合理拒答</td>
+</tr>
+<tr>
+<td><strong>AI 生成样本</strong></td>
+<td>0→1 阶段占比高，后期逐步降低</td>
+<td>无用户时用 LLM 批量生成模拟 query，人工筛选可用</td>
+</tr>
+</tbody>
+</table>
+<h4 id="6-2-核心原则-评测集聚焦-bad-case">6.2 核心原则：评测集聚焦 Bad Case</h4>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：<strong>1+1=2 这种已经掌握的题，不用再考</strong>。好的评测集是让 Agent 从"小学"升到"大学"的不断升级的试卷——里面全是他不会的题。</p>
+</blockquote>
+<p>版本迭代时评测集的演进：<br />
+- 如果当前版本在现有评测集上达到 80% → 从剩下 20% 找未掌握的 case 补进去<br />
+- 如果回退（新版本分数下降）→ 评测集不动，回退的是产品设计<br />
+- <strong>同一次对比必须用同一套评测集</strong>，否则分数不可比</p>
+<h4 id="6-3-评测集的构造-用大模型批量构造">6.3 评测集的构造（用大模型批量构造）</h4>
+<p>对 AI 生成部分，写一个"造题 Prompt"：</p>
+<pre><code>你是一个评测结构专家。
+构造评测集的要求：[具体业务场景描述]
+输出格式：JSON
+注意要点：[覆盖类型、难度分布、异常处理等]
+</code></pre>
+<h3 id="第四步-执行评测">第四步：执行评测</h3>
+<p>根据选定方法跑评测集，生成评测报告。报告必含：<br />
+- 核心业务指标当前值 vs 目标值<br />
+- 各场景下的得分分布<br />
+- Bad Case 归因分布<br />
+- 上线决策建议（能否上线、有何风险、迭代节奏）</p>
+<h3 id="第五步-bad-case-归因分析-四层排查法">第五步：Bad Case 归因分析（四层排查法）</h3>
+<blockquote>
+<p>当发现 Bad Case 时，按优先级从小到大逐层排查：</p>
+</blockquote>
+<pre><code>① 模型能力问题
+   → 同一 Prompt 在不同模型（如 GPT-3.5 vs GPT-4）表现差异显著
+   → 做 A/B 测试控制变量
+
+② Prompt 设计问题
+   → 模糊、约束不足、角色定义不清
+   → 改进：基于优秀回答反向修改（&quot;提示词蒸馏&quot;）
+
+③ 流程 / Agent 设计问题
+   → Agent 协作不合理、缺校验节点、缺记忆机制
+   → 改进：加工作流节点、加记忆模块
+
+④ 数据 / 召回问题
+   → RAG 返回信息不准确或不完整
+   → 改进：切片策略、重排策略、知识库更新
+</code></pre>
+<p><strong>排查策略</strong>：从小节点往大节点排除——先看模型，再看 Prompt，再看 RAG，最后看 Agent 架构。发现哪层有问题就改哪层，再用同一套评测集回测。</p>
+<h3 id="五-agent-能力评测专项">五、Agent 能力评测专项</h3>
+<blockquote>
+<p>Agent 是当前 AI 产品的核心形态，评测维度需要专门拆解。</p>
+</blockquote>
+<h4 id="5-1-agent-的通用组成-提示词里必含的四件套">5.1 Agent 的通用组成（提示词里必含的四件套）</h4>
+<pre><code>Planning（规划）| Memory（记忆）| Tool Use（工具调用）| Execution（执行）
+</code></pre>
+<h4 id="5-2-agent-评测的-过程-结果-双维度">5.2 Agent 评测的"过程 + 结果"双维度</h4>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>检查点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>过程（Process）</strong></td>
+<td>① 成功率 ② 准确率 ③ 上下文相关性 ④ 工具调用正确性</td>
+</tr>
+<tr>
+<td><strong>结果（Outcome）</strong></td>
+<td>① 最终输出质量（视频质量、文案质量） ② 有无 BUG ③ 任务完成度</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5-3-各子能力的评测方式">5.3 各子能力的评测方式</h4>
+<table>
+<thead>
+<tr>
+<th>子能力</th>
+<th>评测点</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Planning</td>
+<td>CoT（思维链）是否合理、能否把复杂问题拆解成子任务</td>
+<td>人工 / LLM 评分</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>上下文是否准确传递（用户偏好、历史对话）</td>
+<td>LLM 自动验证上下文引用</td>
+</tr>
+<tr>
+<td>Tool Use</td>
+<td>工具选择是否正确、参数提取是否准确</td>
+<td>自动化脚本</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td>最终输出质量、任务完成度</td>
+<td>综合评估</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5-4-多-agent-协作链路的评测">5.4 多 Agent 协作链路的评测</h4>
+<p>举例：AI 视频生成的流水线</p>
+<pre><code>艺术总监 Agent → 编剧 Agent → 角色设计 Agent → 场景设计 Agent → 视频生成
+</code></pre>
+<p>每一步都要评：<br />
+- <strong>节点内部</strong>：成功率、输出质量<br />
+- <strong>节点间传递</strong>：数据传递成功率、内容准确性（没有丢字段、没有幻觉）</p>
+<blockquote class="callout callout-insight">
+<p><strong>实战经验</strong>：复杂 case 一般<strong>产品经理亲自评估</strong>，因为涉及多节点、长流程、需要综合判断。</p>
+</blockquote>
+<h4 id="5-5-复杂-agent-的评测设计思路">5.5 复杂 Agent 的评测设计思路（以多步根因分析 Agent 为例）</h4>
+<p>评测设计思路：<br />
+- 一个 case 需要测很多步骤，因为过程复杂、流程长<br />
+- 每个步骤定义<strong>成功标准</strong>（不只是看最终结果）<br />
+- 核心 case 只有 3-4 个（每次迭代重点看这几个）<br />
+- 这种 case = "杀手 case"——做好了用户就离不开</p>
+<p>流程拆解：</p>
+<pre><code>① 提出问题 → 评&quot;是否能准确定位原因+数据匹配批次+不偏题&quot;
+② 多轮追问 → 评&quot;是否按上一轮信息推进&quot;
+③ 提交工单 → 评&quot;工具调用成功率&quot;
+</code></pre>
+<h3 id="六-rag-系统评测与调优">六、RAG 系统评测与调优</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th>调优思路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Top-K</strong></td>
+<td>检索返回的最相关片段数</td>
+<td>K 太小召回不全；K 太大干扰信息多</td>
+</tr>
+<tr>
+<td><strong>Top-P / 相似度阈值</strong></td>
+<td>过滤低相似度结果</td>
+<td>阈值太高会漏召回；太低会引入噪音</td>
+</tr>
+<tr>
+<td><strong>切片策略</strong></td>
+<td>长文档如何切成片段</td>
+<td>过小失去上下文；过大检索不精准</td>
+</tr>
+<tr>
+<td><strong>重排（Re-rank）策略</strong></td>
+<td>对初次检索结果重新排序</td>
+<td>用专门的重排模型提升相关性</td>
+</tr>
+</tbody>
+</table>
+<p><strong>RAG 归因常见问题</strong>：<br />
+- 切片不合理 → 片段不完整<br />
+- 重排策略不当 → 最相关的被排在后面<br />
+- 知识库质量差 → 根源性问题</p>
+<hr />
+<h2 id="第三篇-贯通指标与评测的知识闭环">第三篇：贯通指标与评测的知识闭环</h2>
+<h3 id="闭环关系图">闭环关系图</h3>
+<pre><code>           ┌────────────────────────────────┐
+           │  指标体系（定义好坏）           │
+           │  ─────────────────────────────  │
+           │  · 什么是指标                    │
+           │  · 五层指标（流量→用户→行为→    │
+           │    转化→体验）                  │
+           │  · 拆解六法（要素/二分/公式/    │
+           │    漏斗/矩阵/树）                │
+           │  · 分析框架（AARRR/UJM/OSM）    │
+           └──────────────┬─────────────────┘
+                          │ 输出：完整的指标体系
+                          ▼
+           ┌────────────────────────────────┐
+           │  评测体系（验证好坏）           │
+           │  ─────────────────────────────  │
+           │  ① 定指标 ←────── 基于指标体系   │
+           │  ② 选方法（脚本/LLM/人工）      │
+           │  ③ 造评测集（4 大来源）          │
+           │  ④ 执行评测                     │
+           │  ⑤ Bad Case 归因（4 层排查）     │
+           └──────────────┬─────────────────┘
+                          │ 输出：优化方向
+                          ▼
+           ┌────────────────────────────────┐
+           │   产品迭代 → 指标回升 → 再评测   │
+           │   持续飞轮                        │
+           └────────────────────────────────┘
+</code></pre>
+<h3 id="两套体系的共同底层">两套体系的共同底层</h3>
+<ol>
+<li><strong>都服务于"产品到底行不行"这个根本问题</strong></li>
+<li><strong>都强调"量化而非感觉"</strong>——拒绝"我觉得还行"</li>
+<li><strong>都要求产品经理建立"品味"</strong>——把抽象标准变成可传递的规则</li>
+<li><strong>都指向一个目标：建立专业话语权</strong>——让算法、业务、老板都认可你的判断</li>
+</ol>
+<hr />
+<h2 id="第四篇-实战建议与行业参考">第四篇：实战建议与行业参考</h2>
+<h3 id="一-产品经理实战表达升级">一、产品经理实战表达升级</h3>
+<p>❌ 非专业表达：「我之前做的 AI 产品特别成功。」</p>
+<p>✅ 专业表达：「我主导了 XX 产品的指标体系建设，将核心业务指标从 Y 提升到 Z，通过构建评测体系定位到 Prompt 和 RAG 两层的瓶颈，最终在 3 个月内将采纳率从 35% 提升到 62%。」</p>
+<h3 id="二-高加分的-产品观-表达-金句公式">二、高加分的"产品观"表达（金句公式）</h3>
+<blockquote>
+<p><strong>万能模板</strong>：<br />
+[产品名] + 做了一件[领域]史上没人做过的事 + 具体是什么 + 它解决了什么问题</p>
+</blockquote>
+<p>示例：<br />
+- OpenAI「第一个把 AI 能力产品化的公司——把 AI 变成了可注册可使用的网页，人们第一次能亲身体验 AI 是什么」<br />
+- DeepSeek「弥补了国内没有推理能力模型的空白」<br />
+- Kimi「弥补了国内没有 Agent 能力模型的空白」<br />
+- 抖音「把人找信息变成了信息找人」</p>
+<h3 id="三-推荐学习的产品案例">三、推荐学习的产品案例</h3>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>学习点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Claude</strong></td>
+<td>任务进度可视化强，增强用户安全感（Human-in-the-loop 典范）</td>
+</tr>
+<tr>
+<td><strong>即梦（字节）</strong></td>
+<td>模型能力强，医疗领域大量专家标注投入</td>
+</tr>
+<tr>
+<td><strong>Perplexity</strong></td>
+<td>AI 搜索浏览器，信息源质量高，深度研究利器</td>
+</tr>
+<tr>
+<td><strong>电子笔记类产品</strong></td>
+<td>交互体验优，一键收藏、博主订阅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="四-构建评测体系的关键心法">四、构建评测体系的关键心法</h3>
+<blockquote class="callout callout-insight">
+<p><strong>核心要点</strong>：评测常从"草台班子"起步，关键是<strong>先做起来</strong>，在持续迭代中逼近真实，而非追求一次性完美。</p>
+</blockquote>
+<ul>
+<li>初期可用虚构 case 起步</li>
+<li>随产品迭代持续优化评测集</li>
+<li>用 GSB 或 HPS 进行相对评分，降低主观偏差</li>
+<li>产品经理的"品味"是核心差异化竞争力</li>
+</ul>
+<hr />
+<h2 id="第五篇-术语表">第五篇：术语表</h2>
+<h3 id="指标类">指标类</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PV</td>
+<td>Page View</td>
+<td>页面浏览次数</td>
+</tr>
+<tr>
+<td>UV</td>
+<td>Unique Visitor</td>
+<td>独立访客数</td>
+</tr>
+<tr>
+<td>DAU / WAU / MAU</td>
+<td>Daily/Weekly/Monthly Active Users</td>
+<td>日/周/月活跃用户</td>
+</tr>
+<tr>
+<td>留存率</td>
+<td>Retention Rate</td>
+<td>新增用户经 N 天后仍使用的比例</td>
+</tr>
+<tr>
+<td>用户粘性</td>
+<td>Stickiness</td>
+<td>DAU / MAU</td>
+</tr>
+<tr>
+<td>NPS</td>
+<td>Net Promoter Score</td>
+<td>净推荐值</td>
+</tr>
+<tr>
+<td>CSAT</td>
+<td>Customer Satisfaction</td>
+<td>用户满意度</td>
+</tr>
+<tr>
+<td>ARPU</td>
+<td>Average Revenue Per User</td>
+<td>人均收入</td>
+</tr>
+<tr>
+<td>GMV</td>
+<td>Gross Merchandise Volume</td>
+<td>商品交易总额</td>
+</tr>
+<tr>
+<td>北极星指标</td>
+<td>North Star Metric</td>
+<td>产品最核心的唯一指标</td>
+</tr>
+<tr>
+<td>虚荣指标</td>
+<td>Vanity Metric</td>
+<td>无法驱动决策的指标</td>
+</tr>
+<tr>
+<td>先见性 / 后见性</td>
+<td>Leading / Lagging</td>
+<td>当下可观测 / 事后才能观测</td>
+</tr>
+<tr>
+<td>AARRR</td>
+<td>-</td>
+<td>获客/激活/留存/变现/推荐</td>
+</tr>
+<tr>
+<td>UJM</td>
+<td>User Journey Map</td>
+<td>用户旅程图</td>
+</tr>
+<tr>
+<td>OSM</td>
+<td>Objective / Strategy / Measurement</td>
+<td>目标-策略-度量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-与评测类">AI 与评测类</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM-as-Judge</td>
+<td>-</td>
+<td>用大模型作为评分教师</td>
+</tr>
+<tr>
+<td>Benchmark</td>
+<td>-</td>
+<td>基准测试集（如 MMLU、SuperCLUE）</td>
+</tr>
+<tr>
+<td>Bad Case</td>
+<td>-</td>
+<td>表现不佳的评测案例</td>
+</tr>
+<tr>
+<td>Edge Case</td>
+<td>-</td>
+<td>边界案例</td>
+</tr>
+<tr>
+<td>Golden Case</td>
+<td>-</td>
+<td>黄金标准案例</td>
+</tr>
+<tr>
+<td>CoT</td>
+<td>Chain of Thought</td>
+<td>思维链</td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>Model Context Protocol</td>
+<td>模型上下文协议</td>
+</tr>
+<tr>
+<td>Prompt Distillation</td>
+<td>-</td>
+<td>提示词蒸馏（基于优秀回答反向改写）</td>
+</tr>
+<tr>
+<td>Top-K / Top-P</td>
+<td>-</td>
+<td>RAG 检索的数量阈值 / 相似度阈值</td>
+</tr>
+<tr>
+<td>P90 / P99</td>
+<td>-</td>
+<td>90%/99% 分位延迟</td>
+</tr>
+<tr>
+<td>RPM / TPM</td>
+<td>Requests/Tokens Per Minute</td>
+<td>每分钟请求/Token 数</td>
+</tr>
+<tr>
+<td>Human-in-the-Loop</td>
+<td>HITL</td>
+<td>人在环路</td>
+</tr>
+<tr>
+<td>GSB / HPS</td>
+<td>-</td>
+<td>Good-Same-Bad / High-Pairwise-Score 评分法</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="第六篇-延伸实践建议">第六篇：延伸实践建议</h2>
+<h3 id="实践方向">实践方向</h3>
+<ul>
+<li>[ ] 为一款 AI 产品绘制<strong>用户旅程图（UJM）</strong>，每个节点标注可优化点</li>
+<li>[ ] 按评测体系模板，为一个项目写一份<strong>智能写作产品评测体系文档</strong></li>
+<li>[ ] 完成一次评测集构建（真实日志 + Bad Case + 边界 Case + AI 生成，按 60/20/20 配比）</li>
+<li>[ ] 使用 PromptPilot 平台跑一次完整的提示词评测流程（含批量测试 + 智能评分 + Bad Case 反向优化）</li>
+<li>[ ] 设计一次人工标注任务，配套培训材料与质检流程</li>
+<li>[ ] 围绕一个项目，串联 BRD → MRD → PRD → 评测体系 的全流程文档</li>
+</ul>
+<hr />
+<h2 id="第七篇-个人思考与复习要点">第七篇：个人思考与复习要点</h2>
+<h3 id="知识串联线索">知识串联线索</h3>
+<ol>
+<li><strong>问题意识</strong>：从「盲目换模型翻车」这个真实案例切入 → 必须有评测体系</li>
+<li><strong>量化工具</strong>：先学会拆指标、造体系（指标体系）</li>
+<li><strong>验证工具</strong>：再学会设计评测、归因优化（评测体系）</li>
+<li><strong>闭环</strong>：指标 → 评测 → 归因 → 迭代 → 新指标</li>
+</ol>
+<h3 id="最关键的-5-个概念-必须滚瓜烂熟">最关键的 5 个概念（必须滚瓜烂熟）</h3>
+<ol>
+<li><strong>北极星指标</strong> vs <strong>结果指标</strong> vs <strong>过程指标</strong></li>
+<li><strong>留存率计算口径</strong>（分子分母的陷阱）</li>
+<li><strong>五步评测法</strong>（定指标→选方法→造评测集→执行→归因）</li>
+<li><strong>Bad Case 四层归因</strong>（模型→Prompt→流程→数据）</li>
+<li><strong>Agent 评测的"过程+结果"双维度</strong></li>
+</ol>
+<h3 id="最值得深入探索的方向">最值得深入探索的方向</h3>
+<ul>
+<li><strong>提示词工程的评测化</strong>：未来 AI PM 的核心竞争力是"可量化、可评测、可迭代的 Prompt 工程体系"</li>
+<li><strong>数据飞轮闭环设计</strong>：如何让用户反馈自动化地反哺产品优化</li>
+<li><strong>"用 AI 造评测、用评测训 AI"</strong>：下一代智能体进化的可能路径</li>
+</ul>
+<h3 id="关于学习方法的元认知">关于学习方法的元认知</h3>
+<blockquote>
+<p>知识体系不是树叶的堆砌（零散知识点），而是一棵树——先抓主干（指标+评测两大骨架），再抓分支（拆解方法、分析框架），最后生根（动手做案例）。只有这样，才能把零散知识变成工作中的真正武器。</p>
+</blockquote>
+<hr />
+    </article>
+  </main>
+</div>
+
+<script>
+// ScrollSpy — highlight active nav item
+(function() {
+  const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+  const sections = [];
+  navLinks.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({ id, el, link });
+  });
+
+  function updateActive() {
+    const scrollY = window.scrollY + 100;
+    let current = null;
+    for (const s of sections) {
+      const top = s.el.getBoundingClientRect().top + window.scrollY;
+      if (top <= scrollY) current = s;
+      else break;
+    }
+    navLinks.forEach(l => l.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        updateActive();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+  updateActive();
+})();
+</script>
+</body>
+</html>

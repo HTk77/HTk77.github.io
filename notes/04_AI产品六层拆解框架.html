@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 产品六层拆解框架</title>
+<style>
+  /* ========= Linear Design System ========= */
+  :root {
+    --bg-0: #010102;
+    --bg-1: #08090a;
+    --bg-2: #0f1011;
+    --bg-3: #191a1b;
+    --bg-4: #28282c;
+    --text-1: #f7f8f8;
+    --text-2: #d0d6e0;
+    --text-3: #8a8f98;
+    --text-4: #62666d;
+    --accent: #5e6ad2;
+    --accent-2: #7170ff;
+    --accent-3: #828fff;
+    --success: #10b981;
+    --success-2: #27a644;
+    --warn: #f59e0b;
+    --border-subtle: rgba(255,255,255,0.05);
+    --border-std: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.12);
+    --surface-2: rgba(255,255,255,0.02);
+    --surface-4: rgba(255,255,255,0.04);
+    --surface-5: rgba(255,255,255,0.05);
+    --surface-8: rgba(255,255,255,0.08);
+    --shadow-dialog: 0 8px 2px rgba(0,0,0,0), 0 5px 2px rgba(0,0,0,0.01), 0 3px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter Variable', 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    font-feature-settings: "cv01", "ss03";
+    background: var(--bg-1);
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre, .mono {
+    font-family: 'Berkeley Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+  }
+
+  /* ========= Layout ========= */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  section { padding: 80px 0; border-bottom: 1px solid var(--border-subtle); }
+  section:last-of-type { border-bottom: none; }
+
+  /* ========= Nav ========= */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,16,17,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+  .logo {
+    font-size: 14px; font-weight: 590; color: var(--text-1);
+    letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px;
+  }
+  .logo-mark {
+    width: 20px; height: 20px; border-radius: 5px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    box-shadow: 0 0 20px rgba(94,106,210,0.4);
+  }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    color: var(--text-3); text-decoration: none;
+    font-size: 13px; font-weight: 510;
+    padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+  }
+  .nav-links a:hover { color: var(--text-1); background: var(--surface-4); }
+
+  /* ========= Hero ========= */
+  .hero {
+    padding: 120px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(94,106,210,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 9999px;
+    background: var(--surface-4);
+    border: 1px solid var(--border-std);
+    font-size: 12px; font-weight: 510; color: var(--text-2);
+    margin-bottom: 24px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); }
+  h1.display {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 510;
+    line-height: 1.0;
+    letter-spacing: -0.022em;
+    color: var(--text-1);
+    margin-bottom: 24px;
+  }
+  h1.display .highlight {
+    background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: 20px; font-weight: 400; line-height: 1.55;
+    color: var(--text-2); max-width: 780px;
+    margin-bottom: 32px;
+    letter-spacing: -0.011em;
+  }
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    font-size: 13px; color: var(--text-3);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 8px; }
+  .hero-meta strong { color: var(--text-1); font-weight: 510; }
+
+  /* ========= Section Titles ========= */
+  .section-label {
+    display: inline-block;
+    font-family: 'Berkeley Mono', ui-monospace, monospace;
+    font-size: 12px; font-weight: 400;
+    color: var(--accent-2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 510; line-height: 1.05;
+    letter-spacing: -0.022em;
+    color: var(--text-1);
+    margin-bottom: 16px;
+  }
+  .section-lead {
+    font-size: 18px; line-height: 1.6;
+    color: var(--text-2); max-width: 820px;
+    margin-bottom: 48px;
+    letter-spacing: -0.009em;
+  }
+  h3 {
+    font-size: 22px; font-weight: 590;
+    color: var(--text-1);
+    letter-spacing: -0.012em;
+    margin-bottom: 14px;
+    margin-top: 8px;
+  }
+  h4 {
+    font-size: 16px; font-weight: 590;
+    color: var(--text-1);
+    letter-spacing: -0.005em;
+    margin-bottom: 10px;
+  }
+
+  p { margin-bottom: 14px; }
+  p + p { margin-top: 0; }
+
+  /* ========= Cards ========= */
+  .card {
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 12px;
+    padding: 24px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    background: var(--surface-4);
+    border-color: var(--border-strong);
+  }
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  /* ========= Six-Layer Framework ========= */
+  .framework {
+    display: grid; gap: 12px;
+    margin-top: 24px;
+  }
+  .layer {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 10px;
+    padding: 20px 24px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .layer::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .layer:hover { background: var(--surface-4); border-color: var(--border-strong); transform: translateX(4px); }
+  .layer:hover::before { opacity: 1; }
+  .layer-num {
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 28px; font-weight: 400;
+    color: var(--accent-2);
+    letter-spacing: -0.02em;
+  }
+  .layer-name {
+    font-size: 20px; font-weight: 590;
+    color: var(--text-1);
+    margin-bottom: 4px;
+    letter-spacing: -0.012em;
+  }
+  .layer-desc { font-size: 14px; color: var(--text-3); }
+  .layer-q {
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 12px;
+    color: var(--text-2);
+    padding: 6px 12px;
+    background: var(--surface-5);
+    border: 1px solid var(--border-std);
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+
+  /* ========= Tables ========= */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border-std); border-radius: 12px; background: var(--surface-2); margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; padding: 14px 18px;
+    font-weight: 510; color: var(--text-3);
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+    background: var(--surface-4);
+    border-bottom: 1px solid var(--border-std);
+  }
+  td {
+    padding: 14px 18px;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-2); }
+  td strong, th strong { color: var(--text-1); font-weight: 590; }
+
+  /* ========= Callout ========= */
+  .callout {
+    background: linear-gradient(135deg, rgba(94,106,210,0.08) 0%, rgba(113,112,255,0.04) 100%);
+    border: 1px solid rgba(94,106,210,0.25);
+    border-left: 3px solid var(--accent-2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    position: relative;
+  }
+  .callout-label {
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 11px; font-weight: 510;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent-3);
+    margin-bottom: 8px;
+  }
+  .callout p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0; }
+  .callout.warn {
+    background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(245,158,11,0.02) 100%);
+    border-color: rgba(245,158,11,0.25);
+    border-left-color: var(--warn);
+  }
+  .callout.warn .callout-label { color: var(--warn); }
+
+  /* ========= Pills & Badges ========= */
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px;
+    background: var(--surface-5);
+    border: 1px solid var(--border-std);
+    border-radius: 9999px;
+    font-size: 12px; font-weight: 510;
+    color: var(--text-2);
+  }
+  .pill.accent {
+    background: rgba(94,106,210,0.15);
+    border-color: rgba(94,106,210,0.3);
+    color: var(--accent-3);
+  }
+  .pill.success { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: var(--success); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+  /* ========= Flow Diagram ========= */
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    padding: 24px; background: var(--surface-2);
+    border: 1px solid var(--border-std); border-radius: 12px;
+    overflow-x: auto;
+  }
+  .flow-node {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    background: var(--surface-5);
+    border: 1px solid var(--border-std);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 510;
+    color: var(--text-1);
+    white-space: nowrap;
+  }
+  .flow-node.accent {
+    background: rgba(94,106,210,0.12);
+    border-color: rgba(94,106,210,0.3);
+    color: var(--accent-3);
+  }
+  .flow-arrow {
+    color: var(--text-4); font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ========= Agent Grid ========= */
+  .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+  .agent-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .agent-card:hover { background: var(--surface-4); border-color: rgba(94,106,210,0.3); }
+  .agent-card.main {
+    background: linear-gradient(135deg, rgba(94,106,210,0.12) 0%, rgba(113,112,255,0.04) 100%);
+    border-color: rgba(94,106,210,0.3);
+  }
+  .agent-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface-5);
+    border: 1px solid var(--border-std);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; margin-bottom: 12px;
+    font-family: 'Berkeley Mono', monospace;
+    color: var(--accent-3); font-weight: 510;
+  }
+  .agent-card.main .agent-icon {
+    background: var(--accent); color: #fff; border-color: var(--accent-2);
+  }
+  .agent-name { font-size: 16px; font-weight: 590; color: var(--text-1); margin-bottom: 4px; letter-spacing: -0.008em; }
+  .agent-role { font-size: 12px; color: var(--text-3); margin-bottom: 10px; }
+  .agent-desc { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+  /* ========= Context Data Tree ========= */
+  .tree {
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 13px; line-height: 1.9;
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 12px;
+    padding: 24px;
+    color: var(--text-2);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .tree .k { color: var(--accent-3); }
+  .tree .c { color: var(--text-4); }
+
+  /* ========= Architecture Diagram ========= */
+  .arch {
+    margin-top: 24px;
+    border: 1px solid var(--border-std);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg-2);
+  }
+  .arch-layer {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .arch-layer:last-child { border-bottom: none; }
+  .arch-layer-title {
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .arch-layer-title::before {
+    content: ''; width: 18px; height: 1px; background: var(--accent-2);
+  }
+  .arch-items {
+    display: grid; gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .arch-item {
+    padding: 10px 14px;
+    background: var(--surface-5);
+    border: 1px solid var(--border-std);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 510;
+    color: var(--text-1);
+    text-align: center;
+  }
+  .arch-layer.user .arch-item { color: var(--text-1); }
+  .arch-layer.app { background: linear-gradient(180deg, rgba(94,106,210,0.04) 0%, transparent 100%); }
+  .arch-layer.app .arch-item { background: rgba(94,106,210,0.1); border-color: rgba(94,106,210,0.25); color: var(--accent-3); }
+  .arch-layer.model .arch-item { font-family: 'Berkeley Mono', monospace; font-size: 12px; font-weight: 400; }
+  .arch-layer.data .arch-item { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.2); color: var(--success); }
+
+  /* ========= Check Lists ========= */
+  .check-list { list-style: none; padding: 0; margin: 12px 0; }
+  .check-list li {
+    position: relative;
+    padding: 10px 0 10px 28px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-list li::before {
+    content: '✓';
+    position: absolute; left: 0; top: 10px;
+    width: 18px; height: 18px;
+    color: var(--success);
+    font-weight: 590;
+    font-size: 13px;
+  }
+  .check-list.x li::before { content: '✕'; color: #ef4444; }
+
+  .num-list { counter-reset: n; list-style: none; padding: 0; margin: 12px 0; }
+  .num-list li {
+    counter-increment: n;
+    position: relative;
+    padding: 12px 0 12px 36px;
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.6;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .num-list li:last-child { border-bottom: none; }
+  .num-list li::before {
+    content: counter(n, decimal-leading-zero);
+    position: absolute; left: 0; top: 12px;
+    font-family: 'Berkeley Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-2);
+    font-weight: 510;
+  }
+  .num-list li strong { color: var(--text-1); font-weight: 590; }
+
+  /* ========= Compare Grid ========= */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;
+  }
+  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col {
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .compare-col h4 { margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .compare-col.do h4::before { content: ''; width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+  .compare-col.dont h4::before { content: ''; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; }
+
+  /* ========= Footer ========= */
+  footer {
+    padding: 48px 0;
+    text-align: center;
+    color: var(--text-4);
+    font-size: 13px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  footer .foot-logo {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+    color: var(--text-2); font-weight: 510;
+  }
+
+  /* ========= Utilities ========= */
+  .sm-meta { font-size: 13px; color: var(--text-4); margin-top: 4px; }
+  .spacer-lg { height: 40px; }
+  .divider { height: 1px; background: var(--border-subtle); margin: 32px 0; }
+  strong, b { color: var(--text-1); font-weight: 590; }
+  em { color: var(--accent-3); font-style: normal; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { color: var(--accent-3); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi {
+    background: var(--surface-2);
+    border: 1px solid var(--border-std);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .kpi-val {
+    font-size: 28px; font-weight: 510;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-val.accent { color: var(--accent-3); }
+  .kpi-label { font-size: 12px; color: var(--text-3); }
+
+  /* ========= TOC sidebar mini ========= */
+  @media (max-width: 900px) {
+    .nav-links a { font-size: 12px; padding: 4px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      AI 产品六层拆解框架
+    </div>
+    <div class="nav-links">
+      <a href="#framework">六层框架</a>
+      <a href="#user-layer">用户层</a>
+      <a href="#tech-layer">技术层</a>
+      <a href="#context">上下文工程</a>
+      <a href="#prompt">提示词设计</a>
+      <a href="#model">模型层</a>
+      <a href="#data">基础层</a>
+      <a href="#arch">架构总览</a>
+      <a href="#case">案例参考</a>
+      <a href="#glossary">术语表</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow"><span class="dot"></span> AI 产品方法论</div>
+    <h1 class="display">AI 产品<br><span class="highlight">六层拆解框架</span></h1>
+    <p class="hero-lead">用"六层拆解框架"逆向推导任意 AI 产品的完整架构，掌握从用户旅程到多 Agent 提示词设计的全链路能力，最终能够独立复刻一个 AIGC 产品。</p>
+    <div class="hero-meta">
+      <span><strong>拆解案例</strong> 某 AIGC 短剧平台</span>
+      <span><strong>项目参考</strong> 某大厂视频生成项目</span>
+      <span><strong>核心方法</strong> 六层框架</span>
+    </div>
+
+    <div class="kpi-grid" style="margin-top:40px;">
+      <div class="kpi"><div class="kpi-val accent">6</div><div class="kpi-label">拆解层级</div></div>
+      <div class="kpi"><div class="kpi-val accent">7</div><div class="kpi-label">核心 Agent</div></div>
+      <div class="kpi"><div class="kpi-val accent">162</div><div class="kpi-label">预设风格库</div></div>
+      <div class="kpi"><div class="kpi-val">40%</div><div class="kpi-label">上下文工程占比</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ WHY ============ -->
+<section id="why">
+  <div class="wrap">
+    <div class="section-label">01 · Why</div>
+    <h2>为什么要学产品拆解？</h2>
+    <p class="section-lead">产品拆解不是"看看别人做了什么"，而是一项<strong>核心生产力技能</strong>，直接解决三个场景的问题。</p>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <div class="pill accent" style="margin-bottom:12px;">研判</div>
+        <h3>展现专业深度</h3>
+        <p>评估某个产品时，摆脱"还挺好用的"式判断，用有框架、有层次的方式把它拆透。</p>
+      </div>
+      <div class="card">
+        <div class="pill accent" style="margin-bottom:12px;">落地</div>
+        <h3>快速复刻 MVP</h3>
+        <p>项目要快速出成果时，通过拆解竞品，快速复刻出最低可用产品，避免从零摸索。</p>
+      </div>
+      <div class="card">
+        <div class="pill accent" style="margin-bottom:12px;">创业</div>
+        <h3>站在巨人肩上</h3>
+        <p>想做一个产品但不知道架构怎么设计，逆向推导成熟产品，避免重复踩坑。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FRAMEWORK ============ -->
+<section id="framework">
+  <div class="wrap">
+    <div class="section-label">02 · Core Framework</div>
+    <h2>六层拆解框架（万能框架）</h2>
+    <p class="section-lead">核心方法论——任何 AI 产品都可以用这六层来拆解和构建。</p>
+
+    <div class="framework">
+      <div class="layer">
+        <div class="layer-num">01</div>
+        <div>
+          <div class="layer-name">市场层</div>
+          <div class="layer-desc">看市场年报 · 能解决 80% 的问题 · 产出是否立项、竞品分析报告</div>
+        </div>
+        <div class="layer-q">值不值得做？</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">02</div>
+        <div>
+          <div class="layer-name">商业层</div>
+          <div class="layer-desc">看官网介绍、创始人访谈 · 产出一句话定位、商业模式</div>
+        </div>
+        <div class="layer-q">怎么赚钱？</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">03</div>
+        <div>
+          <div class="layer-name">用户层</div>
+          <div class="layer-desc">用户旅程图、核心功能清单、输出物质量评估</div>
+        </div>
+        <div class="layer-q">用户看到什么？</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">04</div>
+        <div>
+          <div class="layer-name">技术层 <span class="pill accent" style="margin-left:8px;">核心重点</span></div>
+          <div class="layer-desc">技术架构图、Agent 流程图、关键 Agent 提示词</div>
+        </div>
+        <div class="layer-q">怎么实现？</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">05</div>
+        <div>
+          <div class="layer-name">模型层</div>
+          <div class="layer-desc">模型清单与适用场景对照表 · 模型路由逻辑</div>
+        </div>
+        <div class="layer-q">调哪些模型？</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">06</div>
+        <div>
+          <div class="layer-name">基础层</div>
+          <div class="layer-desc">核心数据清单及来源 · 知识库、用户数据、专业知识</div>
+        </div>
+        <div class="layer-q">依赖什么数据？</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:40px;">
+      <div class="callout-label">关键判断</div>
+      <p>市场层和商业层不是产品本身，但产品具体怎么设计，一定是根据这两层推导出来的。<strong>深入理解这两层，才能把后面四层的设计讲透</strong>。</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">拆解原则</div>
+      <p>拆解的时候，具体产品案例不是主角，<strong>六层框架才是重点</strong>。这个框架可以带入到任意一个 AI 产品上，是一个万能框架。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USER LAYER ============ -->
+<section id="user-layer">
+  <div class="wrap">
+    <div class="section-label">03 · User Layer</div>
+    <h2>用户层拆解实战</h2>
+    <p class="section-lead">以某 AIGC 短剧平台为例，用户层拆解的核心就是梳理操作流程，从中推导出 Agent 之间的协作关系。</p>
+
+    <h3>3.1 核心功能</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>功能模块</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><strong>项目创作</strong></td><td>通过多 Agent 协作生成短剧视频</td></tr>
+          <tr><td><strong>我的项目</strong></td><td>管理所有个人项目</td></tr>
+          <tr><td><strong>角色库</strong></td><td>管理个人创作的所有角色</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--text-3); font-size:14px;">三个功能串成完整流程：创作角色 → 存入角色库 → 项目创作生成视频 → 存入我的项目。</p>
+
+    <div class="spacer-lg"></div>
+
+    <h3>3.2 正向流程梳理</h3>
+    <p>用户使用该平台生成一个短剧视频的完整流程：</p>
+    <div class="flow">
+      <span class="flow-node">输入需求</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node accent">艺术总监</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">编剧</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">角色设计师</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">分镜师</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">合成视频</span>
+    </div>
+    <div class="tag-row" style="margin-top:16px;">
+      <span class="pill">艺术总监：确认信息 / 推荐风格（162种筛选）/ 推荐情绪词</span>
+      <span class="pill">编剧：编写剧本 / 输出报价</span>
+      <span class="pill">角色设计师：角色提示词 / 角色图 / 概念图</span>
+      <span class="pill">分镜师：音频提示词 / 场景图提示词 / 动画分镜 / 音频生成</span>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>3.3 逆向流程（加入人机交互判断）</h3>
+    <p>在正向流程基础上，每个关键节点都有 <em>用户确认环节（Human-in-the-loop）</em>：</p>
+
+    <ul class="check-list">
+      <li><strong>角色设计师</strong>：生成角色图 → 是否满意？→ 不满意则重新生成</li>
+      <li><strong>概念图生成</strong>：是否满意？→ 不满意则重新生成</li>
+      <li><strong>场景图</strong>：是否满意？</li>
+      <li><strong>分镜生成</strong>：是否满意？</li>
+      <li><strong>音频生成</strong>：是否满意？</li>
+      <li><strong>全部满意 → 合成最终视频</strong></li>
+    </ul>
+
+    <h4 style="margin-top:28px;">两种输入场景的流程差异</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:30%;">场景</th><th>流程</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>标准清晰剧本</strong></td>
+            <td>输入 → 判断是否符合短片需求 → 注入用户需求 → <em>human 介入</em>（时长/比例/语言）→ 需求分析 → 情绪词生成 → 风格搜索(RAG) → <em>human 介入</em> → 输出</td>
+          </tr>
+          <tr>
+            <td><strong>涉及 IP 角色剧本</strong></td>
+            <td>输入 → 判断 → <strong>识别IP角色</strong> → <strong>推荐模型</strong>（如 Sora 2）→ <em>human 介入</em> → 需求分析 → 情绪词生成 → 风格搜索 → <em>human 介入</em> → 输出</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH LAYER ============ -->
+<section id="tech-layer">
+  <div class="wrap">
+    <div class="section-label">04 · Tech Layer</div>
+    <h2>技术层深度拆解：多 Agent 架构</h2>
+    <p class="section-lead">技术层是整个拆解的核心重点——它回答了"用户看到的每一步交互，背后对应一个 Agent 在做什么"。</p>
+
+    <h3>4.1 为什么需要多 Agent？</h3>
+    <p>单 Agent 的三大局限：</p>
+    <ol class="num-list">
+      <li><strong>提示词冲突</strong>：不同任务的提示词之间会相互干扰</li>
+      <li><strong>任务冲突</strong>：不同任务之间存在冲突</li>
+      <li><strong>上下文过长</strong>：7 个 Agent 合成一个，系统提示词会非常长，必然产生报错、幻觉</li>
+    </ol>
+
+    <div class="callout">
+      <div class="callout-label">核心要点</div>
+      <p>单 Agent 升级为多 Agent 的唯一原因——<strong>场景复杂到单个 Agent 解决不了了</strong>。就像你自己做不过来了，才需要再招一个人。</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>4.2 该平台的 7 个核心 Agent</h3>
+    <div class="agent-grid">
+      <div class="agent-card main">
+        <div class="agent-icon">★</div>
+        <div class="agent-name">艺术总监</div>
+        <div class="agent-role">主 Agent · Master</div>
+        <div class="agent-desc">接收用户需求，确认信息，推荐风格/情绪词，引导后续 Agent 的创作逻辑。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">✎</div>
+        <div class="agent-name">编剧</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">根据初始信息生成故事剧本，编写对话与每一个分镜体的画面描述。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">◉</div>
+        <div class="agent-name">角色设计师</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">将编剧的文字描述转化为角色主图，生成三视图（front/side/back）保持一致性。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">▦</div>
+        <div class="agent-name">场景设计师</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">负责环境概念图的生成，通过优化场景提示词提升画面质量。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">▶</div>
+        <div class="agent-name">分镜师</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">生成分镜的视频提示词、音频提示词、台词，控制时间轴对齐。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">◈</div>
+        <div class="agent-name">产品设计师</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">负责周边角色配饰 / 场景道具生成。</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-icon">♪</div>
+        <div class="agent-name">音乐总监</div>
+        <div class="agent-role">子 Agent</div>
+        <div class="agent-desc">负责音乐风格构思及音频生成，确保设计元素与整体风格一致。</div>
+      </div>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>4.3 Agent 之间如何协作</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4>主-子 Agent 架构</h4>
+        <ul class="check-list">
+          <li><strong>主 Agent（艺术总监）</strong>：全局决策，决定何时调用哪个子 Agent</li>
+          <li><strong>子 Agent</strong>：专注执行特定任务</li>
+          <li><strong>调用方式</strong>：Function Call 或 MCP</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Agent 复用机制</h4>
+        <p style="font-size:14px;">一个 Agent 不一定要"加入群聊"，可以作为<em>工具</em>被调用：</p>
+        <ul class="check-list">
+          <li>分镜师生成音频提示词 → 调用音乐总监 Agent</li>
+          <li>分镜师需要场景图 → 调用场景设计师 Agent</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">核心认知</div>
+      <p>一个工具里面可以封装 Agent，也可以封装外部接口，也可以封装一个单独的大模型。<strong>Agent 的核心就是提示词</strong>——你写多细，它就按多细的方式执行；你写得粗，它就自由发挥。</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>4.4 串行 vs 并行</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>对比维度</th><th>串行</th><th>并行</th></tr></thead>
+        <tbody>
+          <tr><td><strong>速度</strong></td><td>慢（逐个生成）</td><td>快（同时生成）</td></tr>
+          <tr><td><strong>成本</strong></td><td>低（占用少量资源）</td><td>高（占用多个 Agent 资源）</td></tr>
+          <tr><td><strong>适用场景</strong></td><td>短视频 < 5 分钟，分镜少</td><td>长视频，分镜数量多（如 100 个）</td></tr>
+          <tr><td><strong>质量控制</strong></td><td>可逐个确认</td><td>需批量确认</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sm-meta">该平台当前场景（短剧 &lt; 5 分钟）不需要并行。专业影视平台因分镜数量多，需要并行处理。</p>
+  </div>
+</section>
+
+<!-- ============ CONTEXT ENGINEERING ============ -->
+<section id="context">
+  <div class="wrap">
+    <div class="section-label">05 · Context Engineering</div>
+    <h2>全局上下文工程：多 Agent 协作的核心</h2>
+    <p class="section-lead">所有你喂给大模型的，都是它的上下文。上下文工程是多 Agent 能否协作成功的关键基础设施。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>概念</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td><strong>上下文</strong></td><td>喂给大模型的所有信息（系统提示词、用户输入、历史对话、知识库、文件等）</td></tr>
+          <tr><td><strong>上下文工程</strong></td><td>设计上下文何时用、何时不用、如何存取的工程方案</td></tr>
+          <tr><td><strong>提示词工程</strong></td><td>如何让提示词发挥更好效果的工程方案（是上下文工程的子集）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">核心要点</div>
+      <p>一个 AIGC 产品要做得好，<strong>40% 的关键点都在上下文工程里</strong>。上下文工程为什么加"工程"两个字？因为不只是写一个提示词，而是要系统地设计什么时候用、什么时候不用——这叫工程。</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>5.1 全局共享上下文（核心数据表）</h3>
+    <p>该平台的多 Agent 共享一个<em>全局上下文数据表</em>，每个 Agent 都可以读取和更新。产品中反复出现的"更新字段信息"操作，本质就是在写这张表。</p>
+
+    <div class="tree"><span class="c">// 全局上下文数据表</span>
+GlobalContext
+├── <span class="k">项目元数据</span>
+│   ├── 项目 ID
+│   ├── 创作版本号     <span class="c">// 1.0 → 1.1 → 2.0，支持回退</span>
+│   ├── 影片比例
+│   ├── 目标时长
+│   ├── 帧率
+│   └── 对白语言
+│
+├── <span class="k">角色字典</span>
+│   ├── 角色 ID
+│   ├── 角色名称
+│   ├── 角色描述
+│   ├── 主图 URI         <span class="c">// 变量，可随时更新替换</span>
+│   └── 三视图 URI
+│
+└── <span class="k">分镜资产流水线</span>
+    ├── 镜头编号            <span class="c">// 场景1-镜头1</span>
+    ├── 分镜描述
+    ├── 场景图 URI
+    ├── 分镜时长
+    └── 台词              <span class="c">// 含时间戳 8s-9s 说什么</span></div>
+
+    <div class="spacer-lg"></div>
+
+    <div class="two-col">
+      <div>
+        <h3>5.2 "变量"的概念</h3>
+        <p>全局上下文中的 URI、版本号等都是<em>变量</em>——一个可以被任意替换的占位符。</p>
+        <p><strong>类比</strong>：奶茶店计算日营收，单价 = 15 元。老板说改成 16 元时，有了变量只需改一处，所有引用自动更新。</p>
+        <ul class="check-list">
+          <li>角色主图 URI 是变量 → 更新图时只需更新 URI 值</li>
+          <li>所有引用该角色图的 Agent 自动使用最新版本</li>
+          <li>这就是为什么每个 Agent 完成任务后都要"更新字段信息"</li>
+        </ul>
+      </div>
+      <div>
+        <h3>5.3 版本号机制</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>版本</th><th>含义</th></tr></thead>
+            <tbody>
+              <tr><td class="mono"><strong>1.0</strong></td><td>初始版本（从 0 到 1）</td></tr>
+              <tr><td class="mono"><strong>1.1</strong></td><td>小改动（修改某角色/分镜）</td></tr>
+              <tr><td class="mono"><strong>2.0</strong></td><td>推翻重来</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:14px; color:var(--text-3); margin-top:12px;">支持用户说"帮我回退到上一个版本"。就像游戏存档，到点了就存档一下。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROMPT DESIGN ============ -->
+<section id="prompt">
+  <div class="wrap">
+    <div class="section-label">06 · Prompt Design</div>
+    <h2>单个 Agent 提示词设计</h2>
+    <p class="section-lead">一个 Agent = 一份系统提示词。以艺术总监为例，拆解真实的提示词结构。</p>
+
+    <h3>6.1 Agent 提示词的核心结构</h3>
+    <div class="flow" style="margin-top:16px;">
+      <span class="flow-node accent">1. 角色定义</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node accent">2. 核心变量管理</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node accent">3. 关键流程 SOP</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node accent">4. 工具调用规范</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node accent">5. 交互准则</span>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>6.2 艺术总监 Agent 详解</h3>
+
+    <h4 style="margin-top:24px;">角色定义</h4>
+    <ul class="check-list">
+      <li>资深 AI 动画制作人兼艺术总监</li>
+      <li>负责接收用户原始需求</li>
+      <li>最终输出一个高标准的<strong>结构化 Brief</strong>（交给下一个 Agent）</li>
+    </ul>
+
+    <h4 style="margin-top:24px;">任务处理流程（关键 SOP）</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:20%;">步骤</th><th style="width:25%;">动作</th><th>细节</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. 需求获取</strong></td><td>解析用户输入</td><td>判断关键信息是否齐全；缺失则调用追问工具；齐全则激活主流程</td></tr>
+          <tr><td><strong>2. IP 识别</strong></td><td>识别 IP 角色</td><td>存在 IP → 推送 UI 卡片让用户选模型（如 Sora 2）；不存在 → 进入下一步</td></tr>
+          <tr><td><strong>3. 项目初始化</strong></td><td>填槽 + 更新全局上下文</td><td>将时长/比例/语言等存入数据表；调用表单工具推送确认项</td></tr>
+          <tr><td><strong>4. 视觉与情绪构建</strong></td><td>RAG 风格库 + 情绪词</td><td>语义检索 → 用户确认 → 分析文本情感 → 用户确认 → 存入上下文</td></tr>
+          <tr><td><strong>5. 输出</strong></td><td>格式化结构化 Brief</td><td>输出完整结构化需求文档，交给编剧 Agent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin-top:24px;">工具调用规范</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>工具</th><th>功能</th><th>触发条件</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">RAG 风格库</td><td>语义检索匹配艺术风格</td><td>需要推荐视觉风格时</td></tr>
+          <tr><td class="mono">表单工具</td><td>推送 UI 卡片让用户选择/确认</td><td>需要用户确认时长/比例/语言/风格/情绪词时</td></tr>
+          <tr><td class="mono">字段更新工具</td><td>更新全局上下文数据表</td><td>每次收集到新信息或用户确认后</td></tr>
+          <tr><td class="mono">追问工具</td><td>向用户澄清需求</td><td>关键信息缺失时</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin-top:24px;">交互准则</h4>
+    <div class="grid grid-2">
+      <div class="card">
+        <h4>思维展示</h4>
+        <p style="font-size:14px;">执行每一步前，必须陈述当前操作（用户看到的"思考过程"）。</p>
+      </div>
+      <div class="card">
+        <h4>状态同步</h4>
+        <p style="font-size:14px;">字段未更新成功前，禁止向用户承诺进度。</p>
+      </div>
+      <div class="card">
+        <h4>人优先原则</h4>
+        <p style="font-size:14px;">用户修改建议优先级高于 AI 预设。</p>
+      </div>
+      <div class="card">
+        <h4>回退支持</h4>
+        <p style="font-size:14px;">用户不满意时，支持回退到某一步重新执行。</p>
+      </div>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>6.3 如何推导出 Agent 提示词？</h3>
+    <ol class="num-list">
+      <li><strong>体验产品</strong>，分多个场景测试（标准剧本、涉及 IP 的剧本等）</li>
+      <li><strong>记录每个 Agent 的输入和输出</strong></li>
+      <li><strong>观察思考过程</strong>，从中提取关键流程步骤</li>
+      <li><strong>汇总输入输出信息</strong>，结合流程图</li>
+      <li><strong>用 AI 辅助生成提示词</strong>——将输入/输出/流程信息给 AI，让它帮你写出提示词框架</li>
+      <li><strong>通过评测迭代优化</strong>——定义成功标准，测试效果，哪里不好补哪里</li>
+    </ol>
+
+    <div class="callout">
+      <div class="callout-label">逆向推导的核心优势</div>
+      <p>如果你直接让 AI "写一个艺术总监 Agent 的提示词"，生成的东西和你用逆向推导出来的<strong>绝对不一样</strong>。逆向推导的优势在于：你已经知道了真实的输入/输出和处理逻辑。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODEL LAYER ============ -->
+<section id="model">
+  <div class="wrap">
+    <div class="section-label">07 · Model Layer</div>
+    <h2>模型层拆解</h2>
+    <p class="section-lead">模型路由（Model Routing）= 什么场景用什么模型的逻辑规则。写在 Agent 提示词中。</p>
+
+    <h3>模型清单</h3>
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card">
+        <h4>🖼 图片模型</h4>
+        <ul class="check-list">
+          <li><strong class="mono">Nano Banana Pro</strong> · 快速原型设计、基础角色填充</li>
+          <li><strong class="mono">Seedream 4.5</strong> · 角色主图生成</li>
+          <li><strong class="mono">Midjourney V6</strong> · 高质量图片</li>
+          <li><strong class="mono">Stable Diffusion</strong> · 灵活控制，满足 ControlNet 需求</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🎬 视频模型</h4>
+        <ul class="check-list">
+          <li><strong class="mono">Sora 2</strong> · 电影级画面、IP 管控严格</li>
+          <li><strong class="mono">SeeDream</strong></li>
+          <li><strong class="mono">Kling 2.1</strong> · 动作合理性、特效处理</li>
+          <li><strong class="mono">海螺 02</strong></li>
+          <li><strong class="mono">Vidu</strong> · 多人场景真实感</li>
+          <li><strong class="mono">Pika 2.0</strong> · 风格化快速变换</li>
+          <li><strong class="mono">Runway Gen-3</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🔊 音频模型</h4>
+        <ul class="check-list">
+          <li><strong>TTS</strong>: <span class="mono">ElevenLabs / Azure TTS</span></li>
+          <li><strong>BGM</strong>: <span class="mono">Suno / Udio</span></li>
+          <li><strong>SFX</strong>: <span class="mono">AudioCraft</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>📝 文本模型</h4>
+        <p style="font-size:14px;">未明确公开 · 负责需求理解、剧本生成等环节</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">模型信息来源</div>
+      <p>1. 产品"思考过程"中泄露的工具名称（如 <code class="mono">SEEDREAM 4.5</code>）<br>2. 产品官方的宣传和访谈资料<br>3. 通用模型评测结果 + 产品经理自己的理解和审美</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA LAYER ============ -->
+<section id="data">
+  <div class="wrap">
+    <div class="section-label">08 · Data Layer</div>
+    <h2>基础层拆解</h2>
+    <p class="section-lead">产品底层依赖的数据与知识——决定了产品能否随数据积累越用越强（数据飞轮）。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:22%;">数据类型</th><th style="width:44%;">内容</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><strong>风格库</strong></td><td>162 种视觉风格，每种有完整文字描述（不只是"国风水墨"四个字）</td><td>通过 RAG 语义检索匹配用户需求</td></tr>
+          <tr><td><strong>视频知识库</strong></td><td>参考视频（文字描述 + 视频链接存储召回）</td><td>作为 Few-shot 示例提升生成质量</td></tr>
+          <tr><td><strong>内置影视专业知识</strong></td><td>镜头运镜、构图规则、分镜设计规范</td><td>写入 Agent 提示词，确保专业度</td></tr>
+          <tr><td><strong>模型表现得分阈值</strong></td><td>各模型在不同场景下的质量评分</td><td>用于模型路由决策</td></tr>
+          <tr><td><strong>剧本数据</strong></td><td>优质剧本示例</td><td>提升生成质量</td></tr>
+          <tr><td><strong>用户反馈</strong></td><td>用户使用过程中的反馈数据</td><td>迭代优化产品（数据飞轮）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">护城河判断</div>
+      <p>该平台的护城河不在模型上（模型大家都能调），而在于：<br>① <strong>提示词工程</strong>；② <strong>工作流设计</strong>；③ <strong>底层知识数据</strong>（风格库、影视专业知识等）。<br>这些是别人一下子抄不来的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE OVERVIEW ============ -->
+<section id="arch">
+  <div class="wrap">
+    <div class="section-label">09 · Architecture</div>
+    <h2>架构总览</h2>
+    <p class="section-lead">把前面所有层整合成一张图——这就是"值钱的"产品架构图。</p>
+
+    <div class="arch">
+      <div class="arch-layer user">
+        <div class="arch-layer-title">USER LAYER · 用户层</div>
+        <div class="arch-items">
+          <div class="arch-item">项目创作</div>
+          <div class="arch-item">我的项目</div>
+          <div class="arch-item">角色库</div>
+        </div>
+      </div>
+
+      <div class="arch-layer app">
+        <div class="arch-layer-title">APPLICATION LAYER · Agent + Tools</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;" class="two-col">
+          <div>
+            <div style="font-size:12px; color:var(--text-3); margin-bottom:10px;">Agent 体系</div>
+            <div class="arch-items" style="grid-template-columns:1fr 1fr;">
+              <div class="arch-item" style="background:var(--accent); border-color:var(--accent-2); color:#fff;">★ 艺术总监（主）</div>
+              <div class="arch-item">编剧</div>
+              <div class="arch-item">角色设计师</div>
+              <div class="arch-item">场景设计师</div>
+              <div class="arch-item">分镜师</div>
+              <div class="arch-item">产品设计师</div>
+              <div class="arch-item">音乐总监</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:var(--text-3); margin-bottom:10px;">Tools 工具箱</div>
+            <div class="arch-items" style="grid-template-columns:1fr 1fr;">
+              <div class="arch-item">上下文管理</div>
+              <div class="arch-item">状态管理</div>
+              <div class="arch-item">表单工具</div>
+              <div class="arch-item">追问工具</div>
+              <div class="arch-item">分镜拆解</div>
+              <div class="arch-item">成本估算</div>
+              <div class="arch-item">RAG 检索</div>
+              <div class="arch-item">...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-layer model">
+        <div class="arch-layer-title">MODEL LAYER · 模型层</div>
+        <div class="arch-items">
+          <div class="arch-item">Nano Banana</div>
+          <div class="arch-item">Seedream 4.5</div>
+          <div class="arch-item">Midjourney V6</div>
+          <div class="arch-item">Stable Diffusion</div>
+          <div class="arch-item">Sora 2</div>
+          <div class="arch-item">Kling 2.1</div>
+          <div class="arch-item">Vidu / Pika 2.0</div>
+          <div class="arch-item">Suno / Udio</div>
+          <div class="arch-item">ElevenLabs TTS</div>
+          <div class="arch-item">AudioCraft</div>
+        </div>
+      </div>
+
+      <div class="arch-layer data">
+        <div class="arch-layer-title">FOUNDATION LAYER · 基础层</div>
+        <div class="arch-items">
+          <div class="arch-item">风格库 (162种)</div>
+          <div class="arch-item">视频知识库</div>
+          <div class="arch-item">影视专业知识</div>
+          <div class="arch-item">模型评分知识</div>
+          <div class="arch-item">剧本数据</div>
+          <div class="arch-item">用户反馈</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CASE STUDY ============ -->
+<section id="case">
+  <div class="wrap">
+    <div class="section-label">10 · Case Study</div>
+    <h2>项目参考：某大厂视频生成项目</h2>
+    <p class="section-lead">一个真实落地的项目案例——看产品经理的提示词长什么样。</p>
+
+    <h3>项目概况</h3>
+    <div class="grid grid-4">
+      <div class="card"><div class="pill" style="margin-bottom:8px;">定位</div><p style="font-size:14px;">电商场景视频生成 + 社媒推广投流</p></div>
+      <div class="card"><div class="pill" style="margin-bottom:8px;">界面</div><p style="font-size:14px;">Canvas（画板 Agent 交互）+ Editor（类剪映）</p></div>
+      <div class="card"><div class="pill" style="margin-bottom:8px;">架构</div><p style="font-size:14px;">1 主 Agent + 3 子 Agent + 工具</p></div>
+      <div class="card"><div class="pill" style="margin-bottom:8px;">结果</div><p style="font-size:14px;">上线十几天下架——效果不错但营销不足</p></div>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>主 Agent 提示词结构</h3>
+    <div class="tree"><span class="c">// 主 Agent = "平面设计大师"</span>
+MainAgent
+├── <span class="k">角色 &amp; 目标</span>
+├── <span class="k">工作流程</span>  <span class="c">// 最核心部分</span>
+│   ├── 1. 理解上文所有信息（需求理解）
+│   ├── 2. 检查信息是否足够（不够则调用追问 Agent）
+│   ├── 3. 整理用户真实需求
+│   ├── 4. 文案创作环节    → 调用文案 Agent
+│   ├── 5. 设计方向创作    → 调用设计方向 Agent
+│   ├── 6. 设计方案创作    → 调用生图工具
+│   ├── 7. 人物设计环节    → 调用人物设计 Agent
+│   └── 8. 判断是否需要推进（Logo → 周边延展）
+├── <span class="k">必须注意的事项</span>  <span class="c">// 通过评测迭代出来的</span>
+└── <span class="k">示例（Few-shot）</span>  <span class="c">// 帮助模型理解</span></div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>关键启示</h3>
+    <ul class="check-list">
+      <li>主 Agent 只负责<strong>路由</strong>（什么情况调什么 Agent），不负责具体执行</li>
+      <li>这样设计节省上下文 Token 费用（不需要文案创作时直接跳过）</li>
+      <li><strong>"必须注意的事项"</strong>不是一开始就有的，是通过反复评测、发现问题后<em>逐条添加</em>的</li>
+      <li>真实提示词通常在<strong>几百行以上</strong>，是产品经理的核心工作产出</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ AI vs TRADITIONAL ============ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="section-label">11 · Comparison</div>
+    <h2>AI 产品拆解 vs 传统产品拆解</h2>
+    <p class="section-lead">AI 时代产品经理的底层技能正在转换——从"画原型"到"设计 Agent"。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>对比维度</th><th>传统产品拆解</th><th>AI 产品拆解</th></tr></thead>
+        <tbody>
+          <tr><td><strong>测试重点</strong></td><td>功能流程是否跑通</td><td>功能流程 + <em>AI 生成质量评测</em></td></tr>
+          <tr><td><strong>评测方式</strong></td><td>功能测试</td><td>需要构建<strong>评测集</strong>（多场景、多维度打分）</td></tr>
+          <tr><td><strong>关注核心</strong></td><td>交互设计、信息架构</td><td>Agent 架构、提示词设计、上下文工程、模型选型</td></tr>
+          <tr><td><strong>护城河判断</strong></td><td>用户量、品牌、网络效应</td><td>提示词工程 + 工作流设计 + 知识数据</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:40px;">评测方法 · 5 步法</h3>
+    <ol class="num-list">
+      <li><strong>定义打分规则</strong>（端到端能力、过程能力、多 Agent 协同、知识库应用等维度）</li>
+      <li><strong>准备多场景输入信息</strong></li>
+      <li><strong>测试生成效果</strong></li>
+      <li><strong>按打分规则评分</strong></li>
+      <li><strong>发现问题 → 优化对应环节的提示词 → 重新评测</strong></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section id="glossary">
+  <div class="wrap">
+    <div class="section-label">12 · Glossary</div>
+    <h2>关键概念术语表</h2>
+    <p class="section-lead">AI 产品的"黑话库"——用准确术语表达比用通俗说法更显专业。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:18%;">术语</th><th style="width:22%;">英文</th><th>释义</th></tr></thead>
+        <tbody>
+          <tr><td><strong>多 Agent 架构</strong></td><td class="mono">Multi-Agent Architecture</td><td>多个专业化 Agent 协作完成复杂任务的系统设计</td></tr>
+          <tr><td><strong>主-子 Agent</strong></td><td class="mono">Master-Sub Agent</td><td>一个主 Agent 统筹调度，多个子 Agent 专项执行</td></tr>
+          <tr><td><strong>上下文工程</strong></td><td class="mono">Context Engineering</td><td>设计所有喂给大模型信息的存取、使用规则的工程方案</td></tr>
+          <tr><td><strong>提示词工程</strong></td><td class="mono">Prompt Engineering</td><td>设计和优化提示词以获得更好输出的工程方案</td></tr>
+          <tr><td><strong>模型路由</strong></td><td class="mono">Model Routing</td><td>根据不同场景自动选择最合适模型的逻辑规则</td></tr>
+          <tr><td><strong>全局上下文</strong></td><td class="mono">Global Context</td><td>所有 Agent 共享的数据表，存储项目关键信息</td></tr>
+          <tr><td><strong>填槽</strong></td><td class="mono">Slot Filling</td><td>将收集到的关键信息填入对应变量位置</td></tr>
+          <tr><td><strong>人在环路</strong></td><td class="mono">Human-in-the-loop</td><td>在 AI 处理流程中加入人工确认/修改节点</td></tr>
+          <tr><td><strong>Function Call</strong></td><td class="mono">函数调用</td><td>Agent 调用外部工具/其他 Agent 的方式</td></tr>
+          <tr><td><strong>MCP</strong></td><td class="mono">Model Context Protocol</td><td>另一种 Agent 调用外部工具的协议</td></tr>
+          <tr><td><strong>RAG</strong></td><td class="mono">Retrieval-Augmented Generation</td><td>检索增强生成，从知识库检索相关信息辅助生成</td></tr>
+          <tr><td><strong>结构化 Brief</strong></td><td class="mono">Structured Brief</td><td>格式化的需求文档，作为 Agent 之间传递的标准输入</td></tr>
+          <tr><td><strong>三视图</strong></td><td class="mono">Three-view Drawing</td><td>角色的正面/侧面/背面图，用于保持角色一致性</td></tr>
+          <tr><td><strong>POC 验证</strong></td><td class="mono">Proof of Concept</td><td>在 Dify 等平台搭建原型，验证 Agent 流程可行性</td></tr>
+          <tr><td><strong>ReAct</strong></td><td class="mono">Reasoning + Acting</td><td>Agent 的一种架构模式：推理后行动</td></tr>
+          <tr><td><strong>数据飞轮</strong></td><td class="mono">Data Flywheel</td><td>产品随数据积累持续优化的正循环</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAKEAWAY ============ -->
+<section id="takeaway">
+  <div class="wrap">
+    <div class="section-label">13 · Practice & Takeaway</div>
+    <h2>延伸实践与知识串联</h2>
+    <p class="section-lead">把六层框架转化为可动手的实践步骤、可复用的应用思路。</p>
+
+    <h3>动手实践建议</h3>
+    <ol class="num-list">
+      <li><strong>选择一个 Agent 产品</strong>进行拆解</li>
+      <li><strong>梳理用户旅程图</strong>：按业务流程图梳理出操作流程</li>
+      <li><strong>推导技术流程图</strong>：从用户旅程推导背后的 Agent 及协作流程</li>
+      <li><strong>撰写关键 Agent 的提示词</strong>：包含角色、SOP 流程、工具调用规范、交互准则</li>
+      <li><strong>搭建原型（可选）</strong>：在 Coze 或 Dify 上搭建多 Agent 流程，实际测试效果</li>
+    </ol>
+
+    <div class="spacer-lg"></div>
+
+    <h3>通用应用框架</h3>
+    <p>当需要从零设计一个 Agent 产品时——可以用这个框架来推演：</p>
+
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card"><div class="pill accent" style="margin-bottom:10px;">01 · 用户层</div><p>什么场景、什么用户、解决什么痛点？</p></div>
+      <div class="card"><div class="pill accent" style="margin-bottom:10px;">02 · 技术层</div><p>关键流程节点、每个节点怎么实现（单 Agent / 多 Agent）？</p></div>
+      <div class="card"><div class="pill accent" style="margin-bottom:10px;">03 · 单 Agent 细节</div><p>输入/输出是什么？提示词怎么设计？</p></div>
+      <div class="card"><div class="pill accent" style="margin-bottom:10px;">04 · 模型层</div><p>调用什么模型支撑需求？</p></div>
+      <div class="card"><div class="pill accent" style="margin-bottom:10px;">05 · 基础层</div><p>依赖什么数据？</p></div>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <h3>知识串联线索</h3>
+    <ol class="num-list">
+      <li><strong>六层框架是骨架</strong>：任何 AI 产品都可以套用，先确保理解每一层要解决的核心问题</li>
+      <li><strong>从用户旅程到 Agent 流程是核心转化</strong>：用户看到的每一步交互，背后对应一个 Agent 的动作</li>
+      <li><strong>提示词就是 PRD</strong>：传统产品经理写的 PRD 内容，现在都浓缩到了 Agent 的系统提示词里</li>
+      <li><strong>全局上下文是多 Agent 协作的基础设施</strong>：没有共享数据表，Agent 之间就无法传递信息</li>
+      <li><strong>评测驱动迭代</strong>：提示词不是写一次就完了，而是通过评测不断发现问题、补充规则</li>
+    </ol>
+
+    <div class="spacer-lg"></div>
+
+    <h3>待深入探索的方向</h3>
+    <div class="tag-row">
+      <span class="pill">ReAct 架构具体实现</span>
+      <span class="pill">Function Call vs MCP 选型</span>
+      <span class="pill">高质量评测集构建</span>
+      <span class="pill">上下文 Token 优化策略</span>
+      <span class="pill">Coze / Dify 多 Agent 搭建实战</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-logo">
+      <div class="logo-mark" style="width:16px; height:16px; border-radius:4px;"></div>
+      AI 产品六层拆解框架
+    </div>
+    <p>AIPM · 系统笔记可视化</p>
+    <p style="margin-top:8px;">设计系统：Linear.app · 拆解案例：某 AIGC 短剧平台 · 项目参考：某大厂视频生成项目</p>
+  </div>
+</footer>
+
+</body>
+</html>

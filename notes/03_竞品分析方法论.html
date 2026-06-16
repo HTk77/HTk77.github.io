@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竞品分析方法论</title>
+<style>
+/* ========== APPLE DESIGN TOKENS ========== */
+:root {
+  --bg-black: #000000;
+  --bg-light: #f5f5f7;
+  --bg-white: #ffffff;
+  --bg-dark-surface: #1d1d1f;
+  --bg-dark-card: rgba(255,255,255,0.05);
+  --bg-dark-card-hover: rgba(255,255,255,0.08);
+  --bg-nav: rgba(0,0,0,0.82);
+  --text-primary-light: #1d1d1f;
+  --text-secondary-light: rgba(0,0,0,0.56);
+  --text-tertiary-light: rgba(0,0,0,0.32);
+  --text-primary-dark: #f5f5f7;
+  --text-secondary-dark: rgba(255,255,255,0.72);
+  --text-tertiary-dark: rgba(255,255,255,0.40);
+  --apple-blue: #0071e3;
+  --link-light: #06c;
+  --link-dark: #2997ff;
+  --grad-blue: linear-gradient(135deg, #0071e3, #2997ff);
+  --grad-blue-purple: linear-gradient(135deg, #0071e3, #5e5ce6);
+  --grad-blue-teal: linear-gradient(135deg, #2997ff, #5ac8fa);
+  --grad-purple: linear-gradient(135deg, #5e5ce6, #bf5af2);
+  --grad-warm: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  --shadow-elevated: rgba(0,0,0,0.22) 3px 5px 30px 0px;
+  --shadow-modal: rgba(0,0,0,0.32) 0px 12px 64px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 980px;
+  --content-max: 980px;
+  --sidebar-width: 260px;
+  --nav-height: 48px;
+  --font: 'SF Pro Display', 'SF Pro Text', -apple-system, system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --dur: 0.32s;
+  --dur-fast: 0.18s;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 17px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-family: var(--font); color: var(--text-primary-light); background: var(--bg-black); line-height: 1.47; letter-spacing: -0.022em; overflow: hidden; height: 100vh; }
+::selection { background: rgba(0,113,227,0.18); }
+
+/* ========== SVG ICON SYSTEM ========== */
+.icon-svg { width: 20px; height: 20px; flex-shrink: 0; }
+.icon-svg.sm { width: 16px; height: 16px; }
+.icon-svg.lg { width: 24px; height: 24px; }
+
+/* ========== LAYOUT ========== */
+.app { display: flex; height: 100vh; }
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-black);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform var(--dur) var(--ease);
+  z-index: 100;
+  position: relative;
+}
+
+/* Sidebar bottom gradient glow */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to top, rgba(0,113,227,0.04) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar-brand {
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+}
+
+/* Gradient line under brand */
+.sidebar-brand::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, #0071e3, #5e5ce6, transparent);
+  opacity: 0.3;
+}
+
+.sidebar-brand .brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--grad-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0,113,227,0.3);
+}
+
+/* Animated glow ring around brand icon */
+.brand-icon::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 11px;
+  background: conic-gradient(from 0deg, #0071e3, #5e5ce6, #2997ff, #0071e3);
+  opacity: 0.25;
+  animation: iconGlow 4s linear infinite;
+  z-index: -1;
+}
+
+@keyframes iconGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.brand-icon svg { width: 16px; height: 16px; }
+
+.sidebar-brand h1 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary-dark);
+}
+
+.sidebar-brand .subtitle {
+  font-size: 11px;
+  color: var(--text-tertiary-dark);
+  padding-left: 40px;
+}
+
+.sidebar-search { padding: 10px 14px; }
+
+.sidebar-search input {
+  width: 100%;
+  padding: 7px 12px 7px 32px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-primary-dark);
+  outline: none;
+  letter-spacing: -0.01em;
+  transition: all var(--dur-fast) var(--ease);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.28)' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+
+.sidebar-search input:focus {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(0,113,227,0.5);
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+}
+
+.sidebar-search input::placeholder { color: rgba(255,255,255,0.24); }
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 6px 10px 24px; }
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+.nav-group { margin-bottom: 4px; position: relative; z-index: 1; }
+
+.nav-group-head {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.36);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px;
+  transition: all var(--dur-fast);
+  gap: 8px;
+  position: relative;
+}
+
+.nav-group-head:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.56); }
+
+/* Gradient left accent on hover */
+.nav-group-head::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--grad-blue);
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+
+.nav-group-head:hover::before { opacity: 0.5; }
+
+.nav-group-head .nav-icon { width: 16px; height: 16px; opacity: 0.5; }
+.nav-group-head .arr { font-size: 8px; margin-left: auto; opacity: 0.4; transition: transform var(--dur-fast); }
+.nav-group.collapsed .arr { transform: rotate(-90deg); }
+.nav-group.collapsed .nav-links { display: none; }
+
+/* Gradient divider between groups */
+.nav-group + .nav-group::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 2px 16px 6px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+}
+
+.nav-links { padding: 2px 0 4px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px 6px 36px;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.48);
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--dur-fast);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dot indicator */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.16);
+  transition: all var(--dur-fast);
+}
+
+/* Hover gradient background sweep */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0,113,227,0.06), transparent);
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+  pointer-events: none;
+}
+
+.nav-link:hover { color: rgba(255,255,255,0.85); }
+.nav-link:hover::before { background: rgba(255,255,255,0.4); }
+.nav-link:hover::after { opacity: 1; }
+
+.nav-link.active {
+  color: var(--link-dark);
+  font-weight: 500;
+}
+
+/* Active: gradient left bar instead of dot */
+.nav-link.active::before {
+  left: 0;
+  width: 2px;
+  height: 16px;
+  border-radius: 1px;
+  background: var(--grad-blue-purple);
+  transform: translateY(-50%);
+}
+
+.nav-link.active::after {
+  opacity: 1;
+  background: linear-gradient(90deg, rgba(0,113,227,0.1), rgba(94,92,230,0.04), transparent);
+}
+
+/* ========== MAIN ========== */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; background: var(--bg-white); }
+
+.topbar {
+  height: var(--nav-height);
+  min-height: var(--nav-height);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  z-index: 50;
+  position: relative;
+}
+
+/* Gradient accent line at bottom of topbar */
+.topbar::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--apple-blue), #5e5ce6, #2997ff, transparent 70%);
+  opacity: 0.15;
+}
+
+.breadcrumb { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-tertiary-light); flex: 1; letter-spacing: -0.01em; }
+.breadcrumb-item { cursor: pointer; transition: color var(--dur-fast); }
+.breadcrumb-item:hover { color: var(--link-light); }
+.breadcrumb-item.current { color: var(--text-primary-light); font-weight: 600; cursor: default; }
+.breadcrumb-sep { font-size: 9px; opacity: 0.3; }
+
+.btn-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 14px; font-size: 12px; font-weight: 400;
+  font-family: var(--font); color: var(--link-light);
+  background: transparent; border: 1px solid rgba(0,102,204,0.3);
+  border-radius: var(--radius-pill); cursor: pointer;
+  transition: all var(--dur-fast);
+}
+
+.btn-pill:hover { background: var(--apple-blue); color: #fff; border-color: var(--apple-blue); }
+.btn-pill:disabled { opacity: 0.24; cursor: not-allowed; }
+.btn-pill:disabled:hover { background: transparent; color: var(--link-light); }
+
+.mobile-menu { display: none; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-primary-light); padding: 4px; }
+
+/* ========== CONTENT ========== */
+.content { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 6px; }
+
+/* HERO */
+.hero {
+  background: var(--bg-black);
+  color: var(--text-primary-dark);
+  padding: 96px 28px 88px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial glow behind hero text */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(0,113,227,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Decorative grid dots */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 1; }
+
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.032em;
+  margin-bottom: 16px;
+}
+
+.hero h1 .gradient-text {
+  background: linear-gradient(90deg, #fff 0%, #2997ff 50%, #fff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 200% center; }
+}
+
+.hero p {
+  font-size: 1.24rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-secondary-dark);
+  max-width: 520px;
+  margin: 0 auto 28px;
+}
+
+.hero-tags {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-pill);
+  letter-spacing: 0;
+}
+
+.hero-tag svg { width: 12px; height: 12px; opacity: 0.5; }
+
+/* SECTIONS */
+.section {
+  padding: 80px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.section.dark {
+  background: var(--bg-black);
+  color: var(--text-primary-dark);
+}
+
+.section.light {
+  background: var(--bg-light);
+  color: var(--text-primary-light);
+}
+
+.section.white {
+  background: var(--bg-white);
+  color: var(--text-primary-light);
+}
+
+/* Dark sections get a subtle radial gradient ambience */
+.section.dark::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -10%;
+  width: 60%;
+  height: 80%;
+  background: radial-gradient(ellipse, rgba(0,113,227,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.section.dark::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 50%;
+  height: 70%;
+  background: radial-gradient(ellipse, rgba(94,92,230,0.03) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* Gradient transition bands between sections */
+.section + .section.dark { border-top: 1px solid rgba(255,255,255,0.04); }
+.section + .section.light, .section + .section.white { border-top: none; }
+
+.section.dark + .section.light,
+.section.dark + .section.white {
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.06);
+}
+
+/* Mesh gradient accent for specific sections */
+.section[data-accent="blue-purple"]::before {
+  background: radial-gradient(ellipse at 20% 50%, rgba(0,113,227,0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 30%, rgba(94,92,230,0.04) 0%, transparent 50%);
+  width: 100%; height: 100%; top: 0; left: 0;
+}
+
+.section[data-accent="teal"]::before {
+  background: radial-gradient(ellipse at 30% 40%, rgba(90,200,250,0.04) 0%, transparent 55%),
+              radial-gradient(ellipse at 70% 70%, rgba(0,113,227,0.03) 0%, transparent 50%);
+  width: 100%; height: 100%; top: 0; left: 0;
+}
+
+/* Section decorative top line — now gradient */
+.section .section-line {
+  width: 48px;
+  height: 2px;
+  border-radius: 1px;
+  margin: 0 auto 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.section.dark .section-line { background: var(--grad-blue-purple); opacity: 0.5; }
+.section.light .section-line { background: var(--grad-blue); opacity: 0.3; }
+.section.white .section-line { background: var(--grad-blue-teal); opacity: 0.3; }
+
+.section-inner { max-width: var(--content-max); margin: 0 auto; position: relative; z-index: 1; }
+
+.section-header { text-align: center; margin-bottom: 52px; }
+
+.section-header .overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+}
+
+.section.dark .overline {
+  color: var(--link-dark);
+  background: rgba(41,151,255,0.06);
+  border-color: rgba(41,151,255,0.1);
+}
+
+.section.light .overline, .section.white .overline {
+  color: var(--link-light);
+  background: rgba(0,102,204,0.04);
+  border-color: rgba(0,102,204,0.08);
+}
+
+.overline .overline-icon { width: 14px; height: 14px; }
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.028em;
+  margin-bottom: 12px;
+}
+
+/* Dark section titles get gradient text */
+.section.dark .section-header h2 {
+  background: linear-gradient(135deg, #f5f5f7 0%, #2997ff 60%, #5e5ce6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Light/white section titles get subtle blue tint */
+.section.light .section-header h2,
+.section.white .section-header h2 {
+  background: linear-gradient(135deg, #1d1d1f 0%, #0071e3 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-header p {
+  font-size: 1.06rem;
+  line-height: 1.47;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.section.dark .section-header p { color: var(--text-secondary-dark); }
+.section.light .section-header p, .section.white .section-header p { color: var(--text-secondary-light); }
+
+/* Section number watermark — now gradient */
+.section-number {
+  position: absolute;
+  right: 32px;
+  top: 48px;
+  font-size: 120px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section.dark .section-number {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(41,151,255,0.02) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section.light .section-number, .section.white .section-number {
+  background: linear-gradient(180deg, rgba(0,0,0,0.025) 0%, rgba(0,113,227,0.015) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* CARDS */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border-radius: var(--radius-md);
+  padding: 28px 24px 24px;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+/* Dark section cards */
+.section.dark .card {
+  background: var(--bg-dark-card);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.section.dark .card:hover {
+  background: var(--bg-dark-card-hover);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* Light/white section cards */
+.section.light .card, .section.white .card {
+  background: var(--bg-white);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.section.light .card:hover, .section.white .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+  border-color: rgba(0,0,0,0.08);
+}
+
+/* Card top accent bar */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+
+.section.dark .card::before { background: linear-gradient(90deg, transparent, var(--link-dark), transparent); }
+.section.light .card::before, .section.white .card::before { background: linear-gradient(90deg, transparent, var(--apple-blue), transparent); }
+
+.card:hover::before { opacity: 1; }
+
+/* Card arrow */
+.card::after {
+  content: '→';
+  position: absolute;
+  right: 20px;
+  top: 28px;
+  font-size: 15px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.section.dark .card::after { color: var(--link-dark); }
+.section.light .card::after, .section.white .card::after { color: var(--link-light); }
+.card:hover::after { opacity: 0.7; transform: translateX(0); }
+
+/* Card icon — gradient background */
+.card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.section.dark .card-icon {
+  background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(94,92,230,0.08) 100%);
+  border: 1px solid rgba(41,151,255,0.1);
+}
+
+.section.light .card-icon, .section.white .card-icon {
+  background: linear-gradient(135deg, rgba(0,113,227,0.06) 0%, rgba(90,200,250,0.06) 100%);
+  border: 1px solid rgba(0,113,227,0.08);
+}
+
+.card-icon svg { width: 18px; height: 18px; }
+.section.dark .card-icon svg { color: var(--link-dark); }
+.section.light .card-icon svg, .section.white .card-icon svg { color: var(--apple-blue); }
+
+/* Card hover: gradient glow at bottom */
+.card .card-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.section.dark .card .card-glow { background: var(--grad-blue-purple); }
+.section.light .card .card-glow, .section.white .card .card-glow { background: var(--grad-blue-teal); }
+
+.card:hover .card-glow { opacity: 1; }
+
+.card-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.section.dark .card-label { color: rgba(41,151,255,0.6); }
+.section.light .card-label, .section.white .card-label { color: rgba(0,113,227,0.5); }
+
+.card h3 {
+  font-size: 1.18rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  margin-bottom: 6px;
+}
+
+.card p { font-size: 14px; line-height: 1.43; letter-spacing: -0.014em; }
+.section.dark .card p { color: var(--text-secondary-dark); }
+.section.light .card p, .section.white .card p { color: var(--text-secondary-light); }
+
+/* ========== DETAIL PANEL ========== */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.panel {
+  position: fixed; top: 0; right: 0;
+  width: min(660px, 88vw);
+  height: 100vh;
+  background: var(--bg-white);
+  box-shadow: var(--shadow-modal);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform var(--dur) var(--ease);
+  display: flex; flex-direction: column;
+}
+
+.panel.open { transform: translateX(0); }
+
+.panel-header {
+  height: 52px; min-height: 52px;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.panel-back {
+  padding: 4px 12px; font-size: 12px;
+  font-family: var(--font); color: var(--link-light);
+  background: none; border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--radius-pill);
+  cursor: pointer; transition: all var(--dur-fast);
+  margin-right: 12px; flex-shrink: 0;
+}
+
+.panel-back:hover { background: var(--bg-light); }
+.panel-back:disabled { opacity: 0.18; cursor: not-allowed; }
+
+.panel-crumbs { flex: 1; font-size: 12px; color: var(--text-tertiary-light); display: flex; align-items: center; gap: 5px; overflow: hidden; }
+.panel-crumbs .crumb { cursor: pointer; transition: color var(--dur-fast); }
+.panel-crumbs .crumb:hover { color: var(--link-light); }
+
+.panel-close {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.05); border: none; border-radius: 50%;
+  cursor: pointer; color: var(--text-secondary-light);
+  font-size: 12px; transition: all var(--dur-fast); flex-shrink: 0; margin-left: 12px;
+}
+
+.panel-close:hover { background: rgba(0,0,0,0.1); }
+
+.panel-body { flex: 1; overflow-y: auto; padding: 40px 40px 56px; }
+.panel-body::-webkit-scrollbar { width: 4px; }
+.panel-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+/* Panel section accent — gradient */
+.panel-body .detail-accent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.detail-accent .accent-line {
+  width: 32px;
+  height: 3px;
+  background: var(--grad-blue-purple);
+  border-radius: 2px;
+}
+
+.detail-accent .accent-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--grad-blue-purple);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.panel-body h2 {
+  font-size: 1.65rem; font-weight: 600;
+  line-height: 1.1; letter-spacing: -0.024em;
+  margin-bottom: 10px;
+}
+
+.panel-body h3 {
+  font-size: 1.06rem; font-weight: 600;
+  line-height: 1.24; letter-spacing: -0.016em;
+  margin: 28px 0 10px;
+}
+
+/* Decorative h3 left mark — gradient */
+.panel-body h3::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--grad-blue-purple);
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.panel-body p { font-size: 15px; line-height: 1.6; color: var(--text-secondary-light); margin-bottom: 14px; }
+.panel-body ul, .panel-body ol { padding-left: 22px; margin-bottom: 14px; }
+.panel-body li { font-size: 15px; line-height: 1.65; color: var(--text-secondary-light); margin-bottom: 4px; }
+.panel-body strong { color: var(--text-primary-light); font-weight: 600; }
+
+.panel-body table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0; overflow: hidden; border-radius: var(--radius-sm); }
+.panel-body th { background: var(--bg-light); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 12px; letter-spacing: 0.01em; }
+.panel-body td { padding: 9px 14px; border-top: 1px solid rgba(0,0,0,0.05); color: var(--text-secondary-light); line-height: 1.5; }
+
+/* Code blocks */
+.code-block {
+  background: var(--bg-dark-surface);
+  color: rgba(255,255,255,0.86);
+  border-radius: var(--radius-md);
+  padding: 24px 24px 24px 28px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 14px 0;
+  position: relative;
+  letter-spacing: 0;
+  border-left: 3px solid transparent;
+  border-image: var(--grad-blue-purple) 1;
+}
+
+.code-block .copy-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4); font-size: 11px;
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  cursor: pointer; font-family: var(--font); transition: all var(--dur-fast);
+}
+
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+/* Related links */
+.related {
+  margin-top: 40px; padding-top: 28px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.related h4 {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary-light);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.related h4::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: rgba(0,0,0,0.12);
+}
+
+.related-list { display: flex; flex-direction: column; gap: 6px; }
+
+.related-item {
+  display: flex; align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer; transition: all var(--dur-fast) var(--ease);
+  gap: 12px;
+  border: 1px solid transparent;
+}
+
+.related-item:hover {
+  background: linear-gradient(90deg, rgba(0,113,227,0.04), rgba(94,92,230,0.02), transparent);
+  border-color: rgba(0,113,227,0.12);
+  transform: translateX(3px);
+}
+
+.related-item .rel-arrow {
+  font-size: 12px;
+  flex-shrink: 0;
+  background: var(--grad-blue-purple);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.related-item .rel-title { font-size: 14px; font-weight: 500; color: var(--text-primary-light); }
+.related-item .rel-meta { font-size: 11px; color: var(--text-tertiary-light); margin-top: 1px; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 834px) {
+  .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); z-index: 300; }
+  .sidebar.open { transform: translateX(0); }
+  .mobile-menu { display: block; }
+  .hero { padding: 56px 20px 48px; }
+  .hero h1 { font-size: 2.4rem; }
+  .section { padding: 56px 20px; }
+  .section-header h2 { font-size: 1.8rem; }
+  .section-number { display: none; }
+  .card-grid { grid-template-columns: 1fr; }
+  .panel { width: 100vw; }
+  .panel-body { padding: 24px 20px 40px; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 1rem; }
+}
+
+@media print {
+  .sidebar, .topbar, .overlay, .panel, .hero { display: none !important; }
+  .content { overflow: visible; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h1>竞品分析方法论</h1>
+      </div>
+      <div class="subtitle">赫庭 · 知识沉淀</div>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="搜索知识点... ⌘K" autocomplete="off">
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
+      <div class="breadcrumb" id="breadcrumb"><span class="breadcrumb-item current">概览</span></div>
+      <div><button class="btn-pill" id="btnBack" disabled onclick="closePanel()">← 返回概览</button></div>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <button class="panel-back" id="panelBack" disabled onclick="panelGoBack()">←</button>
+    <div class="panel-crumbs" id="panelCrumbs"></div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<script>
+// SVG icon library (inline, no emoji)
+const ICONS = {
+  lightbulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>',
+  layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
+  fileText: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  alertTriangle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" opacity="0.15" stroke="currentColor"/></svg>',
+  barChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>',
+  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  database: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+  award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+};
+
+// Card-level icons mapping
+const CARD_ICONS = {
+  'what-is': 'lightbulb', 'why-ca': 'award', 'pm-role': 'cpu',
+  'stage-0to1': 'compass', 'stage-1toN': 'barChart',
+  'four-overview': 'list', 'step1': 'target', 'step2': 'users', 'step3': 'database', 'step4': 'zap',
+  'six-overview': 'layers', 'L1-market': 'barChart', 'L2-biz': 'barChart', 'L3-user': 'users',
+  'L4-feature': 'grid', 'L5-tech': 'code', 'L6-infra': 'database',
+  'anti-hall': 'shield', 'prompt-design': 'zap',
+  'pt-goal': 'target', 'pt-select': 'compass', 'pt-market': 'barChart',
+  'pt-biz': 'barChart', 'pt-user': 'users', 'pt-feature': 'grid',
+  'mistakes': 'alertTriangle', 'practice': 'award',
+  'porter': 'layers', 'swot': 'grid', 'skill-build': 'book'
+};
+
+const SECTION_ICONS = {
+  core: 'lightbulb', stages: 'target', foursteps: 'list', sixlayers: 'layers',
+  'ai-ctrl': 'cpu', prompts: 'fileText', pitfalls: 'alertTriangle', extend: 'link'
+};
+
+const KB=[
+  {id:'core',title:'核心理念',theme:'dark',desc:'理解竞品分析的本质价值与 AI 时代的角色变化',items:[
+    {id:'what-is',title:'什么是竞品分析',label:'基础',desc:'系统性识别、研究和评估竞争对手的方法论',body:`<h2>竞品分析（Competitive Analysis）</h2><p><strong>定义</strong>：系统性地识别、研究和评估市场中竞争对手的产品、策略与表现，以支持自身产品或业务的决策制定。</p><h3>核心本质</h3><p>竞品分析不是一份报告，而是一种<strong>决策思维方式</strong>。在 AI 时代，报告输出已非核心竞争力。真正的竞争力是：分析过程中的思考路径 + 对 AI 的引导能力。</p><h3>人类不可替代的四个环节</h3><ul><li><strong>目标设定</strong>：为什么要分析？要回答什么问题？</li><li><strong>竞品筛选</strong>：选谁来比？为什么选它？</li><li><strong>数据源判断</strong>：哪些信息可信？需要交叉验证？</li><li><strong>最终决策</strong>：做还是不做？怎么做？</li></ul>`,refs:['why-ca','four-overview','pm-role']},
+    {id:'why-ca',title:'企业为什么看重竞品分析',label:'价值',desc:'基础能力但上限极高，决策场景高频用到',body:`<h2>企业为什么看重竞品分析能力</h2><h3>三层价值</h3><ul><li><strong>保底策略</strong>：方向不明时，分析优秀竞品确保基本盘不低于及格线</li><li><strong>上限极高</strong>：基础能力，却能解决工作中大部分问题</li><li><strong>考察洞察力</strong>：是衡量"透过现象看本质"能力的核心抓手</li></ul><h3>实际应用场景</h3><ul><li>快速了解一个目标公司及其竞争环境</li><li>新产品立项时判断方向可行性</li><li>日常功能迭代的决策依据</li><li>向上汇报时提供数据支撑</li></ul>`,refs:['what-is','practice','stage-0to1']},
+    {id:'pm-role',title:'AI 时代产品经理角色演变',label:'趋势',desc:'从执行者到决策者 + AI 训练师',body:`<h2>AI 时代产品经理的角色演变</h2><h3>角色转变</h3><p><strong>传统 PM</strong>：执行者——自己写报告、画原型、跟开发</p><p><strong>AI 时代 PM</strong>：决策者 + AI 训练师——引导 AI 执行，自己做判断</p><h3>核心能力转变</h3><ul><li>从"掌握信息" → <strong>"定义问题"</strong></li><li>从"执行任务" → <strong>"设计 Prompt + 验证结果"</strong></li><li>从"个人技能" → <strong>"人机协作效率"</strong></li></ul><h3>核心洞察</h3><p>未来 PM 的核心角色是<strong>"AI 训练师"</strong>——通过反馈闭环持续优化自动化工作流。竞争壁垒从"掌握信息"转向"定义问题"。</p>`,refs:['what-is','prompt-design','skill-build']}
+  ]},
+  {id:'stages',title:'产品阶段',theme:'light',desc:'不同产品阶段的分析侧重完全不同，先判断你在哪个阶段',items:[
+    {id:'stage-0to1',title:'0→1 阶段：探索期',label:'阶段',desc:'判断方向可行性，市场层+用户层为重心',body:`<h2>0→1 阶段的竞品分析</h2><h3>核心目标</h3><p>判断方向可行性，确认是否值得立项。</p><h3>分析重心</h3><ul><li><strong>市场层（L1）</strong>：规模够不够大？增速快不快？格局是否已定？</li><li><strong>用户层（L3）</strong>：痛点是否真实存在？有没有未被满足的需求？</li></ul><h3>典型决策问题</h3><ul><li>这个方向<strong>做不做</strong>？</li><li>市场够不够大？</li><li>有没有未被满足的需求？</li></ul><h3>输出成果</h3><p>立项决策依据、BRD（商业需求文档）</p>`,refs:['stage-1toN','L1-market','L3-user','step1']},
+    {id:'stage-1toN',title:'1→N 阶段：增长期',label:'阶段',desc:'深入拆解竞品，功能层+技术层为重心',body:`<h2>1→N 阶段的竞品分析</h2><h3>核心目标</h3><p>深入拆解竞品功能与技术架构，制定差异化策略。</p><h3>分析重心</h3><ul><li><strong>功能层（L4）</strong>：功能对比、差异点识别</li><li><strong>技术层（L5）</strong>：实现方案对比</li><li><strong>商业层（L2）</strong>：变现效率评估</li></ul><h3>典型决策问题</h3><ul><li><strong>怎么做</strong>？</li><li>竞品新功能<strong>要不要跟</strong>？</li><li>我们<strong>哪里输了</strong>？</li></ul>`,refs:['stage-0to1','L4-feature','L5-tech','L2-biz']}
+  ]},
+  {id:'foursteps',title:'四步法',theme:'white',desc:'竞品分析的核心执行框架——明确目标 → 选择竞品 → 收集分析 → 决策判断',items:[
+    {id:'four-overview',title:'四步法全流程概览',label:'方法论',desc:'人主导三步，AI执行一步，环环相扣',body:`<h2>竞品分析四步法</h2><p>核心执行框架，每一步都有明确目标和操作方法。</p><h3>全流程</h3><p><strong>① 明确目标</strong>（人）→ <strong>② 选择竞品</strong>（人）→ <strong>③ 收集分析</strong>（AI）→ <strong>④ 决策判断</strong>（人）</p><h3>核心原则</h3><ul><li>四步中有<strong>三步由人主导</strong>，只有数据收集交给 AI</li><li>AI 需在<strong>清晰指令</strong>下运作</li><li>每一步的输出是下一步的输入</li></ul><h3>关键检查点</h3><ul><li>步骤1后：你能说出"我要回答什么问题"吗？</li><li>步骤2后：竞品能代表市场全貌吗？</li><li>步骤3后：关键数据有交叉验证吗？</li><li>步骤4后：决策有数据支撑吗？</li></ul>`,refs:['step1','step2','step3','step4']},
+    {id:'step1',title:'第一步：明确分析目标',label:'步骤 1',desc:'5个要素：决策类型、方向、用户、场景、标准',body:`<h2>第一步：明确分析目标</h2><p>整个分析的<strong>起点和基石</strong>。目标不清是最常见的失败原因。</p><h3>目标的 5 个要素</h3><table><tr><th>要素</th><th>说明</th><th>示例</th></tr><tr><td><strong>决策类型</strong></td><td>核心问题</td><td>判断"做不做"</td></tr><tr><td><strong>具体方向</strong></td><td>越具体越好</td><td>AI 漫剧生成工具</td></tr><tr><td><strong>目标用户</strong></td><td>初步猜测</td><td>短视频创作者</td></tr><tr><td><strong>核心场景</strong></td><td>使用情况</td><td>文字故事转漫画视频</td></tr><tr><td><strong>成功标准</strong></td><td>量化门槛</td><td>年增速>20%、CR5<50%</td></tr></table><h3>技巧</h3><p>想不清楚时，让 AI 反向输出"需解决的问题清单"来理清思路。</p>`,refs:['four-overview','step2','pt-goal','mistakes']},
+    {id:'step2',title:'第二步：科学选择竞品',label:'步骤 2',desc:'4类竞品分类 + 数量建议 + 获取渠道',body:`<h2>第二步：科学选择竞品</h2><h3>竞品分类（业务×用户双维度）</h3><table><tr><th>类型</th><th>定义</th><th>举例</th></tr><tr><td><strong>直接竞品</strong></td><td>业务相同、用户相同</td><td>麦当劳 vs 肯德基</td></tr><tr><td><strong>间接竞品</strong></td><td>需求类似但方式不同</td><td>外卖 vs 预制菜</td></tr><tr><td><strong>潜在竞品</strong></td><td>尚未进入但有能力</td><td>抖音做外卖</td></tr><tr><td><strong>替代品</strong></td><td>用户现有替代方案</td><td>自己做饭</td></tr></table><h3>数量建议</h3><ul><li><strong>单点功能</strong>：1 个 · <strong>常规迭代</strong>：2-4 个 · <strong>全行业</strong>：5+</li></ul><p>选 20 个浅尝辄止不如选 3 个深入拆解。</p><h3>获取渠道</h3><ul><li><strong>市场数据</strong>：艾瑞咨询、极光大数据、QuestMobile、券商研报</li><li><strong>用户反馈</strong>：App Store、小红书、知乎、Reddit</li><li><strong>企业信息</strong>：天眼查/企查查、Product Hunt</li><li><strong>工具平台</strong>：AI 工具集、36氪、虎嗅</li></ul>`,refs:['step1','step3','pt-select','porter']},
+    {id:'step3',title:'第三步：收集分析',label:'步骤 3',desc:'按六层模型逐层收集，AI为主、人工验证',body:`<h2>第三步：收集分析（AI 执行）</h2><p>按照六层框架逐层收集和分析数据。</p><h3>执行原则</h3><ul><li>每条数据<strong>必须标注来源</strong></li><li>不确定标注"未知"，<strong>禁止杜撰</strong></li><li>关键结论<strong>人工交叉核对</strong></li></ul><h3>六层分析顺序</h3><ol><li><strong>L1</strong> 市场规模、增速、格局</li><li><strong>L2</strong> 变现模式、成本、壁垒</li><li><strong>L3</strong> 用户画像、痛点、场景</li><li><strong>L4</strong> 功能对比、差异、机会</li><li><strong>L5</strong> 技术方案、架构</li><li><strong>L6</strong> 数据来源、算力成本</li></ol>`,refs:['step2','step4','six-overview','anti-hall']},
+    {id:'step4',title:'第四步：决策判断',label:'步骤 4',desc:'综合分析结果，做出最终决策',body:`<h2>第四步：决策判断（人来拍板）</h2><p>AI 完成数据收集后，<strong>最终决策仍需人类完成</strong>。</p><h3>决策输出</h3><ul><li><strong>做不做</strong>：基于 L1 + L2</li><li><strong>怎么做</strong>：基于 L3 + L4 的机会判断</li><li><strong>差异化</strong>：基于痛点-功能映射中的空白机会</li></ul><h3>SWOT 汇总</h3><ul><li><strong>S/W</strong>（内部）← L4 + L5</li><li><strong>O/T</strong>（外部）← L1 + L2 + L3</li></ul>`,refs:['step3','swot','mistakes','four-overview']}
+  ]},
+  {id:'sixlayers',title:'六层分析框架',theme:'dark',desc:'从宏观到微观、从外部到内部的完整分析骨架',items:[
+    {id:'six-overview',title:'六层模型总览',label:'框架',desc:'上层决定下层分析方向，六层缺一不可',body:`<h2>六层结构化分析框架</h2><p>竞品分析的<strong>完整骨架</strong>，自上而下。</p><h3>层间逻辑</h3><ul><li><strong>L1 市场层</strong> → 值不值得进？</li><li><strong>L2 商业层</strong> → 能不能活？</li><li><strong>L3 用户层</strong> → 切谁？切哪个场景？</li><li><strong>L4 功能层</strong> → 做什么？不做什么？</li><li><strong>L5 技术层</strong> → 怎么实现？</li><li><strong>L6 基础层</strong> → 底层支撑？</li></ul><h3>灵活使用</h3><ul><li><strong>0→1</strong>：侧重 L1-L3</li><li><strong>1→N</strong>：侧重 L3-L6</li></ul><p>六层<strong>都不可缺失</strong>，只是深度不同。</p>`,refs:['L1-market','L2-biz','L3-user','L4-feature','L5-tech','L6-infra']},
+    {id:'L1-market',title:'L1 市场层',label:'L1',desc:'TAM/SAM/SOM、增速、CR5、融资动态',body:`<h2>L1 市场层：赛道值不值得进？</h2><h3>TAM / SAM / SOM</h3><table><tr><th>指标</th><th>全称</th><th>定义</th></tr><tr><td><strong>TAM</strong></td><td>Total Addressable Market</td><td>假设100%份额时的总收入</td></tr><tr><td><strong>SAM</strong></td><td>Serviceable Addressable Market</td><td>实际能触达的部分</td></tr><tr><td><strong>SOM</strong></td><td>Serviceable Obtainable Market</td><td>1-3年能拿到的份额</td></tr></table><h3>关键指标</h3><ul><li><strong>CAGR</strong>：>20% = 高增长</li><li><strong>生命周期</strong>：成长期最佳</li><li><strong>CR5</strong>：<50% = 格局未定</li><li><strong>融资动态</strong>：有大额融资 = 被验证</li></ul>`,refs:['six-overview','L2-biz','pt-market','porter']},
+    {id:'L2-biz',title:'L2 商业层',label:'L2',desc:'变现模式、LTV、成本结构、壁垒',body:`<h2>L2 商业层：能不能赚钱？</h2><h3>商业模式</h3><ul><li><strong>免费增值</strong> · <strong>订阅制</strong> · <strong>按量付费</strong> · <strong>买断制</strong></li></ul><p>AI 产品典型：<strong>订阅 + 按量</strong></p><h3>LTV（用户生命周期价值）</h3><p>LTV = ARPU × 1/Churn Rate</p><p><strong>LTV/CAC > 3</strong> → 健康模型</p><h3>分析要点</h3><ul><li>收费方式？免费版 vs 付费版差异？</li><li>单次生成的算力成本？</li><li>壁垒：技术/数据/品牌/网络效应？</li></ul>`,refs:['L1-market','L3-user','pt-biz','six-overview']},
+    {id:'L3-user',title:'L3 用户层',label:'L3',desc:'用户画像、旅程图、卡诺模型、痛点矩阵',body:`<h2>L3 用户层：给谁用？痛不痛？</h2><h3>画像四要素</h3><ul><li>基本信息 · JTBD · 痛点 · 期望</li></ul><h3>用户旅程</h3><p>认知 → 考虑 → 试用 → 使用 → 付费 → 留存/流失</p><h3>卡诺模型</h3><ul><li><strong>基本型</strong>：没有就不行——必须做</li><li><strong>期望型</strong>：越好越满意——核心竞争区</li><li><strong>兴奋型</strong>：有了超惊喜——差异化来源</li><li><strong>无差异</strong>：有没有都一样——不做</li><li><strong>反向型</strong>：做了反而不满——坚决不做</li></ul><h3>痛点优先级</h3><p><strong>高频 × 高痛 = 最优先</strong></p>`,refs:['L2-biz','L4-feature','pt-user','six-overview']},
+    {id:'L4-feature',title:'L4 功能层',label:'L4',desc:'功能对比表、痛点映射、机会判断',body:`<h2>L4 功能层：做什么功能？</h2><h3>功能三维度</h3><ul><li><strong>核心功能</strong>：所有竞品都做的</li><li><strong>特色功能</strong>：个别竞品的差异化</li><li><strong>边界功能</strong>：故意不做的——思考为什么</li></ul><h3>痛点-功能映射</h3><table><tr><th>情况</th><th>判断</th></tr><tr><td>已解决且好</td><td>无明显机会</td></tr><tr><td>已解决但一般</td><td><strong>体验机会</strong></td></tr><tr><td>没人解决</td><td><strong>空白机会</strong></td></tr><tr><td>试过但失败</td><td><strong>创新机会</strong></td></tr></table>`,refs:['L3-user','L5-tech','pt-feature','six-overview']},
+    {id:'L5-tech',title:'L5 技术层',label:'L5',desc:'实现方案、技术门槛、架构选择',body:`<h2>L5 技术/模型层</h2><ul><li><strong>实现方案</strong>：多 Agent vs Workflow？自研 vs API？</li><li><strong>技术门槛</strong>：需要多少训练数据？</li><li><strong>架构选择</strong>：Agent 灵活但贵，Workflow 稳定</li><li><strong>模型对比</strong>：不同模型效果差异</li></ul>`,refs:['L4-feature','L6-infra','six-overview']},
+    {id:'L6-infra',title:'L6 基础层',label:'L6',desc:'数据来源、算力成本、算法架构',body:`<h2>L6 基础层</h2><ul><li><strong>数据来源</strong>：训练数据哪来？质量？独家？</li><li><strong>算力成本</strong>：单次推理成本？能否规模化？</li><li><strong>算法架构</strong>：底层技术栈？有无创新？</li></ul>`,refs:['L5-tech','L2-biz','six-overview']}
+  ]},
+  {id:'ai-ctrl',title:'AI 控制点',theme:'light',desc:'AI 是工具不是答案——掌握控制点才能用好它',items:[
+    {id:'anti-hall',title:'防止 AI 幻觉三大策略',label:'风控',desc:'限定来源 + 明确未知 + 人工校验',body:`<h2>防止 AI 幻觉</h2><p>核心公式：<strong>限定来源 + 明确未知 + 人工校验</strong></p><h3>三策略</h3><ul><li><strong>数据源限定</strong>：Prompt 中指定可信网站，不让 AI 凭记忆</li><li><strong>输出规范</strong>：不确定时标注"未知"，加入"禁止杜撰"</li><li><strong>结果验证</strong>：市场规模、融资金额必须人工交叉验证</li></ul>`,refs:['prompt-design','step3','mistakes']},
+    {id:'prompt-design',title:'Prompt 设计三要素',label:'技巧',desc:'角色 + 步骤 + 格式 = 优质 Prompt',body:`<h2>高质量 Prompt 设计</h2><p><strong>角色 + 步骤 + 格式，缺一不可。</strong></p><h3>三要素</h3><ul><li><strong>角色定义</strong>："你是一个资深行业分析师"</li><li><strong>目标拆解</strong>："请分三步完成：1... 2... 3..."</li><li><strong>输出格式</strong>："以 HTML 表格形式输出"</li></ul><h3>进阶</h3><ul><li>要求标注信息来源和置信度</li><li>指定搜索渠道和关键词</li><li>设置"禁止杜撰"兜底规则</li></ul>`,refs:['anti-hall','pt-goal','pm-role']}
+  ]},
+  {id:'prompts',title:'Prompt 模板库',theme:'dark',desc:'可复用模板 + 使用场景说明，可直接复用到工作中',items:[
+    {id:'pt-goal',title:'模板1：明确分析目标',label:'步骤1',desc:'拆解模糊需求为可执行问题清单',body:`<h2>Prompt 模板1：明确分析目标</h2><p><strong>使用场景</strong>：项目启动时，拆解需求为可执行问题清单。</p><div class="code-block">我是一个产品经理，正在评估一个新产品方向{ 你的产品方向 }\n\n分析目标的5个要素：\n1. 决策类型：判断"做不做"\n2. 具体方向：[你的选题方向，越具体越好]\n3. 目标用户假设：[你初步猜测是给谁用的]\n4. 核心场景假设：[用户在什么情况下会用]\n5. 成功标准：[什么情况下算"值得做"]\n\n请帮我拆解成具体的分析问题清单——\n我需要回答哪些子问题才能做出"做/不做"的决策？</div>`,refs:['step1','pt-select','prompt-design']},
+    {id:'pt-select',title:'模板2：竞品搜索与分类',label:'步骤2',desc:'系统性找出赛道竞品并分类',body:`<h2>Prompt 模板2：竞品搜索与分类</h2><div class="code-block">帮我找出{ 赛道名称 }这个赛道的竞品。\n请按以下分类列出：\n1. 直接竞品（做一样的事，抢一样的用户）\n2. 间接竞品（解决类似需求但方式不同）\n3. 替代品（用户现在用什么方式解决）\n4. 潜在竞品（还没进来但有能力进来的大公司）\n\n每个竞品说明：名称、官网、核心功能、目标用户、融资阶段\n输出时说明信息来源。\n\n请用 browse 工具搜索：\n- 36氪搜索 "关键词"\n- ProductHunt 搜索 "关键词"\n- 小红书搜索 "关键词"</div>`,refs:['step2','pt-goal','pt-market']},
+    {id:'pt-market',title:'模板3：市场层分析',label:'L1',desc:'市场规模、增速、竞争格局',body:`<h2>Prompt 模板3：市场层分析</h2><div class="code-block">帮我分析{ 产品方向 }的市场层：\n1. 市场规模：全球和中国分别多大？\n   请标注数据来源\n2. 增长趋势：年增速多少？生命周期阶段？\n3. 竞争格局：前5名占多少份额？\n   最近一年有没有大额融资？\n\n请用 browse 工具搜索：\n- 艾瑞咨询搜 "行业关键词"\n- 36氪搜 "关键词" 融资新闻\n- IT桔子搜相关公司融资记录\n\n每个数据必须标来源</div>`,refs:['L1-market','pt-biz','pt-select']},
+    {id:'pt-biz',title:'模板4：商业层分析',label:'L2',desc:'收费模式、成本、壁垒',body:`<h2>Prompt 模板4：商业层分析</h2><div class="code-block">对比这4个｛竞品1｝、｛竞品2｝、｛竞品3｝、｛竞品4｝的商业模式：\n1. 怎么收费？免费版 vs 付费版差异？价格？\n2. 成本结构：生成一次内容大概多少算力成本？\n3. 有没有壁垒？技术/数据/品牌？\n\n请用 browse 工具去每个竞品官网看定价页面。\n如果拿不到的内容请告诉我，禁止杜撰</div>`,refs:['L2-biz','pt-market','pt-user']},
+    {id:'pt-user',title:'模板5：用户层分析',label:'L3',desc:'WHO / WHERE / WHAT / WHY 四维',body:`<h2>Prompt 模板5：用户层分析</h2><div class="code-block">帮我做用户层分析：\n\n1. WHO 用户画像：\n   年龄、职业、技术水平、付费意愿\n   从竞品评论和社交媒体提取真实数据\n\n2. WHERE 使用场景：\n   拆成"任务前-中-后"三段\n\n3. WHAT 痛点挖掘：\n   按"频率×痛感"分级，统计 Top 5\n\n4. WHY 决策因素：\n   为什么选这个竞品？弃用原因？\n\n搜索：小红书、知乎、App Store、Reddit\n每条信息标注来源。</div>`,refs:['L3-user','pt-biz','pt-feature']},
+    {id:'pt-feature',title:'模板6：功能层对比',label:'L4',desc:'功能拆解、对比表、痛点映射',body:`<h2>Prompt 模板6：功能层对比</h2><div class="code-block">帮我做功能分析：\n\n1. 功能拆解：\n   每个竞品的核心功能、特色功能、边界功能\n\n2. 功能对比表：\n   （✅好 / ⚠️一般 / ❌没有）\n\n3. 痛点-功能映射：\n   - 哪些痛点已解决？好不好？\n   - 哪些没人解决？（空白机会）\n   - 哪些试过但失败？（体验机会）\n\n4. 机会判断：\n   应该做什么、不做什么？理由。\n\n请去各竞品官网和应用商店看功能。</div>`,refs:['L4-feature','pt-user','step4']}
+  ]},
+  {id:'pitfalls',title:'误区与实战',theme:'light',desc:'避开前人踩过的坑，掌握实战分析应用',items:[
+    {id:'mistakes',title:'四大常见误区',label:'避坑',desc:'目标不清、堆砌信息、贪多、过度依赖AI',body:`<h2>四大常见误区</h2><h3>误区1：目标不清就开始</h3><p>反面案例：输出 45 页 PPT，老板只关心"要不要换方向"。<strong>先厘清"谁看、看什么、做什么决策"</strong>。</p><h3>误区2：信息堆砌代替洞察</h3><p>罗列"支持上传 PDF/Word"没有价值。有价值的是"做不做、为何做、如何做"。</p><h3>误区3：贪多求全</h3><p>选 20 个竞品浅尝辄止。<strong>深度 > 广度</strong>。</p><h3>误区4：完全依赖 AI</h3><p>AI 会编造数据。<strong>关键数据必须人工验证</strong>。</p>`,refs:['step1','anti-hall','what-is']},
+    {id:'practice',title:'实战中的竞品分析',label:'实战',desc:'三类高频问题与分析思路',body:`<h2>实战中的竞品分析应用</h2><h3>类型1：功能差异对比</h3><p>"微信和钉钉有什么不同？"→ 追溯到<strong>用户群体和场景差异</strong></p><h3>类型2：设计取舍</h3><p>"抖音为什么没有进度条？"→ <strong>沉浸感 > 控制感</strong></p><h3>类型3：战略决策</h3><p>"百度网盘面对夸克怎么做？"→ 结合<strong>市场+优势+竞品</strong></p><h3>核心原则</h3><p>关键不是了解多少竞品，而是能否<strong>透过现象看本质</strong>。</p>`,refs:['why-ca','what-is','four-overview']}
+  ]},
+  {id:'extend',title:'扩展与能力建设',theme:'white',desc:'补充分析框架和个人能力提升路径',items:[
+    {id:'porter',title:'波特五力模型',label:'扩展',desc:'分析行业竞争强度和盈利潜力',body:`<h2>波特五力模型</h2><ul><li><strong>行业内竞争</strong> → L1 的 CR5 分析</li><li><strong>新进入者威胁</strong> → L2 的壁垒分析</li><li><strong>替代品威胁</strong> → 竞品选择的"替代品"</li><li><strong>供应商议价力</strong> → L6（模型供应商如 OpenAI）</li><li><strong>买方议价力</strong> → L3（用户转换成本）</li></ul>`,refs:['L1-market','L2-biz','swot','step2']},
+    {id:'swot',title:'SWOT 分析',label:'扩展',desc:'六层分析后的综合汇总工具',body:`<h2>SWOT 分析</h2><h3>与六层模型对应</h3><ul><li><strong>S/W</strong>（内部）← L4 + L5</li><li><strong>O/T</strong>（外部）← L1 + L2 + L3</li></ul><p>适合所有层分析完成后，作为<strong>决策前的最终汇总</strong>。不建议在分析初期使用。</p>`,refs:['porter','step4','six-overview']},
+    {id:'skill-build',title:'Skill 封装与知识管理',label:'能力',desc:'将工作流转化为可复用的自动化技能',body:`<h2>个人能力建设</h2><h3>Skill 封装</h3><ul><li>将重复性工作<strong>标准化为固定流程</strong></li><li>持续训练 AI 理解你的偏好</li><li>形成专属自动化能力</li></ul><h3>知识管理</h3><p><strong>原子化 + 自动沉淀 + 双向链接</strong></p><ul><li><strong>原子笔记</strong>：每条只含一个核心概念</li><li><strong>自动沉淀</strong>：Notebook LM 转结构化知识</li><li><strong>双向链接</strong>：建立知识关联图谱</li></ul>`,refs:['pm-role','prompt-design','what-is']}
+  ]}
+];
+
+const itemMap={};
+KB.forEach(s=>s.items.forEach(i=>{itemMap[i.id]={...i,sectionId:s.id,sectionTitle:s.title};}));
+
+let detailStack=[];
+
+function renderSidebar(){
+  document.getElementById('sidebarNav').innerHTML=KB.map(s=>{
+    const icon=SECTION_ICONS[s.id]||'list';
+    return `<div class="nav-group" data-g="${s.id}">
+      <div class="nav-group-head" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="nav-icon">${ICONS[icon]}</span>${s.title}<span class="arr">▾</span>
+      </div>
+      <div class="nav-links">${s.items.map(i=>`
+        <div class="nav-link" data-id="${i.id}" onclick="openItem('${i.id}')">${i.title}</div>
+      `).join('')}</div>
+    </div>`;
+  }).join('');
+  // Style nav icons
+  document.querySelectorAll('.nav-icon').forEach(el=>{el.querySelector('svg').style.cssText='width:14px;height:14px;color:rgba(255,255,255,0.32)';});
+}
+
+function renderContent(){
+  document.getElementById('content').innerHTML=`
+    <div class="hero">
+      <div class="hero-content">
+        <h1><span class="gradient-text">竞品分析方法论</span></h1>
+        <p>系统掌握分析框架、AI 辅助方法与决策思维<br>适用于产品立项、功能迭代、日常决策</p>
+        <div class="hero-tags">
+          <span class="hero-tag">${ICONS.layers} 六层框架</span>
+          <span class="hero-tag">${ICONS.list} 四步法</span>
+          <span class="hero-tag">${ICONS.fileText} 6个Prompt模板</span>
+          <span class="hero-tag">${ICONS.cpu} AI控制点</span>
+        </div>
+      </div>
+    </div>
+    ${KB.map((s,idx)=>{
+      const icon=SECTION_ICONS[s.id]||'list';
+      return `<div class="section ${s.theme}" id="sec-${s.id}">
+        <span class="section-number">0${idx+1}</span>
+        <div class="section-inner">
+          <div class="section-line"></div>
+          <div class="section-header">
+            <span class="overline"><span class="overline-icon">${ICONS[icon]}</span> ${s.title}</span>
+            <h2>${s.title}</h2>
+            <p>${s.desc}</p>
+          </div>
+          <div class="card-grid">${s.items.map(item=>{
+            const cIcon=CARD_ICONS[item.id]||'compass';
+            return `<div class="card" onclick="openItem('${item.id}')">
+              <div class="card-icon">${ICONS[cIcon]}</div>
+              <div class="card-label">${item.label}</div>
+              <h3>${item.title}</h3>
+              <p>${item.desc}</p>
+              <div class="card-glow"></div>
+            </div>`;
+          }).join('')}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+  // Fix hero tag SVGs
+  document.querySelectorAll('.hero-tag svg').forEach(el=>{el.style.cssText='width:12px;height:12px;color:rgba(255,255,255,0.4)';});
+  // Fix overline icons
+  document.querySelectorAll('.overline-icon svg').forEach(el=>{el.style.cssText='width:13px;height:13px';});
+  // Fix card icons
+  document.querySelectorAll('.card-icon svg').forEach(el=>{el.style.cssText='width:18px;height:18px';});
+}
+
+function openItem(id){
+  const item=itemMap[id];if(!item)return;
+  detailStack.push(id);
+  showDetail(item);
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.remove('active'));
+  const n=document.querySelector(`.nav-link[data-id="${id}"]`);
+  if(n){n.classList.add('active');n.scrollIntoView({block:'nearest'});}
+  updateCrumbs(item);
+  closeMobile();
+}
+
+function showDetail(item){
+  const body=document.getElementById('panelBody');
+  body.scrollTop=0;
+  document.getElementById('panelBack').disabled=detailStack.length<=1;
+  let related='';
+  if(item.refs&&item.refs.length){
+    related=`<div class="related"><h4>关联知识点</h4><div class="related-list">${
+      item.refs.map(rid=>{const r=itemMap[rid];if(!r)return '';
+        return `<div class="related-item" onclick="navTo('${rid}')">
+          <span class="rel-arrow">↗</span>
+          <div><div class="rel-title">${r.title}</div><div class="rel-meta">${r.sectionTitle} · ${r.label}</div></div>
+        </div>`;
+      }).join('')
+    }</div></div>`;
+  }
+  const accent=`<div class="detail-accent"><span class="accent-line"></span><span class="accent-label">${item.sectionTitle} / ${item.label}</span></div>`;
+  body.innerHTML=accent+item.body+related;
+  // Copy buttons
+  body.querySelectorAll('.code-block').forEach(block=>{
+    if(!block.querySelector('.copy-btn')){
+      const btn=document.createElement('button');btn.className='copy-btn';btn.textContent='复制';
+      btn.onclick=e=>{e.stopPropagation();navigator.clipboard.writeText(block.textContent.replace('复制','').trim());btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1500);};
+      block.appendChild(btn);
+    }
+  });
+}
+
+function navTo(id){
+  const item=itemMap[id];if(!item)return;
+  detailStack.push(id);showDetail(item);
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.remove('active'));
+  const n=document.querySelector(`.nav-link[data-id="${id}"]`);
+  if(n){n.classList.add('active');n.scrollIntoView({block:'nearest'});}
+  updateCrumbs(item);
+}
+
+function panelGoBack(){
+  if(detailStack.length<=1)return;detailStack.pop();
+  const prev=detailStack[detailStack.length-1];
+  const item=itemMap[prev];if(item){showDetail(item);updateCrumbs(item);}
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.remove('active'));
+  const n=document.querySelector(`.nav-link[data-id="${prev}"]`);if(n)n.classList.add('active');
+}
+
+function closePanel(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  detailStack=[];
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.remove('active'));
+  document.getElementById('breadcrumb').innerHTML='<span class="breadcrumb-item current">概览</span>';
+}
+
+function updateCrumbs(item){
+  document.getElementById('breadcrumb').innerHTML=`
+    <span class="breadcrumb-item" onclick="closePanel()">概览</span><span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-item" onclick="closePanel()">${item.sectionTitle}</span><span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-item current">${item.title}</span>`;
+  document.getElementById('panelCrumbs').innerHTML=`
+    <span class="crumb" onclick="closePanel()">${item.sectionTitle}</span>
+    <span style="font-size:9px;opacity:.3">›</span>
+    <span style="color:var(--text-primary-light);font-weight:500">${item.title}</span>`;
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function closeMobile(){if(innerWidth<=834)document.getElementById('sidebar').classList.remove('open');}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  renderSidebar();renderContent();
+  const si=document.getElementById('searchInput');
+  si.addEventListener('input',e=>{
+    const q=e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.nav-link').forEach(el=>{el.style.display=(!q||el.textContent.toLowerCase().includes(q))?'':'none';});
+    if(q)document.querySelectorAll('.nav-group').forEach(el=>el.classList.remove('collapsed'));
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')closePanel();
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();si.focus();}
+  });
+});
+</script>
+</body>
+</html>

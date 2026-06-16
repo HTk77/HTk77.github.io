@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鲁云庚 · AI 产品经理 | 从体育赛事到 AI 产品</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%235e6ad2'/%3E%3Ctext x='16' y='23' font-size='19' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='700'%3EH%3C/text%3E%3C/svg%3E">
+<meta property="og:title" content="鲁云庚 · AI 产品经理">
+<meta property="og:description" content="5 年体育赛事产业主线，主导 4 款 AI 产品从 0 到 1。从赛事 PM 自然延伸到 AIPM。">
+<meta property="og:type" content="website">
+<meta name="description" content="鲁云庚（赫庭）— AI 产品经理。5 年体育赛事产业主线，主导 3 款 AI 产品从 0 到 1 落地。">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+  :root{
+    /* —— Linear 精确色值 —— */
+    --bg:#08090a;            /* marketing black */
+    --bg-panel:#0f1011;      /* panel */
+    --surface:#191a1b;       /* elevated */
+    --card:rgba(255,255,255,.02);
+    --card-2:rgba(255,255,255,.04);
+    --card-hover:rgba(255,255,255,.055);
+    --border:rgba(255,255,255,.08);
+    --border-sub:rgba(255,255,255,.05);
+    --text:#f7f8f8;
+    --text-2:#d0d6e0;
+    --text-muted:#8a8f98;
+    --text-faint:#62666d;
+    --indigo:#5e6ad2;        /* brand CTA */
+    --violet:#7170ff;        /* accent */
+    --violet-h:#828fff;      /* hover */
+    --green:#10b981;
+    --maxw:1180px;
+    --mono:"Berkeley Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    /* motion — Linear: 即时工程感 */
+    --t-fast:130ms;
+    --ease:cubic-bezier(0,0,.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:"Inter var","Inter","PingFang SC","Microsoft YaHei",sans-serif;
+    font-feature-settings:"cv01","ss03";
+    line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(820px 540px at 80% -8%, rgba(94,106,210,.14), transparent 60%),
+      radial-gradient(720px 600px at 4% 14%, rgba(113,112,255,.06), transparent 55%),
+      var(--bg);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;opacity:.025;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .icon{width:1em;height:1em;stroke-width:1.75;vertical-align:middle;display:inline-block}
+
+  /* —— NAV —— */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(8,9,10,.6);border-bottom:1px solid transparent;transition:var(--t-fast) var(--ease)}
+  nav.scrolled{border-bottom:1px solid var(--border-sub);background:rgba(8,9,10,.85)}
+  .nav-in{max-width:var(--maxw);margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-weight:590;font-size:16px;letter-spacing:-.2px}
+  .logo .m{font-family:var(--mono);color:var(--text-muted);font-weight:400;font-size:13px;margin-left:4px}
+  .nav-links{display:flex;gap:28px;font-size:14px}
+  .nav-links a{color:var(--text-muted);font-weight:510;transition:color var(--t-fast) var(--ease)}
+  .nav-links a:hover{color:var(--text)}
+  .nav-toggle{display:none;background:var(--card-2);border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:6px;cursor:pointer;align-items:center;justify-content:center}
+  .nav-toggle .icon{font-size:18px}
+
+  /* —— HERO —— */
+  header{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 70px}
+  .hero{display:grid;grid-template-columns:1.08fr .92fr;gap:54px;align-items:center;width:100%}
+  .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card-2);
+    color:var(--text-2);font-size:13px;font-weight:510;padding:6px 14px;border-radius:9999px;margin-bottom:30px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .hero h1{font-size:92px;line-height:1;font-weight:600;letter-spacing:-3px;margin-bottom:22px}
+  .hero .role{font-size:23px;font-weight:510;letter-spacing:-.4px;margin-bottom:8px;color:var(--text)}
+  .hero .role b{color:var(--violet);font-weight:590}
+  .hero .sub{color:var(--text-muted);font-size:15px;font-family:var(--mono);margin-bottom:28px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:30px}
+  .chip{font-size:13px;color:var(--text-2);border:1px solid var(--border-sub);background:var(--card);padding:6px 13px;border-radius:9999px}
+  .chip b{color:var(--text);font-weight:590}
+  .hero .desc{color:var(--text-2);font-size:16px;line-height:1.75;max-width:530px;margin-bottom:34px}
+  .hero .desc b{color:var(--text);font-weight:590}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+  .btn{padding:11px 22px;border-radius:7px;font-size:14.5px;font-weight:510;cursor:pointer;transition:var(--t-fast) var(--ease);display:inline-flex;align-items:center;gap:8px}
+  .btn .icon{font-size:17px}
+  .btn-primary{background:var(--indigo);color:#fff}
+  .btn-primary:hover{background:var(--violet-h);transform:translateY(-1px)}
+  .btn-ghost{border:1px solid var(--border);color:var(--text);background:var(--card)}
+  .btn-ghost:hover{border-color:var(--border);background:var(--card-hover)}
+  .socials{display:flex;gap:20px;color:var(--text-faint);font-size:14px}
+  .socials a{display:inline-flex;align-items:center;gap:7px;transition:color var(--t-fast)}
+  .socials a:hover{color:var(--violet)}
+  .socials .icon{font-size:16px}
+
+  .portrait{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/4.5;
+    border:1px solid var(--border);background:linear-gradient(160deg,#17181c,#0c0d10);display:flex;align-items:flex-end}
+  .portrait .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    color:var(--text-faint);font-size:13px;text-align:center;
+    background:repeating-linear-gradient(45deg,rgba(255,255,255,.01) 0 12px,transparent 12px 24px)}
+  .portrait .ph .icon{font-size:46px;opacity:.3}
+  .portrait .glass{position:relative;z-index:2;margin:16px;width:calc(100% - 32px);backdrop-filter:blur(16px);
+    background:rgba(15,16,17,.65);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  .portrait .glass .t{font-weight:590;font-size:14.5px}
+  .portrait .glass .s{font-size:12px;color:var(--text-muted);font-family:var(--mono);margin-top:2px}
+  .portrait .avatar{width:40px;height:40px;border-radius:50%;background:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#fff}
+  .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:var(--text-faint);font-size:11px;letter-spacing:1.5px;font-family:var(--mono);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .mouse{width:20px;height:32px;border:1.5px solid var(--text-faint);border-radius:11px;position:relative}
+  .mouse::after{content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;border-radius:2px;background:var(--violet);animation:sc 1.6s infinite}
+  @keyframes sc{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,9px)}}
+
+  /* —— SECTION —— */
+  section{padding:104px 0;position:relative}
+  .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .ln{width:30px;height:1px;background:var(--violet)}
+  .eyebrow span{color:var(--violet);font-size:12px;font-weight:510;letter-spacing:2.5px;text-transform:uppercase;font-family:var(--mono)}
+  .sec-title{font-size:42px;font-weight:510;letter-spacing:-1px;margin-bottom:14px}
+  .sec-desc{color:var(--text-muted);font-size:16px;line-height:1.7;max-width:660px;margin-bottom:50px}
+  .sec-desc b{color:var(--text-2);font-weight:590}
+
+  .grid{display:grid;gap:18px}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
+
+  .card{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:28px;transition:var(--t-fast) var(--ease)}
+  .card:hover{background:var(--card-hover);border-color:var(--border)}
+  .card-icon{width:44px;height:44px;border-radius:10px;background:var(--card-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--violet);margin-bottom:20px}
+  .card-icon .icon{font-size:21px}
+  .card h3{font-size:19px;font-weight:590;letter-spacing:-.3px;margin-bottom:9px}
+  .card p{color:var(--text-muted);font-size:14.5px;line-height:1.7}
+
+  /* —— 经历 —— */
+  .exp{display:grid;grid-template-columns:200px 1fr;gap:28px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:28px 30px;margin-bottom:16px;transition:var(--t-fast) var(--ease)}
+  .exp:hover{background:var(--card-hover)}
+  .exp .meta .ico{width:42px;height:42px;border-radius:10px;background:var(--card-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--violet);margin-bottom:14px}
+  .exp .meta .ico .icon{font-size:20px}
+  .exp .meta .yr{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:510}
+  .exp .meta .co{display:block;color:var(--text-faint);font-size:12.5px;margin-top:4px}
+  .exp .body h3{font-size:20px;font-weight:590;letter-spacing:-.3px;margin-bottom:3px}
+  .exp .body .pos{color:var(--violet);font-size:14px;font-weight:510;margin-bottom:11px}
+  .exp .body p{color:var(--text-muted);font-size:14.5px;line-height:1.7;margin-bottom:14px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:12.5px;color:var(--text-2);background:var(--card-2);border:1px solid var(--border-sub);padding:5px 11px;border-radius:9999px}
+  .tag b{color:var(--violet)}
+
+  /* —— 项目 —— */
+  .proj{border:1px solid var(--border);background:var(--card);border-radius:12px;overflow:hidden;transition:var(--t-fast) var(--ease);display:flex;flex-direction:column}
+  .proj:hover{background:var(--card-hover);transform:translateY(-3px)}
+  .proj .banner{aspect-ratio:16/9;background:linear-gradient(135deg,#1b1c28,#0f1016);border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .proj .banner img{width:100%;height:100%;object-fit:cover;display:block}
+  .proj .banner .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-faint);font-size:12px;font-family:var(--mono)}
+  .proj .banner .ph .icon{font-size:30px;opacity:.4}
+  .proj .banner .cat{position:absolute;top:12px;left:12px;font-size:11px;font-family:var(--mono);color:var(--violet);border:1px solid var(--border);background:rgba(8,9,10,.7);padding:4px 10px;border-radius:9999px}
+  .proj .pad{padding:24px;display:flex;flex-direction:column;flex:1}
+  .proj h3{font-size:20px;font-weight:590;letter-spacing:-.3px;margin-bottom:3px}
+  .proj .pr{color:var(--text-faint);font-size:12px;font-family:var(--mono);margin-bottom:13px}
+  .proj p{color:var(--text-muted);font-size:14px;line-height:1.7;margin-bottom:18px;flex:1}
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px}
+  .metric{background:var(--card-2);border:1px solid var(--border-sub);border-radius:8px;padding:12px 8px;text-align:center}
+  .metric .v{font-size:19px;font-weight:590;color:var(--violet);letter-spacing:-.5px;line-height:1.1}
+  .metric .k{font-size:11px;color:var(--text-faint);margin-top:5px}
+  .proj .more{font-size:12.5px;color:var(--text-faint);display:flex;align-items:center;gap:6px}
+  .proj .more b{color:var(--text-2);font-weight:510}
+
+  /* —— 笔记 —— */
+  .note{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:26px;transition:var(--t-fast) var(--ease);display:flex;flex-direction:column;height:100%}
+  .note:hover{background:var(--card-hover);transform:translateY(-3px)}
+  .note .ni{width:42px;height:42px;border-radius:10px;background:var(--card-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--violet);margin-bottom:18px}
+  .note .ni .icon{font-size:20px}
+  .note h4{font-size:16.5px;font-weight:590;letter-spacing:-.3px;margin-bottom:9px}
+  .note p{color:var(--text-muted);font-size:13.5px;line-height:1.65;flex:1;margin-bottom:16px}
+  .note .open{font-size:13px;color:var(--violet);font-weight:510;display:inline-flex;align-items:center;gap:6px}
+  .note .open .icon{font-size:15px}
+
+  /* —— 文章 —— */
+  .article{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:24px 28px;transition:var(--t-fast) var(--ease)}
+  .article:hover{background:var(--card-hover)}
+  .article h4{font-size:18px;font-weight:590;letter-spacing:-.3px;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .article h4 .icon{font-size:18px;color:var(--violet)}
+  .article .ds{color:var(--text-muted);font-size:13.5px}
+  .article .ext{font-size:19px;color:var(--text-faint)}
+
+  /* —— 照片墙 —— */
+  .archive-title{text-align:center;font-size:clamp(48px,8vw,96px);font-weight:510;letter-spacing:-2px;color:var(--text);opacity:.16;margin-bottom:6px}
+  .archive-sub{text-align:center;color:var(--text-muted);font-size:15px;margin-bottom:44px}
+  /* —— Justified 画廊（Flickr/Google Photos 算法：等高·两端对齐·零裁切）—— */
+  .jgallery{display:flex;flex-wrap:wrap;gap:10px}
+  .jgallery .ji{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--border);background:#0c0d10;cursor:zoom-in;flex:none}
+  .jgallery .ji img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
+  .jgallery .ji:hover img{transform:scale(1.05)}
+  .jgallery .ji:hover{border-color:rgba(255,255,255,.18)}
+  .jgallery .ji .cap{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 10px;font-size:12px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.82));opacity:0;transform:translateY(6px);transition:opacity var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+  .jgallery .ji:hover .cap{opacity:1;transform:none}
+  /* Lightbox 点击看完整大图（contain·不裁切）*/
+  .lb{position:fixed;inset:0;background:rgba(4,5,6,.94);z-index:200;display:none;align-items:center;justify-content:center;padding:32px;cursor:zoom-out;backdrop-filter:blur(4px)}
+  .lb.open{display:flex}
+  .lb img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px;box-shadow:0 30px 80px -20px rgba(0,0,0,.85)}
+  .lb .lb-cap{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:var(--text-2);font-size:13.5px;font-family:var(--mono)}
+  .lb .lb-x{position:absolute;top:20px;right:26px;color:var(--text-2);font-size:30px;line-height:1;cursor:pointer;z-index:2}
+  .lb .lb-nav{position:absolute;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:46px;line-height:1;cursor:pointer;padding:12px 20px;user-select:none;transition:color var(--t-fast) var(--ease);z-index:2}
+  .lb .lb-nav:hover{color:#fff}
+  .lb .lb-prev{left:10px}
+  .lb .lb-next{right:10px}
+  @media(max-width:700px){.lb .lb-nav{font-size:34px;padding:8px 12px}}
+  /* 可玩 Demo 游戏卡 */
+  .game-card{display:grid;grid-template-columns:1.25fr 1fr;border:1px solid var(--border);background:var(--card);border-radius:14px;overflow:hidden;transition:var(--t-fast) var(--ease)}
+  .game-card:hover{background:var(--card-hover);border-color:rgba(255,255,255,.14);transform:translateY(-3px)}
+  .game-card .game-cover{overflow:hidden;min-height:300px}
+  .game-card .game-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
+  .game-card:hover .game-cover img{transform:scale(1.05)}
+  .game-info{padding:38px;display:flex;flex-direction:column;justify-content:center}
+  .game-info .cat{font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:1px;margin-bottom:12px}
+  .game-info h3{font-size:25px;font-weight:590;letter-spacing:-.4px;margin-bottom:12px}
+  .game-info p{color:var(--text-muted);font-size:14.5px;line-height:1.75;margin-bottom:22px}
+  .play-btn{display:inline-flex;align-items:center;gap:8px;background:var(--indigo);color:#fff;padding:12px 24px;border-radius:8px;font-size:14.5px;font-weight:510;width:fit-content;transition:var(--t-fast) var(--ease)}
+  .game-card:hover .play-btn{background:var(--violet-h)}
+  .play-btn .icon{font-size:16px}
+
+  /* —— 联系 —— */
+  .contact-box{border:1px solid var(--border);background:var(--bg-panel);border-radius:16px;padding:58px;text-align:center}
+  .contact-box h2{font-size:38px;font-weight:510;letter-spacing:-1px;margin-bottom:12px}
+  .contact-box p{color:var(--text-muted);margin-bottom:34px;font-size:15px}
+  .contact-methods{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .cm{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:18px 26px;min-width:210px;transition:var(--t-fast) var(--ease);display:flex;align-items:center;gap:14px;text-align:left}
+  .cm:hover{background:var(--card-hover);transform:translateY(-2px)}
+  .cm .ci{width:38px;height:38px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--violet);flex-shrink:0}
+  .cm .ci .icon{font-size:18px}
+  .cm .l{font-size:11px;color:var(--text-faint);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+  .cm .v{font-size:14.5px;font-weight:510}
+
+  footer{border-top:1px solid var(--border-sub);padding:34px 0;text-align:center;color:var(--text-faint);font-size:13px;font-family:var(--mono)}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:.6s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:920px){
+    .hero{grid-template-columns:1fr;gap:36px}.portrait{max-width:360px;margin:0 auto}
+    .hero h1{font-size:62px;letter-spacing:-2px}
+    .nav-links{display:none}.nav-toggle{display:flex}
+    .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+    .exp{grid-template-columns:1fr;gap:14px}
+    .game-card{grid-template-columns:1fr}.game-card .game-cover{min-height:200px}.game-info{padding:26px}
+    section{padding:72px 0}.contact-box{padding:38px 22px}
+    .sec-title{font-size:32px}
+  }
+  /* ===== 动效升级层 · Linear 哲学(即时 / ease-out / 无弹性) ===== */
+  .card,.proj,.note{position:relative}
+  /* 自定义光标 */
+  .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0}
+  .cursor-dot{width:6px;height:6px;background:var(--violet);transition:opacity .3s}
+  .cursor-ring{width:32px;height:32px;border:1.5px solid rgba(129,140,248,.5);transition:width var(--t-fast) var(--ease),height var(--t-fast) var(--ease),border-color var(--t-fast),background var(--t-fast),opacity .3s}
+  .cursor-ring.hot{width:52px;height:52px;border-color:rgba(129,140,248,.9);background:rgba(129,140,248,.07)}
+  body.cursor-on,body.cursor-on a,body.cursor-on button{cursor:none}
+  /* 卡片 spotlight 跟随高光(Linear/Vercel 同款) */
+  .card::before,.proj::before,.note::before{content:"";position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity var(--t-fast) var(--ease);background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(129,140,248,.10),transparent 62%);pointer-events:none;z-index:0}
+  .card:hover::before,.proj:hover::before,.note:hover::before{opacity:1}
+  .card>*,.note>*{position:relative;z-index:1}
+  .proj .banner,.proj .pad{position:relative;z-index:1}
+  /* reveal 升级:更长缓动 + GPU */
+  .reveal{transition:opacity .55s var(--ease),transform .55s var(--ease);will-change:opacity,transform}
+  /* Hero 入场:纯 CSS keyframes(稳健无竞态,reduce 下自动瞬显) */
+  @keyframes heroFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  header .hero>div:first-child>*{animation:heroFade .55s var(--ease) both}
+  header .hero>div:first-child>*:nth-child(1){animation-delay:.05s}
+  header .hero>div:first-child>*:nth-child(2){animation-delay:.12s}
+  header .hero>div:first-child>*:nth-child(3){animation-delay:.19s}
+  header .hero>div:first-child>*:nth-child(4){animation-delay:.26s}
+  header .hero>div:first-child>*:nth-child(5){animation-delay:.33s}
+  header .hero>div:first-child>*:nth-child(6){animation-delay:.40s}
+  header .hero>div:first-child>*:nth-child(7){animation-delay:.47s}
+  header .hero>div:first-child>*:nth-child(8){animation-delay:.54s}
+  header .portrait{animation:heroFade .6s var(--ease) .28s both}
+  /* 触摸设备:关光标 */
+  @media (hover:none),(pointer:coarse){.cursor-dot,.cursor-ring{display:none!important}body.cursor-on,body.cursor-on a,body.cursor-on button{cursor:auto}}
+  /* 无障碍兜底 */
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.cursor-dot,.cursor-ring{display:none!important}body.cursor-on{cursor:auto}}
+</style>
+</head>
+<body>
+
+<div id="progress" style="position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--indigo),var(--violet));z-index:60;transition:width .12s linear"></div>
+<nav id="nav">
+  <div class="nav-in">
+    <div class="logo">鲁云庚<span class="m">/ HeTing</span></div>
+    <div class="nav-links">
+      <a href="#about">关于</a>
+      <a href="#experience">经历</a>
+      <a href="#projects">项目</a>
+      <a href="#playable">Demo</a>
+      <a href="#notes">知识沉淀</a>
+      <a href="#articles">文章</a>
+      <a href="#archive">现场</a>
+      <a href="#contact">联系</a>
+    </div>
+    <button class="nav-toggle" aria-label="菜单" onclick="document.querySelector('.nav-links').style.display='flex';this.style.display='none'"><i data-lucide="menu" class="icon"></i></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header>
+  <div class="wrap hero">
+    <div>
+      <div class="badge"><span class="dot"></span> Available · 求职中 · AI 产品经理</div>
+      <h1>鲁云庚</h1>
+      <div class="role">AI Product Manager <b>· 从体育赛事到 AI 产品</b></div>
+      <div class="sub">杭州 · 29 · 艺术设计本科</div>
+      <div class="chips">
+        <div class="chip"><b>5 年</b> 体育赛事产业主线</div>
+        <div class="chip"><b>千万级</b> 项目操盘</div>
+        <div class="chip"><b>3 款</b> AI 产品 0→1</div>
+      </div>
+      <p class="desc">擅长把<b>模糊的业务问题</b>做成结构化 AI 产品方案，再用 <b>RAG / Multi-Agent / 工作流编排</b>落地。不是赶时髦转 AI——是被真实业务推着，<b>把 AI 长进了行业里</b>。</p>
+      <div class="cta">
+        <a href="#contact" class="btn btn-primary">联系合作 <i data-lucide="arrow-right" class="icon"></i></a>
+        <a href="#projects" class="btn btn-ghost">看 AI 项目</a>
+      </div>
+      <div class="socials">
+        <a href="mailto:L540178025@outlook.com"><i data-lucide="mail" class="icon"></i> L540178025@outlook.com</a>
+        <a href="#contact"><i data-lucide="message-square" class="icon"></i> HeTing-97L</a>
+      </div>
+    </div>
+    <div class="portrait">
+      <img loading="lazy" src="assets/img/portrait.jpg" alt="鲁云庚" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 12%">
+      <div class="glass">
+        <div><div class="t">AI Product Manager</div><div class="s">EVENT OPS · 5Y · HZ</div></div>
+        <div class="avatar">鲁</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="mouse"></div>SCROLL</div>
+</header>
+
+<!-- 关于 -->
+<section id="about">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>About</span></div>
+    <h2 class="sec-title reveal">关于我</h2>
+    <p class="sec-desc reveal">从体育消费品产品（球星卡）起步，做了 5 年体育赛事——杭州亚运千万级项目操盘。2024 年公司启动 AI 化升级，我顺势从赛事 PM 转做 AI 产品经理，主导 3 款 AI 产品从 0 到 1 落地。一条主线，没有断点。</p>
+    <div class="grid grid-2">
+      <div class="card reveal"><div class="card-icon"><i data-lucide="rocket" class="icon"></i></div><h3>0→1 AI 产品实操</h3><p>主导业务场景 AI 化需求分析，具备从模糊业务问题到结构化 AI 产品方案的落地能力。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="settings-2" class="icon"></i></div><h3>AI 工程化深度实操</h3><p>RAG、Workflow、Multi-Agent、HITL、MCP、Function Call、Vibe Coding 主流技术栈；Claude Code / Cursor / Dify / Coze 为日常生产力。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="bar-chart-3" class="icon"></i></div><h3>指标体系构建</h3><p>搭建用户反馈 bad case 机制，推动 AI 产品效果评测、体验优化与稳定性提升。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="blocks" class="icon"></i></div><h3>业务复杂度抽象与方法论沉淀</h3><p>把高复杂度、低标准化的业务流程抽象为可被 AI 消费的结构化资产——11 阶段 × 4 周期业务链路、23 条 IF-THEN 业务规则。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 经历 -->
+<section id="experience">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>Experience</span></div>
+    <h2 class="sec-title reveal">工作经历</h2>
+    <p class="sec-desc reveal">从赛事项目交付到 AI 产品负责人，一条主线持续上升。</p>
+
+    <div class="exp reveal">
+      <div class="meta"><div class="ico"><i data-lucide="bot" class="icon"></i></div><div class="yr">2024.01 — 2026.04</div><span class="co">江苏择道观行</span></div>
+      <div class="body">
+        <h3>AI 产品经理</h3><div class="pos">江苏择道观行文化传播有限公司</div>
+        <p>负责体育赛事业务上下游需求承接与挖掘，主导公司 0→N 项目的 PoC / MVP 验证，搭建 AgentBuilder 智能体平台并持续优化提示词、知识库、工具调用能力。</p>
+        <div class="tagrow"><span class="tag">需求翻译 · 边界定义</span><span class="tag">Vibe-Coding 出 <b>Demo</b></span><span class="tag">北极星指标体系</span><span class="tag">Agent 评估体系</span></div>
+      </div>
+    </div>
+
+    <div class="exp reveal">
+      <div class="meta"><div class="ico"><i data-lucide="trophy" class="icon"></i></div><div class="yr">2022 — 2024</div><span class="co">江苏择道观行</span></div>
+      <div class="body">
+        <h3>项目经理</h3><div class="pos">江苏择道观行文化传播有限公司</div>
+        <p>负责大型体育赛事项目整体推进，统筹需求梳理、方案排期、节点把控、现场实施到赛后留档；长期对接 15+ 业务方，搭建跨地远程协作流程与团队 SOP。</p>
+        <div class="tagrow"><span class="tag">对接 <b>15+</b> 业务方</span><span class="tag">杭州亚运 · 千万级</span><span class="tag">供应链与风险控制</span><span class="tag">团队带教 · SOP</span></div>
+      </div>
+    </div>
+
+    <div class="exp reveal">
+      <div class="meta"><div class="ico"><i data-lucide="layers" class="icon"></i></div><div class="yr">2021 — 2022</div><span class="co">中体卡业（大连）</span></div>
+      <div class="body">
+        <h3>产品经理</h3><div class="pos">中体卡业（大连）体育文化产业有限公司</div>
+        <p>负责体育消费品（球星卡）产品从需求分析到上线落地的全流程管理，开展市场调研与竞品分析，撰写 PRD 与原型，数据驱动产品迭代。</p>
+        <div class="tagrow"><span class="tag">产品全生命周期</span><span class="tag">用户研究 · 竞品分析</span><span class="tag">PRD 与原型</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 项目 -->
+<section id="projects">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>AI Projects</span></div>
+    <h2 class="sec-title reveal">AI 产品矩阵</h2>
+    <p class="sec-desc reveal">4 款 AI 产品，全部以「产品负责人」身份从 0 到 1——3 款企业级落地 + 1 款 C 端独立孵化。这里只放结果与方法论——<b>完整链路细节，面试详谈</b>。</p>
+    <div class="grid grid-2">
+
+      <div class="proj reveal">
+        <div class="banner">
+          <span class="cat">赛事带教</span>
+          <img loading="lazy" src="assets/img/banner-1.png" alt="择小智教练 Agent">
+        </div>
+        <div class="pad">
+          <h3>择小智教练 Agent</h3><div class="pr">产品负责人 · 2024.01 — 至今</div>
+          <p>赛事职能新人带教系统。五层产品架构 + HITL 自检 + 教练兜底，把隐性经验书面化、可复用。</p>
+          <div class="metrics"><div class="metric"><div class="v">96%</div><div class="k">AI 自检准确率</div></div><div class="metric"><div class="v">14天</div><div class="k">培养周期</div></div><div class="metric"><div class="v">4×</div><div class="k">带教效能</div></div></div>
+          <div class="more">服务 <b>8 资深 PM + 37 新人</b> · 运行 13 个月</div>
+        </div>
+      </div>
+
+      <div class="proj reveal">
+        <div class="banner">
+          <span class="cat">AI 中台</span>
+          <img loading="lazy" src="assets/img/banner-2.png" alt="择道利天一 AI Agent 平台">
+        </div>
+        <div class="pad">
+          <h3>择道利天一</h3><div class="pr">产品负责人 · 2025.01 — 至今</div>
+          <p>企业内部低代码 AI Agent 创建平台。「工作台 + 市场 + 插件市场」三层架构，HTTP / MCP 双轨插件 + 可视化编排。</p>
+          <div class="metrics"><div class="metric"><div class="v">32万</div><div class="k">月调用量</div></div><div class="metric"><div class="v">-50%</div><div class="k">开发周期</div></div><div class="metric"><div class="v">50万</div><div class="k">年省成本</div></div></div>
+          <div class="more">接入 <b>12 业务线</b> · 孵化 <b>28 Agent</b></div>
+        </div>
+      </div>
+
+      <div class="proj reveal">
+        <div class="banner">
+          <span class="cat">辅助决策</span>
+          <img loading="lazy" src="assets/img/banner-3.png" alt="AI 辅助决策助手">
+        </div>
+        <div class="pad">
+          <h3>AI 辅助决策助手</h3><div class="pr">产品负责人 · 2025.08 — 至今</div>
+          <p>赛事筹备全链路决策智能体。15 个垂直领域专家 SOP 知识资产化，「智能核查 + 辅助决策」双能力。</p>
+          <div class="metrics"><div class="metric"><div class="v">10min</div><div class="k">决策耗时(原2h)</div></div><div class="metric"><div class="v">6%</div><div class="k">出错率(原18%)</div></div><div class="metric"><div class="v">20万</div><div class="k">单赛避损</div></div></div>
+          <div class="more">以 <b>ICF 超级杯</b> 为例，拦截高风险错误决策</div>
+        </div>
+      </div>
+
+      <div class="proj reveal">
+        <div class="banner">
+          <span class="cat">C 端 · 独立 0→1</span>
+          <img loading="lazy" src="assets/img/banner-4.png" alt="拾胶 SHIJIAO">
+        </div>
+        <div class="pad">
+          <h3>拾胶 SHIJIAO</h3><div class="pr">项目负责人 · 2026.04 — 至今 · 独立孵化</div>
+          <p>面向 Z 世代的 AI 黑胶唱片鉴赏小程序，「拍照识碟 + AI 讲解 + 藏品记录」。从用户调研、竞品 / BRD / MRD / PRD 到 RAG 内容体系与可演示 Demo 全链路独立操盘。</p>
+          <div class="metrics"><div class="metric"><div class="v">86.3%</div><div class="k">英文识别准确率</div></div><div class="metric"><div class="v">6.25%</div><div class="k">幻觉率</div></div><div class="metric"><div class="v">¥0.06</div><div class="k">单次识别成本</div></div></div>
+          <div class="more">50 样本实测 · 后端卡停时 <b>Vibe Coding 独立做出真 AI Demo</b></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 可玩 Demo -->
+<section id="playable">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>Playable</span></div>
+    <h2 class="sec-title reveal">可玩 Demo</h2>
+    <p class="sec-desc reveal">不止会写 PRD——用 Vibe Coding 独立做出能<b>直接玩</b>的完整产品。点开即玩，无需安装。</p>
+    <a href="demos/space-cleaner/index.html" target="_blank" class="game-card reveal">
+      <div class="game-cover"><img loading="lazy" src="assets/img/game-cover.png" alt="宇宙清道夫 Space Cleaner"></div>
+      <div class="game-info">
+        <div class="cat">H5 GAME · VIBE CODING</div>
+        <h3>宇宙清道夫 Space Cleaner</h3>
+        <p>物理弹射玩法的太空清理 H5 小游戏，含连续关卡与技能系统，从竞品调研、玩法设计到落地迭代至 v8.5.1，全程独立完成。</p>
+        <span class="play-btn"><i data-lucide="play" class="icon"></i> 在线试玩</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- 知识沉淀 -->
+<section id="notes">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>Knowledge</span></div>
+    <h2 class="sec-title reveal">知识沉淀</h2>
+    <p class="sec-desc reveal">系统化的 AI 产品方法论沉淀——不是听过就忘，是<b>拆解、重组、可复用</b>的结构化知识资产。每一篇都可点开细读。</p>
+    <div class="grid grid-4">
+      <a href="notes/01_AI产品指标与评测体系.html" target="_blank" class="note reveal">
+        <div class="ni"><i data-lucide="bar-chart-3" class="icon"></i></div>
+        <h4>AI 产品指标与评测体系</h4>
+        <p>从指标体系到评测体系的完整闭环：五层指标、四大分析框架、AI 评测五步法、Bad Case 四层归因。</p>
+        <span class="open">展开细读 <i data-lucide="arrow-up-right" class="icon"></i></span>
+      </a>
+      <a href="notes/02_RAG系统全链路知识地图.html" target="_blank" class="note reveal">
+        <div class="ni"><i data-lucide="workflow" class="icon"></i></div>
+        <h4>RAG 系统全链路知识地图</h4>
+        <p>一张图讲透 RAG：离线构建 × 在线链路 × 评估调优，外加按「召回差/幻觉高」反向排障。</p>
+        <span class="open">展开细读 <i data-lucide="arrow-up-right" class="icon"></i></span>
+      </a>
+      <a href="notes/03_竞品分析方法论.html" target="_blank" class="note reveal">
+        <div class="ni"><i data-lucide="binoculars" class="icon"></i></div>
+        <h4>竞品分析方法论</h4>
+        <p>四步法 + 六层模型为骨架，「人做判断、AI 做收集」，配 6 个可复用 Prompt 与防幻觉控制点。</p>
+        <span class="open">展开细读 <i data-lucide="arrow-up-right" class="icon"></i></span>
+      </a>
+      <a href="notes/04_AI产品六层拆解框架.html" target="_blank" class="note reveal">
+        <div class="ni"><i data-lucide="boxes" class="icon"></i></div>
+        <h4>AI 产品六层拆解框架</h4>
+        <p>市场→商业→用户→技术→模型→基础，一套逆向推导任意 AI 产品架构的可复用框架。</p>
+        <span class="open">展开细读 <i data-lucide="arrow-up-right" class="icon"></i></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 文章 -->
+<section id="articles">
+  <div class="wrap">
+    <div class="eyebrow reveal"><div class="ln"></div><span>Writing</span></div>
+    <h2 class="sec-title reveal">公开写作</h2>
+    <p class="sec-desc reveal">在公开平台持续输出 AI 产品思考与实践，是专业度最直接的背书。</p>
+    <div class="grid grid-2">
+      <a href="#" class="article reveal">
+        <div><h4><i data-lucide="pen-tool" class="icon"></i>人人都是产品经理</h4><div class="ds">专栏作者 · AI 产品方法论与实战拆解</div></div>
+        <i data-lucide="arrow-up-right" class="icon ext"></i>
+      </a>
+      <a href="#" class="article reveal">
+        <div><h4><i data-lucide="rss" class="icon"></i>微信公众号</h4><div class="ds">主理人 · AI 产品思考 · 行业观察 · 项目复盘</div></div>
+        <i data-lucide="arrow-up-right" class="icon ext"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 现场 -->
+<section id="archive">
+  <div class="wrap">
+    <div class="archive-title reveal">过往现场</div>
+    <div class="archive-sub reveal">5 年体育赛事，每一个都是真实战场 · 赛场 / 场馆 / 采访 / 团队 / 证书</div>
+    <div class="jgallery" id="jgallery">
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-opening1.jpg" alt="十五运开幕式"><span class="cap">十五运开幕式 · 万人场馆氛围</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-kayak.jpg" alt="ICF皮划艇世界杯"><span class="cap">2024 ICF 皮划艇世界杯 · 杭州</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-bwf.jpg" alt="BWF世界巡回赛总决赛"><span class="cap">BWF 世界巡回赛总决赛 · 杭州</span></div>
+      <div class="ji" data-ar="1.79"><img loading="lazy" src="assets/img/gal-aerial.jpg" alt="开幕式航拍"><span class="cap">开幕式航拍 · 灯光与地屏景观</span></div>
+      <div class="ji" data-ar="0.75"><img loading="lazy" src="assets/img/gal-interview.jpg" alt="媒体采访"><span class="cap">接受媒体采访 · 赛区现场</span></div>
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-lotus.jpg" alt="主体育场全景"><span class="cap">杭州主体育场 · 全景</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-gym.jpg" alt="体操赛场"><span class="cap">体操赛场 · 全景</span></div>
+      <div class="ji" data-ar="1.49"><img loading="lazy" src="assets/img/gal-basketball.jpg" alt="篮球赛事现场"><span class="cap">篮球赛事现场 · 满场氛围</span></div>
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-stage.jpg" alt="赛场景观主舞台"><span class="cap">赛场景观营造 · 主舞台鸟瞰</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-track.jpg" alt="主体育场赛道夜景"><span class="cap">主体育场 · 夜间赛道景观</span></div>
+      <div class="ji" data-ar="0.75"><img loading="lazy" src="assets/img/gal-stage2.jpg" alt="亚运开幕式主舞台"><span class="cap">亚运开幕式 · 主舞台</span></div>
+      <div class="ji" data-ar="1.77"><img loading="lazy" src="assets/img/gal-opening2.jpg" alt="全运会开幕式"><span class="cap">全运会开幕式 · 主场馆</span></div>
+      <div class="ji" data-ar="2.19"><img loading="lazy" src="assets/img/gal-football.jpg" alt="足球赛场全景"><span class="cap">足球赛场 · 全景</span></div>
+      <div class="ji" data-ar="1.77"><img loading="lazy" src="assets/img/gal-swim.jpg" alt="游泳馆"><span class="cap">游泳馆 · 赛前</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-waterpolo.jpg" alt="水上项目场馆"><span class="cap">水上项目场馆 · 广州</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-badminton.jpg" alt="羽毛球赛场"><span class="cap">羽毛球赛场 · 多场地布局</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-tennis.jpg" alt="ATP250杭州公开赛"><span class="cap">ATP250 杭州公开赛 · 中心球场</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-canoe.jpg" alt="皮划艇激流回旋赛道"><span class="cap">皮划艇激流回旋赛道</span></div>
+      <div class="ji" data-ar="1.49"><img loading="lazy" src="assets/img/gal-paddle.jpg" alt="桨板竞速"><span class="cap">桨板竞速 · 河道赛段</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-bwf2.jpg" alt="BWF总决赛决赛场地"><span class="cap">BWF 总决赛 · 决赛场地</span></div>
+      <div class="ji" data-ar="1.50"><img loading="lazy" src="assets/img/gal-stand.jpg" alt="满场看台"><span class="cap">满场看台 · 十五运</span></div>
+      <div class="ji" data-ar="0.74"><img loading="lazy" src="assets/img/gal-interview2.jpg" alt="CBA赛事媒体采访"><span class="cap">CBA 赛事 · 媒体采访</span></div>
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-launch.jpg" alt="赛事新闻发布会"><span class="cap">赛事新闻发布会</span></div>
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-team.jpg" alt="赛事保障团队合影"><span class="cap">赛事保障团队合影</span></div>
+      <div class="ji" data-ar="0.75"><img loading="lazy" src="assets/img/gal-pass.jpg" alt="场馆保障工作证件"><span class="cap">十五运场馆保障 · 工作证件</span></div>
+      <div class="ji" data-ar="1.33"><img loading="lazy" src="assets/img/gal-cert.jpg" alt="参与证书与工作证件"><span class="cap">赛事工作证件与参与证书</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 联系 -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-box reveal">
+      <h2>聊聊 AI 产品的事？</h2>
+      <p>正在寻找 AI 产品经理机会 · 欢迎随时联系</p>
+      <div class="contact-methods">
+        <a href="mailto:L540178025@outlook.com" class="cm"><div class="ci"><i data-lucide="mail" class="icon"></i></div><div><div class="l">Email</div><div class="v">L540178025@outlook.com</div></div></a>
+        <div class="cm"><div class="ci"><i data-lucide="message-square" class="icon"></i></div><div><div class="l">WeChat</div><div class="v">HeTing-97L</div></div></div>
+        <a href="tel:13841576033" class="cm"><div class="ci"><i data-lucide="phone" class="icon"></i></div><div><div class="l">Phone</div><div class="v">138 4157 6033</div></div></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 鲁云庚 · HeTing · AI Product Manager · 杭州</footer>
+<div class="lb" id="lb"><span class="lb-x">&times;</span><span class="lb-nav lb-prev">&#8249;</span><img id="lb-img" src="" alt=""><span class="lb-nav lb-next">&#8250;</span><div class="lb-cap" id="lb-cap"></div></div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  const fallbackIcons={
+    'arrow-right':'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    'arrow-up-right':'<path d="M7 17 17 7"/><path d="M7 7h10v10"/>',
+    'bar-chart-3':'<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+    binoculars:'<path d="M10 10h4"/><path d="M19 7V5a2 2 0 0 0-2-2h-1"/><path d="M5 7V5a2 2 0 0 1 2-2h1"/><path d="M10 21a5 5 0 1 1-5-5"/><path d="M14 21a5 5 0 1 0 5-5"/><path d="M12 16V7"/>',
+    blocks:'<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+    bot:'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M9 13h.01"/><path d="M15 13h.01"/><path d="M10 17h4"/>',
+    boxes:'<path d="M2.5 10.5 12 5l9.5 5.5L12 16z"/><path d="M2.5 10.5V16L12 21.5V16"/><path d="M21.5 10.5V16L12 21.5"/>',
+    layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
+    mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/>',
+    menu:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+    'message-square':'<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>',
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.89.66 2.78a2 2 0 0 1-.45 2.11L8.09 9.84a16 16 0 0 0 6.07 6.07l1.23-1.23a2 2 0 0 1 2.11-.45c.89.31 1.82.53 2.78.66A2 2 0 0 1 22 16.92z"/>',
+    play:'<path d="m5 3 14 9-14 9z"/>',
+    'pen-tool':'<path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18"/><path d="m2 2 7.6 7.6"/>',
+    rocket:'<path d="M4.5 16.5c-1.5 1.3-2 3.7-2 5 1.3 0 3.7-.5 5-2"/><path d="M9 15 4 20"/><path d="M15 9l-6 6"/><path d="M14 3c3 0 7 1 7 1s1 4 1 7l-4 4-7-7z"/><path d="M14 3 9 8"/><path d="M18 15l-5 5"/><path d="M15 9h.01"/>',
+    rss:'<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+    'settings-2':'<path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
+    trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M6 2h12v7a6 6 0 0 1-12 0z"/><path d="M12 15v4"/><path d="M8 21h8"/>',
+    workflow:'<rect width="8" height="8" x="3" y="3" rx="2"/><rect width="8" height="8" x="13" y="13" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/>'
+  };
+  function createFallbackIcons(){
+    document.querySelectorAll('[data-lucide]').forEach(el=>{
+      const name=el.getAttribute('data-lucide');
+      const body=fallbackIcons[name]||'<circle cx="12" cy="12" r="8"/>';
+      const cls=el.getAttribute('class')||'icon';
+      el.outerHTML=`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+    });
+  }
+  if(window.lucide&&typeof lucide.createIcons==='function'){lucide.createIcons();}else{createFallbackIcons();}
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* nav 滚动态 */
+  const nav=document.getElementById('nav');
+  const onScroll=()=>nav.classList.toggle('scrolled',scrollY>40);
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  /* 滚动：浏览器原生滚动（最跟手灵活）—— 已移除 Lenis 惯性平滑 */
+
+  /* reveal 入场 + 同组交错 */
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  document.querySelectorAll('.grid,.tagrow,.contact-methods,.photos').forEach(g=>[...g.children].forEach((c,i)=>{if(c.classList&&c.classList.contains('reveal'))c.style.transitionDelay=(i*60)+'ms'}));
+
+  /* Hero 入场已改为纯 CSS @keyframes(heroFade),无需 JS 操控 opacity */
+
+  /* 数字计数(滚动进入 0→真值,保留前后缀/小数) */
+  const cio=new IntersectionObserver(es=>es.forEach(e=>{
+    if(!e.isIntersecting)return; cio.unobserve(e.target);
+    const el=e.target, raw=el.textContent.trim(), m=raw.match(/-?[\d.]+/);
+    if(!m||reduce)return;
+    const numStr=m[0], target=parseFloat(numStr), idx=raw.indexOf(numStr);
+    const pre=raw.slice(0,idx), suf=raw.slice(idx+numStr.length);
+    const dec=(numStr.split('.')[1]||'').length, dur=900, start=performance.now();
+    function tick(now){
+      const p=Math.min(1,(now-start)/dur);
+      const v=target*(1-Math.pow(1-p,3));
+      el.textContent=pre+(dec>0?v.toFixed(dec):Math.round(v))+suf;
+      if(p<1){requestAnimationFrame(tick);}else{el.textContent=raw;}
+    }
+    requestAnimationFrame(tick);
+  }),{threshold:.6});
+  document.querySelectorAll('.metric .v').forEach(el=>cio.observe(el));
+
+  /* 自定义光标(仅精确指针 + 非减弱动效) */
+  if(fine && !reduce){
+    document.body.classList.add('cursor-on');
+    const dot=document.createElement('div'),ring=document.createElement('div');
+    dot.className='cursor-dot';ring.className='cursor-ring';document.body.append(dot,ring);
+    let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+    addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';dot.style.opacity='1';ring.style.opacity='1'},{passive:true});
+    (function loop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
+    document.querySelectorAll('a,button,.card,.proj,.note,.cm,.chip').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hot'));el.addEventListener('mouseleave',()=>ring.classList.remove('hot'))});
+    document.addEventListener('mouseleave',()=>{dot.style.opacity='0';ring.style.opacity='0'});
+  }
+
+  /* 卡片 spotlight 跟随高光 */
+  document.querySelectorAll('.card,.proj,.note').forEach(c=>c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true}));
+
+  /* 磁吸主 CTA(克制 · 强度 .25) */
+  if(fine && !reduce){
+    document.querySelectorAll('.btn-primary').forEach(btn=>{
+      btn.addEventListener('mousemove',e=>{const r=btn.getBoundingClientRect();btn.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.25}px,${(e.clientY-r.top-r.height/2)*.35}px)`});
+      btn.addEventListener('mouseleave',()=>btn.style.transform='');
+    });
+  }
+
+  /* 顶部阅读进度条 */
+  const _pg=document.getElementById('progress');
+  if(_pg)addEventListener('scroll',()=>{const d=document.documentElement;_pg.style.width=(d.scrollTop/((d.scrollHeight-d.clientHeight)||1)*100)+'%'},{passive:true});
+
+  /* Justified 画廊布局（等高 · 两端对齐 · 零裁切） */
+  function layoutGallery(){
+    const g=document.getElementById('jgallery');
+    if(!g)return;
+    const W=g.clientWidth, gap=10, targetH=innerWidth<700?150:innerWidth<1000?200:248;
+    const items=[...g.children];
+    let row=[], sumAR=0;
+    const flush=(last)=>{
+      const totalGap=(row.length-1)*gap;
+      let h=(W-totalGap)/sumAR;
+      if(last&&h>targetH*1.45)h=targetH;
+      row.forEach(it=>{const ar=parseFloat(it.dataset.ar)||1.5;it.style.height=h+'px';it.style.width=(ar*h)+'px';});
+      row=[];sumAR=0;
+    };
+    items.forEach(it=>{
+      sumAR+=parseFloat(it.dataset.ar)||1.5; row.push(it);
+      if(sumAR*targetH+(row.length-1)*gap>=W)flush(false);
+    });
+    if(row.length)flush(true);
+  }
+  layoutGallery();
+  addEventListener('resize',layoutGallery);
+  addEventListener('load',layoutGallery);
+
+  /* Lightbox：点击看完整大图（contain 不裁切）+ ←/→ 切换 + 计数 */
+  (function(){
+    const lb=document.getElementById('lb');if(!lb)return;
+    const lbImg=document.getElementById('lb-img'),lbCap=document.getElementById('lb-cap');
+    const items=[...document.querySelectorAll('#jgallery .ji')];
+    let idx=0;
+    const show=i=>{
+      idx=(i+items.length)%items.length;
+      const img=items[idx].querySelector('img'),cap=items[idx].querySelector('.cap');
+      lbImg.src=img.src;lbImg.alt=img.alt||'';
+      lbCap.textContent=(cap?cap.textContent:'')+'　·　'+(idx+1)+' / '+items.length;
+    };
+    items.forEach((ji,i)=>ji.addEventListener('click',()=>{show(i);lb.classList.add('open');}));
+    const close=()=>lb.classList.remove('open');
+    lb.querySelector('.lb-x').addEventListener('click',e=>{e.stopPropagation();close();});
+    lb.querySelector('.lb-prev').addEventListener('click',e=>{e.stopPropagation();show(idx-1);});
+    lb.querySelector('.lb-next').addEventListener('click',e=>{e.stopPropagation();show(idx+1);});
+    lb.addEventListener('click',e=>{if(e.target===lb)close();});
+    addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')show(idx-1);else if(e.key==='ArrowRight')show(idx+1);});
+  })();
+</script>
+</body>
+</html>
