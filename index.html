@@ -6,9 +6,9 @@
 <title>鲁云庚 · AI 产品经理 | 从体育赛事到 AI 产品</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%235e6ad2'/%3E%3Ctext x='16' y='23' font-size='19' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='700'%3EH%3C/text%3E%3C/svg%3E">
 <meta property="og:title" content="鲁云庚 · AI 产品经理">
-<meta property="og:description" content="5 年体育赛事产业主线，主导 4 款 AI 产品从 0 到 1。从赛事 PM 自然延伸到 AIPM。">
+<meta property="og:description" content="业务专家型 AIPM：5 年赛事一线业务沉淀，主导 3 条企业级 AI 业务线与 1 个 C 端独立项目从 0 到 1。">
 <meta property="og:type" content="website">
-<meta name="description" content="鲁云庚（赫庭）— AI 产品经理。5 年体育赛事产业主线，主导 3 款 AI 产品从 0 到 1 落地。">
+<meta name="description" content="鲁云庚（赫庭）— AI 产品经理。业务专家型 AIPM，擅长把赛事行业隐性经验沉淀为 AI 可消费、可评测、可复用的数据资产。">
 <link rel="preconnect" href="https://rsms.me/">
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 <style>
@@ -102,6 +102,11 @@
   .chip b{color:var(--text);font-weight:590}
   .hero .desc{color:var(--text-2);font-size:16px;line-height:1.75;max-width:530px;margin-bottom:34px}
   .hero .desc b{color:var(--text);font-weight:590}
+  .method-strip{max-width:560px;margin:-12px 0 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .method-step{border:1px solid var(--border-sub);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border-radius:10px;padding:10px 10px 11px;min-height:74px;position:relative;overflow:hidden}
+  .method-step::before{content:"";position:absolute;left:10px;right:10px;top:9px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent);opacity:.35}
+  .method-step .n{font-family:var(--mono);font-size:10px;color:var(--violet);letter-spacing:.9px;text-transform:uppercase;margin-bottom:12px}
+  .method-step .v{font-size:12.5px;color:var(--text-2);line-height:1.35}
   .cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
   .btn{min-height:44px;padding:11px 22px;border-radius:8px;font-size:14.5px;font-weight:560;cursor:pointer;transition:transform var(--t-fast) var(--ease),background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease);display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden}
   .btn::before{content:"";position:absolute;inset:-1px;background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.18) 40%,transparent 62%);transform:translateX(-120%);transition:transform .45s var(--ease);pointer-events:none}
@@ -181,9 +186,14 @@
   .proj:hover{background:var(--card-hover);transform:translateY(-3px)}
   .proj .banner{aspect-ratio:16/9;background:linear-gradient(135deg,#1b1c28,#0f1016);border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
   .proj .banner img{width:100%;height:100%;object-fit:cover;display:block}
+  .proj .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.04) 18%,rgba(0,0,0,.68) 100%);pointer-events:none}
   .proj .banner .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-faint);font-size:12px;font-family:var(--mono)}
   .proj .banner .ph .icon{font-size:30px;opacity:.4}
-  .proj .banner .cat{position:absolute;top:12px;left:12px;font-size:11px;font-family:var(--mono);color:var(--violet);border:1px solid var(--border);background:rgba(8,9,10,.7);padding:4px 10px;border-radius:9999px}
+  .proj .banner .cat{position:absolute;z-index:2;top:12px;left:12px;font-size:11px;font-family:var(--mono);color:var(--violet);border:1px solid var(--border);background:rgba(8,9,10,.7);padding:4px 10px;border-radius:9999px}
+  .project-signal{position:absolute;z-index:2;left:16px;right:16px;bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+  .project-signal .k{font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+  .project-signal .v{font-size:15px;color:var(--text);font-weight:590;letter-spacing:-.2px}
+  .project-signal .r{font-family:var(--mono);font-size:11px;color:var(--text-2);border:1px solid rgba(255,255,255,.12);background:rgba(8,9,10,.55);backdrop-filter:blur(10px);border-radius:999px;padding:6px 9px;white-space:nowrap}
   .proj .pad{padding:24px;display:flex;flex-direction:column;flex:1}
   .proj h3{font-size:20px;font-weight:590;letter-spacing:-.3px;margin-bottom:3px}
   .proj .pr{color:var(--text-faint);font-size:12px;font-family:var(--mono);margin-bottom:13px}
@@ -311,7 +321,7 @@
   .reveal.in{opacity:1;transform:none}
 
   @media(max-width:920px){
-    .hero{grid-template-columns:1fr;gap:36px}.portrait{max-width:360px;margin:0 auto}
+    .hero{grid-template-columns:1fr;gap:30px}.portrait{max-width:360px;margin:0 auto}
     .hero h1{font-size:62px;letter-spacing:-2px}
     .nav-links{display:none}.nav-toggle{display:flex}
     .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
@@ -326,13 +336,34 @@
     .sec-title{font-size:32px}
   }
   @media(max-width:560px){
+    header{min-height:auto;padding:96px 0 52px;align-items:flex-start}
+    .hero{gap:22px}
+    .badge{margin-bottom:22px}
+    .hero h1{font-size:58px;letter-spacing:-1.8px;margin-bottom:18px}
+    .hero .role{font-size:21px;line-height:1.35;margin-bottom:10px}
+    .hero .sub{font-size:14px;margin-bottom:24px}
+    .chips{gap:8px;margin-bottom:24px}
+    .chip{font-size:12.5px;padding:6px 11px}
+    .hero .desc{font-size:15px;line-height:1.7;margin-bottom:22px}
+    .method-strip{grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 24px}
+    .method-step{min-height:66px;padding:9px 10px}
+    .method-step .n{font-size:9.5px;margin-bottom:10px}
+    .method-step .v{font-size:12px}
     .repo-metrics{grid-template-columns:1fr}
     .repo-feature{padding:22px}
     .repo-feature h3{font-size:24px}
     .terminal pre{font-size:11px}
-    .cta{gap:10px}
+    .cta{gap:10px;margin-bottom:20px}
     .btn{width:100%;justify-content:center}
-    .hero-tags{gap:6px}
+    .socials{display:none}
+    .portrait{position:absolute;right:20px;top:118px;width:92px;aspect-ratio:1;border-radius:18px;box-shadow:0 16px 44px rgba(0,0,0,.34)}
+    .portrait::before{inset:0}
+    .portrait::after{left:0;right:0;top:0;bottom:0;border-radius:inherit;background:linear-gradient(180deg,rgba(0,0,0,0) 42%,rgba(0,0,0,.42))}
+    .portrait-img{left:0;right:0;top:0;bottom:0;width:100%;height:100%;border-radius:inherit;object-position:center 14%}
+    .portrait .glass,.hero-tags{display:none}
+    .project-signal{left:12px;right:12px;bottom:12px;align-items:flex-start;flex-direction:column;gap:8px}
+    .project-signal .v{font-size:13.5px}
+    .project-signal .r{font-size:10px}
   }
   /* ===== 动效升级层 · Linear 哲学(即时 / ease-out / 无弹性) ===== */
   .card,.proj,.note,.repo-card,.repo-feature,.workflow-card,.game-card{position:relative}
@@ -400,14 +431,20 @@
     <div>
       <div class="badge"><span class="dot"></span> Available · 求职中 · AI 产品经理</div>
       <h1>鲁云庚</h1>
-      <div class="role">AI Product Manager <b>· 从体育赛事到 AI 产品</b></div>
+      <div class="role">AI Product Manager <b>· 业务专家型 AIPM</b></div>
       <div class="sub">杭州 · 29</div>
       <div class="chips">
-        <div class="chip"><b>5 年</b> 体育赛事产业主线</div>
+        <div class="chip"><b>5 年</b> 赛事一线业务沉淀</div>
         <div class="chip"><b>千万级</b> 项目操盘</div>
-        <div class="chip"><b>3 款</b> AI 产品 0→1</div>
+        <div class="chip"><b>3 条</b> B 端 AI 业务线</div>
       </div>
-      <p class="desc">擅长把<b>模糊的业务问题</b>做成结构化 AI 产品方案，再用 <b>RAG / Multi-Agent / 工作流编排</b>落地。不是赶时髦转 AI——是被真实业务推着，<b>把 AI 长进了行业里</b>。</p>
+      <p class="desc">擅长把赛事行业专家脑子里的 <b>know-how</b> 拆成规则、题库、画像和评测集，再用 <b>RAG / Workflow / Agent / HITL</b> 跑成可上线系统。核心差异是：<b>懂业务，也能把 AI 能力跑到能交付</b>。</p>
+      <div class="method-strip reveal">
+        <div class="method-step"><div class="n">01 Input</div><div class="v">隐性经验</div></div>
+        <div class="method-step"><div class="n">02 Asset</div><div class="v">规则 / 题库 / 画像</div></div>
+        <div class="method-step"><div class="n">03 Agent</div><div class="v">RAG + HITL 闭环</div></div>
+        <div class="method-step"><div class="n">04 Result</div><div class="v">业务指标改善</div></div>
+      </div>
       <div class="cta">
         <a href="#contact" class="btn btn-primary">联系合作 <i data-lucide="arrow-right" class="icon"></i></a>
         <a href="#projects" class="btn btn-ghost">看 AI 项目</a>
@@ -439,12 +476,12 @@
   <div class="wrap">
     <div class="eyebrow reveal"><div class="ln"></div><span>About</span></div>
     <h2 class="sec-title reveal">关于我</h2>
-    <p class="sec-desc reveal">从体育消费品产品（球星卡）起步，做了 5 年体育赛事——杭州亚运千万级项目操盘。2024 年公司启动 AI 化升级，我顺势从赛事 PM 转做 AI 产品经理，主导 3 款 AI 产品从 0 到 1 落地。一条主线，没有断点。</p>
+    <p class="sec-desc reveal">从体育消费品产品（球星卡）起步，做了 5 年大型体育赛事交付，经历杭州亚运等千万级项目。2024 年公司启动 AI 化升级后，我基于一线业务沉淀转型 AI 产品经理，主线是把高复杂度、低标准化的赛事经验变成 AI 可消费、可评测、可复用的数据资产。</p>
     <div class="grid grid-2">
-      <div class="card reveal"><div class="card-icon"><i data-lucide="rocket" class="icon"></i></div><h3>0→1 AI 产品实操</h3><p>主导业务场景 AI 化需求分析，具备从模糊业务问题到结构化 AI 产品方案的落地能力。</p></div>
-      <div class="card reveal"><div class="card-icon"><i data-lucide="settings-2" class="icon"></i></div><h3>AI 工程化深度实操</h3><p>RAG、Workflow、Multi-Agent、HITL、MCP、Function Call、Vibe Coding 主流技术栈；Claude Code / Cursor / Dify / Coze 为日常生产力。</p></div>
-      <div class="card reveal"><div class="card-icon"><i data-lucide="bar-chart-3" class="icon"></i></div><h3>指标体系构建</h3><p>搭建用户反馈 bad case 机制，推动 AI 产品效果评测、体验优化与稳定性提升。</p></div>
-      <div class="card reveal"><div class="card-icon"><i data-lucide="blocks" class="icon"></i></div><h3>业务复杂度抽象与方法论沉淀</h3><p>把高复杂度、低标准化的业务流程抽象为可被 AI 消费的结构化资产——11 阶段 × 4 周期业务链路、23 条 IF-THEN 业务规则。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="rocket" class="icon"></i></div><h3>0→1 AI 产品实操</h3><p>主导 3 条企业级 AI 业务线从 PoC / MVP 到上线运行：带教 Agent、Agent 创建平台、辅助决策助手，核心都围绕内部降本增效。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="settings-2" class="icon"></i></div><h3>AI 工程化深度实操</h3><p>熟悉 Workflow + RAG + Agent 混合架构、Function Call、MCP、HITL、模型路由与 Dify 二开；日常用 Claude Code / Cursor 做 POC 与 Demo 验证。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="bar-chart-3" class="icon"></i></div><h3>评测与 Bad Case 闭环</h3><p>搭建 200 条评测集、L1-L4 四层指标、AI 判分与教练金标准对齐机制，用 Bad Case 四层归因定位数据 / 流程 / Prompt / 模型问题。</p></div>
+      <div class="card reveal"><div class="card-icon"><i data-lucide="blocks" class="icon"></i></div><h3>业务复杂度抽象与数据资产化</h3><p>把高复杂度、低标准化的业务流程抽象为可被 AI 消费的结构化资产：11 阶段 × 4 周期业务链路、23 条 IF-THEN 业务规则、12 个业务知识库。</p></div>
     </div>
   </div>
 </section>
@@ -460,8 +497,8 @@
       <div class="meta"><div class="ico"><i data-lucide="bot" class="icon"></i></div><div class="yr">2024.01 — 2026.04</div><span class="co">江苏择道观行</span></div>
       <div class="body">
         <h3>AI 产品经理</h3><div class="pos">江苏择道观行文化传播有限公司</div>
-        <p>负责体育赛事业务上下游需求承接与挖掘，主导公司 0→N 项目的 PoC / MVP 验证，搭建 AgentBuilder 智能体平台并持续优化提示词、知识库、工具调用能力。</p>
-        <div class="tagrow"><span class="tag">需求翻译 · 边界定义</span><span class="tag">Vibe-Coding 出 <b>Demo</b></span><span class="tag">北极星指标体系</span><span class="tag">Agent 评估体系</span></div>
+        <p>负责赛事业务 AI 化需求挖掘、产品架构与落地推进，主导带教 Agent、企业内部 Agent 创建平台、辅助决策助手等 0→1 项目；推动团队从扣子 MVP 验证升级到 Dify 自建中台、模型路由与评测闭环。</p>
+        <div class="tagrow"><span class="tag">隐性经验 · 数据资产化</span><span class="tag">Vibe-Coding 出 <b>Demo</b></span><span class="tag">Dify 二开 · 模型路由</span><span class="tag">Agent 评测体系</span></div>
       </div>
     </div>
 
@@ -469,7 +506,7 @@
       <div class="meta"><div class="ico"><i data-lucide="trophy" class="icon"></i></div><div class="yr">2022 — 2024</div><span class="co">江苏择道观行</span></div>
       <div class="body">
         <h3>项目经理</h3><div class="pos">江苏择道观行文化传播有限公司</div>
-        <p>负责大型体育赛事项目整体推进，统筹需求梳理、方案排期、节点把控、现场实施到赛后留档；长期对接 15+ 业务方，搭建跨地远程协作流程与团队 SOP。</p>
+        <p>负责大型体育赛事项目整体推进，统筹需求梳理、方案排期、节点把控、现场实施到赛后留档；长期对接 15+ 业务方，沉淀跨地远程协作流程、风险控制方法和新人带教 SOP。</p>
         <div class="tagrow"><span class="tag">对接 <b>15+</b> 业务方</span><span class="tag">杭州亚运 · 千万级</span><span class="tag">供应链与风险控制</span><span class="tag">团队带教 · SOP</span></div>
       </div>
     </div>
@@ -490,24 +527,25 @@
   <div class="wrap">
     <div class="eyebrow reveal"><div class="ln"></div><span>AI Projects</span></div>
     <h2 class="sec-title reveal">AI 产品矩阵</h2>
-    <p class="sec-desc reveal">4 款 AI 产品，全部以「产品负责人」身份从 0 到 1——3 款企业级落地 + 1 款 C 端独立孵化。这里只放结果与方法论——<b>完整链路细节，面试详谈</b>。</p>
+    <p class="sec-desc reveal">4 款 AI 产品，全部以「产品负责人」身份从 0 到 1——3 款企业级降本增效产品 + 1 款 C 端独立孵化。这里不堆概念，重点展示我如何把业务经验沉淀成知识库、规则、评测集和可持续回流的数据飞轮。</p>
     <div class="grid grid-2">
 
       <div class="proj reveal">
         <div class="banner">
           <span class="cat">赛事带教</span>
           <img loading="lazy" src="assets/img/banner-1.png" alt="择小智教练 Agent">
+          <div class="project-signal"><div><div class="k">Data Flywheel</div><div class="v">教练经验 → 12 库 → 评测闭环</div></div><div class="r">HITL</div></div>
         </div>
         <div class="pad">
           <h3>择小智教练 Agent</h3><div class="pr">产品负责人 · 2024.01 — 至今</div>
-          <p>赛事职能新人带教系统。五层产品架构 + HITL 自检 + 教练兜底，把隐性经验书面化、可复用。</p>
+          <p>面向赛事新人 PM 的智能带教系统，把资深 PM 的隐性经验沉淀成题库、规则、画像与评测集。</p>
           <div class="case-layers">
             <div class="case-layer"><div class="l">Problem</div><div class="v">新人带教依赖隐性经验</div></div>
-            <div class="case-layer"><div class="l">AI Move</div><div class="v">HITL 自检 + 教练兜底</div></div>
+            <div class="case-layer"><div class="l">AI Move</div><div class="v">HITL 数据飞轮 + 12 库</div></div>
             <div class="case-layer"><div class="l">Evidence</div><div class="v">带教周期压缩到 14 天</div></div>
           </div>
-          <div class="metrics"><div class="metric"><div class="v">96%</div><div class="k">AI 自检准确率</div></div><div class="metric"><div class="v">14天</div><div class="k">培养周期</div></div><div class="metric"><div class="v">4×</div><div class="k">带教效能</div></div></div>
-          <div class="more">服务 <b>8 资深 PM + 37 新人</b> · 运行 13 个月</div>
+          <div class="metrics"><div class="metric"><div class="v">96%</div><div class="k">AI 自检准确率</div></div><div class="metric"><div class="v">73%</div><div class="k">新人顶岗率</div></div><div class="metric"><div class="v">4×</div><div class="k">带教效能</div></div></div>
+          <div class="more">服务 <b>8 资深 PM + 37 新人</b> · 培养周期 <b>1 年 → 14 天</b> · 教练介入 -60%</div>
         </div>
       </div>
 
@@ -515,17 +553,18 @@
         <div class="banner">
           <span class="cat">AI 中台</span>
           <img loading="lazy" src="assets/img/banner-2.png" alt="择道利天一 AI Agent 平台">
+          <div class="project-signal"><div><div class="k">Platform Layer</div><div class="v">Dify 二开 + 模型网关 + 联邦知识库</div></div><div class="r">12 Lines</div></div>
         </div>
         <div class="pad">
           <h3>择道利天一</h3><div class="pr">产品负责人 · 2025.01 — 至今</div>
-          <p>企业内部低代码 AI Agent 创建平台。「工作台 + 市场 + 插件市场」三层架构，HTTP / MCP 双轨插件 + 可视化编排。</p>
+          <p>企业内部低代码 AI Agent 创建平台，补齐多租户、IAM、审计、监控、模型路由与知识库联邦。</p>
           <div class="case-layers">
             <div class="case-layer"><div class="l">Problem</div><div class="v">业务线重复造 Agent</div></div>
-            <div class="case-layer"><div class="l">AI Move</div><div class="v">低代码编排 + 插件市场</div></div>
+            <div class="case-layer"><div class="l">AI Move</div><div class="v">Dify 二开 + 模型网关</div></div>
             <div class="case-layer"><div class="l">Evidence</div><div class="v">孵化 28 个 Agent</div></div>
           </div>
-          <div class="metrics"><div class="metric"><div class="v">32万</div><div class="k">月调用量</div></div><div class="metric"><div class="v">-50%</div><div class="k">开发周期</div></div><div class="metric"><div class="v">50万</div><div class="k">年省成本</div></div></div>
-          <div class="more">接入 <b>12 业务线</b> · 孵化 <b>28 Agent</b></div>
+          <div class="metrics"><div class="metric"><div class="v">32万</div><div class="k">月调用量</div></div><div class="metric"><div class="v">67%</div><div class="k">业务自助率</div></div><div class="metric"><div class="v">-35%</div><div class="k">Token 成本</div></div></div>
+          <div class="more">接入 <b>12 业务线</b> · 孵化 <b>28 Agent</b> · 年省人力约 <b>50 万</b></div>
         </div>
       </div>
 
@@ -533,17 +572,18 @@
         <div class="banner">
           <span class="cat">辅助决策</span>
           <img loading="lazy" src="assets/img/banner-3.png" alt="AI 辅助决策助手">
+          <div class="project-signal"><div><div class="k">Decision Pack</div><div class="v">历史案例 + 风险预警 + SOP 核查</div></div><div class="r">Human Decide</div></div>
         </div>
         <div class="pad">
           <h3>AI 辅助决策助手</h3><div class="pr">产品负责人 · 2025.08 — 至今</div>
-          <p>赛事筹备全链路决策智能体。15 个垂直领域专家 SOP 知识资产化，「智能核查 + 辅助决策」双能力。</p>
+          <p>面向在岗 PM 的实时辅助决策系统，AI 不替人拍板，只输出可复核的决策拆解包。</p>
           <div class="case-layers">
             <div class="case-layer"><div class="l">Problem</div><div class="v">复杂筹备决策易遗漏</div></div>
-            <div class="case-layer"><div class="l">AI Move</div><div class="v">专家 SOP 资产化核查</div></div>
+            <div class="case-layer"><div class="l">AI Move</div><div class="v">15 SOP 节点 + 决策卡片</div></div>
             <div class="case-layer"><div class="l">Evidence</div><div class="v">单赛避损 20 万</div></div>
           </div>
           <div class="metrics"><div class="metric"><div class="v">10min</div><div class="k">决策耗时(原2h)</div></div><div class="metric"><div class="v">6%</div><div class="k">出错率(原18%)</div></div><div class="metric"><div class="v">20万</div><div class="k">单赛避损</div></div></div>
-          <div class="more">以 <b>ICF 超级杯</b> 为例，拦截高风险错误决策</div>
+          <div class="more">3 个月重构上线 · 以 <b>ICF 超级杯</b> 为例，开赛前 48h 辅助 PM 快速改方案</div>
         </div>
       </div>
 
@@ -551,10 +591,11 @@
         <div class="banner">
           <span class="cat">C 端 · 独立 0→1</span>
           <img loading="lazy" src="assets/img/banner-4.png" alt="拾胶 SHIJIAO">
+          <div class="project-signal"><div><div class="k">Solo Build</div><div class="v">拍照识碟 + RAG 讲解 + 藏品记录</div></div><div class="r">Demo</div></div>
         </div>
         <div class="pad">
           <h3>拾胶 SHIJIAO</h3><div class="pr">项目负责人 · 2026.04 — 至今 · 独立孵化</div>
-          <p>面向 Z 世代的 AI 黑胶唱片鉴赏小程序，「拍照识碟 + AI 讲解 + 藏品记录」。从用户调研、竞品 / BRD / MRD / PRD 到 RAG 内容体系与可演示 Demo 全链路独立操盘。</p>
+          <p>面向 Z 世代的 AI 黑胶唱片鉴赏小程序，从用户调研、PRD、RAG 内容体系到可演示 Demo 独立操盘。</p>
           <div class="case-layers">
             <div class="case-layer"><div class="l">Problem</div><div class="v">黑胶知识门槛高</div></div>
             <div class="case-layer"><div class="l">AI Move</div><div class="v">识碟 + RAG 讲解</div></div>
