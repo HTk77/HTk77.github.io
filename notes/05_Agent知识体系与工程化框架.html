@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 知识体系与工程化框架 · 鲁云庚</title>
+<style>
+  :root{
+    --bg:#08090a;--panel:#0f1011;--card:rgba(255,255,255,.028);--card2:rgba(255,255,255,.045);
+    --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.05);
+    --text:#f7f8f8;--text2:#d0d6e0;--muted:#8a8f98;--faint:#62666d;
+    --violet:#7170ff;--indigo:#5e6ad2;--cyan:#22d3ee;--green:#10b981;--amber:#f59e0b;--rose:#fb7185;
+    --max:1180px;--mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --ease:cubic-bezier(0,0,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(820px 520px at 74% -8%,rgba(113,112,255,.16),transparent 64%),
+    radial-gradient(660px 460px at 8% 28%,rgba(34,211,238,.06),transparent 62%),
+    radial-gradient(720px 520px at 84% 92%,rgba(245,158,11,.045),transparent 62%),var(--bg)}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;opacity:.028;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  a{color:inherit;text-decoration:none}.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+  .progress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));z-index:100}
+  nav{position:fixed;top:0;left:0;right:0;z-index:90;background:rgba(8,9,10,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line2)}
+  .nav-in{max-width:var(--max);margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-weight:590;letter-spacing:-.2px}.logo span{font-family:var(--mono);color:var(--muted);font-size:12px;margin-left:6px}
+  .nav-links{display:flex;gap:18px;font-size:13px;color:var(--muted)}.nav-links a{position:relative;transition:color .16s var(--ease)}.nav-links a:hover,.nav-links a.active{color:var(--text)}
+  .nav-links a.active::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:1px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+  header{min-height:92vh;display:flex;align-items:center;padding:132px 0 86px;position:relative}
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .eyebrow{font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px}
+  h1{font-size:clamp(46px,7vw,86px);line-height:.98;font-weight:620;letter-spacing:-2.4px;margin-bottom:24px}
+  .gradient{background:linear-gradient(135deg,#fff 8%,var(--cyan) 42%,var(--violet) 82%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{font-size:18px;color:var(--text2);max-width:680px;line-height:1.8;margin-bottom:30px}.lede b{color:var(--text);font-weight:590}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px}.pill{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-family:var(--mono);font-size:12px;color:var(--text2)}
+  .hero-board{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.018));border-radius:18px;padding:18px;box-shadow:0 28px 80px rgba(0,0,0,.28)}
+  .board-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.board-card{border:1px solid var(--line2);background:rgba(0,0,0,.2);border-radius:12px;padding:20px;min-height:136px;position:relative;overflow:hidden}
+  .board-card::before{content:"";position:absolute;inset:auto -20% -40% -20%;height:90px;background:radial-gradient(ellipse at center,rgba(113,112,255,.2),transparent 65%)}
+  .board-k{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em}.board-v{font-size:34px;font-weight:620;line-height:1;margin:18px 0 8px}.board-d{font-size:13px;color:var(--muted);line-height:1.45}
+  section{padding:96px 0;border-top:1px solid var(--line2)}.section-head{margin-bottom:42px}.section-head h2{font-size:clamp(30px,4vw,48px);line-height:1.08;font-weight:590;letter-spacing:-1px;margin-bottom:14px}.section-head p{font-size:16px;color:var(--muted);max-width:760px}
+  .grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  .card{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:26px;position:relative;overflow:hidden;transition:transform .18s var(--ease),background .18s var(--ease),border-color .18s var(--ease)}
+  .card:hover{transform:translateY(-3px);background:rgba(255,255,255,.052);border-color:rgba(255,255,255,.14)}
+  .num{font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}.card h3{font-size:21px;line-height:1.25;margin-bottom:8px;font-weight:590}.card p{color:var(--muted);font-size:14.5px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}.tag{font-family:var(--mono);font-size:11px;color:var(--text2);border:1px solid var(--line2);background:rgba(255,255,255,.03);border-radius:999px;padding:4px 8px}
+  .lane{display:grid;grid-template-columns:170px 1fr;gap:22px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:24px;margin-bottom:14px}.lane .k{font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:.1em;text-transform:uppercase}.lane h3{font-size:22px;margin-bottom:6px}.lane p{color:var(--muted)}
+  .matrix{display:grid;grid-template-columns:1.1fr repeat(3,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden}.matrix>div{padding:16px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);background:rgba(255,255,255,.024)}.matrix>div:nth-child(4n){border-right:0}.matrix .head{font-family:var(--mono);font-size:12px;color:var(--violet);text-transform:uppercase}.matrix .rowh{font-weight:590;color:var(--text)}.matrix .cell{font-size:14px;color:var(--muted)}
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.step{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:20px;min-height:170px}.step b{display:block;color:var(--text);font-size:18px;margin:10px 0 8px}.step span{font-family:var(--mono);font-size:11px;color:var(--violet)}
+  .callout{border:1px solid rgba(113,112,255,.22);border-left:3px solid var(--violet);background:rgba(113,112,255,.055);border-radius:12px;padding:22px 24px;margin-top:24px}.callout .label{font-family:var(--mono);font-size:11px;color:var(--violet);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}.callout p{color:var(--text2)}
+  .source-list{display:grid;gap:10px}.source-list a{display:flex;justify-content:space-between;gap:18px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:16px 18px;color:var(--text2);transition:background .16s var(--ease)}.source-list a:hover{background:var(--card2)}.source-list span{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s var(--ease),transform .55s var(--ease)}.reveal.in{opacity:1;transform:none}
+  footer{padding:34px 0;color:var(--faint);font-family:var(--mono);font-size:12px;text-align:center;border-top:1px solid var(--line2)}
+  @media(max-width:920px){.hero,.g2,.g3,.g4,.flow{grid-template-columns:1fr}.hero-board{max-width:560px}.board-grid{grid-template-columns:1fr 1fr}.lane{grid-template-columns:1fr}.matrix{grid-template-columns:1fr}.matrix>div{border-right:0}.nav-links{display:none}}
+  @media(max-width:560px){.wrap,.nav-in{padding-left:20px;padding-right:20px}.board-grid{grid-template-columns:1fr}section{padding:72px 0}.source-list a{flex-direction:column}.hero-meta{gap:8px}}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal,.card{transition:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<nav>
+  <div class="nav-in">
+    <a class="logo" href="../index.html#notes">鲁云庚<span>/ Agent Note</span></a>
+    <div class="nav-links">
+      <a href="#definition">定义</a>
+      <a href="#architecture">架构</a>
+      <a href="#tooling">工具</a>
+      <a href="#delivery">落地</a>
+      <a href="#glossary">术语</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow reveal">AI Product Manager · Knowledge Asset</div>
+      <h1 class="reveal">Agent 知识体系<br><span class="gradient">与工程化框架</span></h1>
+      <p class="lede reveal">这不是“某节课的摘录”，而是我对 Agent 产品化的结构化沉淀：从定义、架构、记忆、工具调用，到评估、守护、人机协同与上线治理。核心判断是：<b>Agent 不是更会聊天的模型，而是能在边界内持续完成任务的系统。</b></p>
+      <div class="hero-meta reveal">
+        <span class="pill">Agent Architecture</span>
+        <span class="pill">RAG / Memory</span>
+        <span class="pill">MCP / Tools</span>
+        <span class="pill">Evals / Guardrails</span>
+      </div>
+    </div>
+    <div class="hero-board reveal">
+      <div class="board-grid">
+        <div class="board-card"><div class="board-k">Core</div><div class="board-v">6</div><div class="board-d">模型、指令、工具、记忆、编排、守护</div></div>
+        <div class="board-card"><div class="board-k">Loop</div><div class="board-v">O-P-A</div><div class="board-d">Observe / Plan / Act 持续闭环</div></div>
+        <div class="board-card"><div class="board-k">Risk</div><div class="board-v">HITL</div><div class="board-d">高风险动作进入人工审批</div></div>
+        <div class="board-card"><div class="board-k">Quality</div><div class="board-v">Trace</div><div class="board-d">用轨迹、数据集和评测驱动迭代</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="definition">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">01 · Definition</div>
+      <h2>先把 Agent 定义清楚：它是一个可运行工作流单元</h2>
+      <p>一个专业的 Agent 不应只被描述成“会自主思考”。在工程语境里，它更像一个封装好的运行单元：模型负责推理，指令定义边界，工具连接外部系统，记忆提供状态，守护负责风险控制，评估负责持续改进。</p>
+    </div>
+    <div class="grid g3">
+      <div class="card reveal"><div class="num">Model</div><h3>推理内核</h3><p>决定理解、生成、工具选择与复杂任务分解能力。模型越强，并不自动等于 Agent 越可靠，还需要边界、工具和评估体系。</p><div class="tags"><span class="tag">Reasoning</span><span class="tag">Latency</span><span class="tag">Cost</span></div></div>
+      <div class="card reveal"><div class="num">Instructions</div><h3>角色与约束</h3><p>定义 Agent 的任务、禁止事项、输出格式、判断标准和交互风格。它是产品需求在运行时的具体化。</p><div class="tags"><span class="tag">Role</span><span class="tag">Policy</span><span class="tag">Output Type</span></div></div>
+      <div class="card reveal"><div class="num">Tools</div><h3>行动能力</h3><p>通过 Function Calling、MCP、浏览器、数据库、搜索或内部 API，让模型可以获取新信息或触发动作。</p><div class="tags"><span class="tag">Schema</span><span class="tag">MCP</span><span class="tag">API</span></div></div>
+      <div class="card reveal"><div class="num">Memory</div><h3>状态连续性</h3><p>短期记忆维持当前上下文，长期记忆沉淀用户偏好和业务知识，情景记忆记录任务过程与关键决策。</p><div class="tags"><span class="tag">Context</span><span class="tag">RAG</span><span class="tag">Profile</span></div></div>
+      <div class="card reveal"><div class="num">Orchestration</div><h3>编排与移交</h3><p>单 Agent 适合边界清晰任务；多 Agent 适合专业分工。关键选择是“谁拥有最终答案”，以及何时移交。</p><div class="tags"><span class="tag">Handoff</span><span class="tag">Manager</span><span class="tag">Routing</span></div></div>
+      <div class="card reveal"><div class="num">Guardrails</div><h3>质量与安全边界</h3><p>输入、输出、工具参数和高风险动作都应有检查机制。敏感动作需要人审，而不是让模型自由执行。</p><div class="tags"><span class="tag">Validation</span><span class="tag">Approval</span><span class="tag">Audit</span></div></div>
+    </div>
+    <div class="callout reveal"><div class="label">Product View</div><p>产品经理看 Agent，不应只看“能不能回答”，而要看它是否能在明确边界内稳定完成任务：任务成功率、工具选择正确率、人工介入率、错误恢复能力和可追溯性，才是能否上线的判断标准。</p></div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">02 · Architecture</div>
+      <h2>从“能力清单”到“系统架构”：Agent 的六层拆解</h2>
+      <p>原笔记里的“记忆、规划、工具、执行”是好的骨架，但还不够工程化。真正可上线的 Agent 需要把上下文、工具、运行时、评估和治理放进同一张图里。</p>
+    </div>
+    <div class="lane reveal"><div class="k">Layer 01</div><div><h3>目标层：任务、边界与成功定义</h3><p>先定义任务输入、输出、失败条件、不可做事项、成功标准。没有清晰目标，后面的模型和工具都会变成“炫技”。</p></div></div>
+    <div class="lane reveal"><div class="k">Layer 02</div><div><h3>上下文层：短期上下文 + 长期知识</h3><p>短期上下文解决当前对话连续性；长期知识通过 RAG、文件检索、用户画像或业务数据库提供事实依据。</p></div></div>
+    <div class="lane reveal"><div class="k">Layer 03</div><div><h3>推理层：计划、分解、选择与反思</h3><p>让模型把目标拆成步骤，决定是否需要工具，观察工具结果，再调整计划。复杂任务需要限制步数、预算和重试策略。</p></div></div>
+    <div class="lane reveal"><div class="k">Layer 04</div><div><h3>工具层：函数、MCP、工作流与外部系统</h3><p>工具描述要足够清楚，参数要结构化，结果要可校验。工具越多，越需要检索、分组和权限控制。</p></div></div>
+    <div class="lane reveal"><div class="k">Layer 05</div><div><h3>控制层：Guardrails、人审与权限</h3><p>输入过滤、输出校验、工具调用前后检查、敏感动作审批，是 Agent 从 Demo 走向生产的分水岭。</p></div></div>
+    <div class="lane reveal"><div class="k">Layer 06</div><div><h3>评估层：Trace、数据集、回归测试</h3><p>不要靠主观体验判断 Agent 好坏。要用轨迹记录、人工标注、评测集和线上反馈，持续发现失败模式。</p></div></div>
+  </div>
+</section>
+
+<section id="memory">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">03 · Memory</div>
+      <h2>记忆不是“把资料塞进向量库”，而是上下文治理</h2>
+      <p>长期记忆的核心难点不是存储，而是“何时写入、写什么、如何召回、如何防止污染”。RAG 是常见方案，但不是所有记忆问题都应该用 RAG 解决。</p>
+    </div>
+    <div class="matrix reveal">
+      <div class="head">Memory Type</div><div class="head">解决问题</div><div class="head">典型实现</div><div class="head">风险点</div>
+      <div class="rowh">短期记忆</div><div class="cell">维持当前任务上下文</div><div class="cell">Context Window / Conversation State</div><div class="cell">上下文过长导致噪声、成本和遗忘</div>
+      <div class="rowh">长期知识</div><div class="cell">补充模型训练外事实</div><div class="cell">RAG / File Search / DB Query</div><div class="cell">分块不佳、召回偏差、来源不可信</div>
+      <div class="rowh">用户记忆</div><div class="cell">沉淀偏好、历史选择和个人状态</div><div class="cell">Profile Store / Preference Memory</div><div class="cell">隐私、过期信息、错误偏好固化</div>
+      <div class="rowh">过程记忆</div><div class="cell">记录任务步骤、工具结果和决策</div><div class="cell">Trace / Event Log / Episodic Memory</div><div class="cell">轨迹膨胀、不可解释或难复盘</div>
+    </div>
+    <div class="callout reveal"><div class="label">RAG Design Checklist</div><p>面向 Agent 的 RAG 需要额外关注：查询改写、混合检索、重排、引用来源、答案置信度、失败兜底，以及工具结果是否能进入下一轮规划。</p></div>
+  </div>
+</section>
+
+<section id="tooling">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">04 · Tools & MCP</div>
+      <h2>工具调用的关键不是“能调”，而是“可发现、可校验、可治理”</h2>
+      <p>Function Calling 把工具调用结构化，MCP 进一步把工具、资源、提示词等能力以协议方式暴露出来。工具生态越开放，越要补上权限、确认、日志和异常处理。</p>
+    </div>
+    <div class="flow">
+      <div class="step reveal"><span>Step 01</span><b>工具发现</b><p>Agent 需要知道有哪些工具、何时使用、需要什么参数。</p></div>
+      <div class="step reveal"><span>Step 02</span><b>参数生成</b><p>模型按 JSON Schema 或工具协议生成结构化参数。</p></div>
+      <div class="step reveal"><span>Step 03</span><b>调用执行</b><p>运行时调用外部 API、MCP Server、数据库或工作流。</p></div>
+      <div class="step reveal"><span>Step 04</span><b>结果观察</b><p>工具结果进入上下文，供模型继续判断、追问或下一步行动。</p></div>
+      <div class="step reveal"><span>Step 05</span><b>验证收口</b><p>对结果做格式、事实、权限和副作用检查，必要时人审。</p></div>
+    </div>
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card reveal"><div class="num">Function Calling</div><h3>单平台工具标准化</h3><p>适合应用内少量稳定工具。重点是 schema、工具描述、错误返回和二次确认。</p></div>
+      <div class="card reveal"><div class="num">MCP</div><h3>跨平台能力复用</h3><p>通过客户端与服务器的能力协商、工具列表和工具调用，使同一能力被不同 AI 应用复用。</p></div>
+      <div class="card reveal"><div class="num">Tool Search</div><h3>大规模工具检索</h3><p>当工具数量很大时，不应一次塞给模型，而应按需求动态检索和加载候选工具。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="orchestration">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">05 · Orchestration</div>
+      <h2>单 Agent、Manager、Handoff：先选组织形态，再谈智能</h2>
+      <p>多 Agent 不是越多越高级。只有当任务需要不同角色、不同工具权限、不同审批策略或不同输出责任时，才值得拆成多 Agent。</p>
+    </div>
+    <div class="grid g3">
+      <div class="card reveal"><div class="num">Pattern A</div><h3>单 Agent</h3><p>适合边界清晰、工具少、风险低的任务。优点是链路短、延迟低；缺点是复杂任务容易失控。</p><div class="tags"><span class="tag">FAQ</span><span class="tag">轻量工作流</span></div></div>
+      <div class="card reveal"><div class="num">Pattern B</div><h3>Manager 调用专家</h3><p>一个主 Agent 保持最终答复权，把专家 Agent 当工具调用。适合需要统一口径的复合任务。</p><div class="tags"><span class="tag">Supervisor</span><span class="tag">Agents as Tools</span></div></div>
+      <div class="card reveal"><div class="num">Pattern C</div><h3>Handoff 移交</h3><p>当某个专家需要接管对话或完整任务分支时使用。关键是移交条件、上下文摘要和责任边界。</p><div class="tags"><span class="tag">Delegate</span><span class="tag">Ownership</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="delivery">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">06 · Delivery</div>
+      <h2>Agent 产品上线，应该按“闭环质量”而不是“演示效果”验收</h2>
+      <p>真正的交付不是做出一次惊艳 Demo，而是让系统在大量真实输入下稳定工作，并且失败时可解释、可恢复、可追责。</p>
+    </div>
+    <div class="grid g4">
+      <div class="card reveal"><div class="num">01</div><h3>任务定义</h3><p>明确用户、场景、输入、输出、成功标准、禁止行为和升级路径。</p></div>
+      <div class="card reveal"><div class="num">02</div><h3>最小工具面</h3><p>只暴露完成任务必需的工具，先做少而稳，再扩展能力面。</p></div>
+      <div class="card reveal"><div class="num">03</div><h3>评测集</h3><p>沉淀黄金样本、边界样本、坏例样本，用数据集跑回归。</p></div>
+      <div class="card reveal"><div class="num">04</div><h3>Trace 复盘</h3><p>记录模型调用、工具调用、移交、守护和最终输出，用轨迹定位失败原因。</p></div>
+      <div class="card reveal"><div class="num">05</div><h3>Guardrails</h3><p>输入、输出和工具调用都要校验；敏感动作必须进入人工审批。</p></div>
+      <div class="card reveal"><div class="num">06</div><h3>灰度上线</h3><p>先在低风险场景上线，观察成功率、人工介入率、失败类型和成本。</p></div>
+      <div class="card reveal"><div class="num">07</div><h3>反馈闭环</h3><p>把线上失败样本回流到评测集、提示词、工具描述和业务规则。</p></div>
+      <div class="card reveal"><div class="num">08</div><h3>治理机制</h3><p>沉淀权限、审计、版本管理、模型回滚和数据安全机制。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="glossary">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">07 · Glossary</div>
+      <h2>术语表：保留通用概念，去掉个案痕迹</h2>
+      <p>术语表从“课堂速记”调整为面向项目沟通和面试表达的专业词汇表。</p>
+    </div>
+    <div class="matrix reveal">
+      <div class="head">中文</div><div class="head">英文</div><div class="head">产品含义</div><div class="head">关注点</div>
+      <div class="rowh">智能体</div><div class="cell">Agent</div><div class="cell">封装模型、指令、工具、记忆和控制策略的任务执行单元</div><div class="cell">目标边界、工具权限、评估</div>
+      <div class="rowh">函数调用</div><div class="cell">Function Calling</div><div class="cell">模型按结构化 schema 请求外部功能或数据</div><div class="cell">参数校验、错误处理</div>
+      <div class="rowh">模型上下文协议</div><div class="cell">MCP</div><div class="cell">用于连接 AI 应用与外部工具、资源、提示词的开放协议</div><div class="cell">能力发现、权限、审计</div>
+      <div class="rowh">检索增强生成</div><div class="cell">RAG</div><div class="cell">从外部知识源检索内容并注入上下文辅助回答</div><div class="cell">分块、召回、重排、引用</div>
+      <div class="rowh">移交</div><div class="cell">Handoff</div><div class="cell">把任务或对话控制权交给另一个专门 Agent</div><div class="cell">移交条件、上下文压缩</div>
+      <div class="rowh">人机协同</div><div class="cell">Human-in-the-loop</div><div class="cell">在高风险或低置信动作前让人批准、修改或拒绝</div><div class="cell">审批体验、责任链路</div>
+      <div class="rowh">守护机制</div><div class="cell">Guardrails</div><div class="cell">自动检查输入、输出、工具参数或执行结果的控制层</div><div class="cell">误杀率、漏放率、延迟</div>
+      <div class="rowh">轨迹</div><div class="cell">Trace</div><div class="cell">记录一次 Agent 运行中的模型、工具、移交和守护事件</div><div class="cell">复盘、评测、审计</div>
+    </div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">08 · References</div>
+      <h2>参考来源</h2>
+      <p>内容参考官方文档与一手资料后重新整理为个人知识沉淀，页面中的判断和表达已转化为产品经理视角。</p>
+    </div>
+    <div class="source-list reveal">
+      <a href="https://developers.openai.com/api/docs/guides/agents/define-agents" target="_blank" rel="noopener">OpenAI Agents SDK · Agent definitions<span>agent / tools / handoffs</span></a>
+      <a href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI Function Calling Guide<span>tool calling / schema</span></a>
+      <a href="https://developers.openai.com/api/docs/guides/agents/guardrails-approvals" target="_blank" rel="noopener">OpenAI Guardrails and Human Review<span>guardrails / approvals</span></a>
+      <a href="https://developers.openai.com/api/docs/guides/agent-evals" target="_blank" rel="noopener">OpenAI Evaluate Agent Workflows<span>traces / graders / evals</span></a>
+      <a href="https://modelcontextprotocol.io/docs/learn/architecture" target="_blank" rel="noopener">Model Context Protocol · Architecture<span>MCP / tools / resources</span></a>
+      <a href="https://adk.dev/" target="_blank" rel="noopener">Google Agent Development Kit<span>production agents</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Agent Knowledge System · Personal knowledge asset · Updated 2026</div>
+</footer>
+
+<script>
+  const progress=document.getElementById('progress');
+  const navLinks=[...document.querySelectorAll('.nav-links a')];
+  const sections=[...document.querySelectorAll('section[id]')];
+  const revealEls=[...document.querySelectorAll('.reveal')];
+  const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.15});
+  revealEls.forEach((el,i)=>{el.style.transitionDelay=Math.min(i%6*45,180)+'ms';io.observe(el)});
+  const spy=new IntersectionObserver(entries=>entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));
+  }),{rootMargin:'-35% 0px -55% 0px',threshold:0});
+  sections.forEach(s=>spy.observe(s));
+  addEventListener('scroll',()=>{
+    const max=document.documentElement.scrollHeight-innerHeight;
+    progress.style.width=(max>0?scrollY/max*100:0)+'%';
+  },{passive:true});
+</script>
+</body>
+</html>
